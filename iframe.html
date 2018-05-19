@@ -1,0 +1,18 @@
+<html>
+
+<head></head>
+
+<body>
+    <div>is body</div>
+    <iframe name='iframe' src="./bothwaybind.html" frameborder="0">
+
+    </iframe>
+    <script>
+        window.onload = () => {
+            let idoc = window.frames['iframe'].document
+            console.log(idoc.body.innerHTML)
+        }
+    </script>
+</body>
+
+</html>

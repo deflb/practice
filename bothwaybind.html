@@ -1,0 +1,115 @@
+<html>
+
+<head></head>
+
+<body>
+    <div id='root'>
+        <input type="text" v-model='value'>
+        <input type="text" v-model='value'>
+        <div>
+            <input type="text" v-model='value'>
+        </div>
+        <button v-bind='addHandle'>add</button>
+        <div v-text='value'></div>
+    </div>
+</body>
+<script>
+    function isObject(val) {
+        return val !== null && typeof val === 'object'
+    }
+    function hasOwnProperty(obj, key) {
+        return obj.hasOwnProperty(key)
+    }
+    window.onload = () => {
+        console.log(window.top)
+        function v(options) {
+            this.init(options)
+        }
+        v.prototype.init = function (...props) {
+            let { el, data, methods } = props[0]
+            this.el = el;
+            this.data = data;
+            this.methods = methods;
+
+            this.compile(this.el)
+            this.obverse(this.data)
+        }
+
+        v.prototype.obverse = function (obj) {
+            let value, that = this;
+            for (let key in obj) {
+                if (hasOwnProperty(obj, key)) {
+                    value = obj[key]
+                    isObject(value) && this.observe(value)
+                    Object.defineProperty(obj, key, {
+                        enumerable: true,
+                        configurable: true,
+                        get() {
+                            return value
+                        },
+                        set(newValue) {
+                            if (value !== newValue) {
+                                value = newValue
+                                // 直接更新肯定会有性能问题 等于重新深度遍历一遍dom -- thinking someWay to handle
+                                that.compile(that.el)
+                            }
+                        }
+                    })
+                }
+            }
+        }
+
+        v.prototype.compile = function (root) {
+            let rootEle = root.nodeType === 1 ? root : document.querySelector(root), child = rootEle.childNodes
+            child.forEach((item, index) => {
+                item.childNodes.length && this.compile(item)
+                if (item.nodeType === 1) {
+                    let attr
+                    if (item.hasAttribute('v-model') && item.nodeName === 'INPUT') {
+                        attr = item.getAttribute('v-model')
+                        item.addEventListener('input', (e) => {
+                            this.data[attr] = Number(e.target.value)
+                        })
+                        new updateView(item, 'value', this, attr)
+                    }
+                    if (item.hasAttribute('v-bind')) {
+                        attr = item.getAttribute('v-bind')
+                        item.onclick = this.methods[attr].bind(this)
+                    }
+                    if (item.hasAttribute('v-text')) {
+                        attr = item.getAttribute('v-text')
+                        new updateView(item, 'textContent', this, attr)
+                    }
+                }
+            })
+        }
+
+        function updateView(el, way, examples, attr) {
+            this.el = el;
+            this.way = way;
+            this.examples = examples // 实例
+            this.attr = attr;
+
+            this.init()
+        }
+
+        updateView.prototype.init = function () {
+            this.el[this.way] = this.examples.data[this.attr]
+        }
+
+        new v({
+            el: '#root',
+            data: {
+                value: 0,
+            },
+            methods: {
+                addHandle() {
+                    this.data.value++;
+                }
+            }
+        })
+    }
+
+</script>
+
+</html>

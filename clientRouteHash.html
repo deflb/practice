@@ -1,0 +1,29 @@
+<html>
+
+<body>
+    <a href="#page1">进入page1</a>
+    <a href="#page2">进入page2</a>
+    <div id='app'></div>
+    <script>
+        var wd = window || global
+        wd.onload = function () {
+            var app = document.getElementById('app')
+            function hashHandle(hash) {
+                switch (hash) {
+                    case '#page1':
+                        app.innerText = 'is page1'
+                        break;
+                    case '#page2':
+                        app.innerText = 'is page2'
+                        break;
+                }
+            }
+            hashHandle(location.hash)
+            wd.onhashchange = function (e) {
+                hashHandle(e.target.location.hash)
+            }
+        }
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,59 @@
+<html>
+
+<head></head>
+
+<body>
+    <div id='root'></div>
+    <div class='wrapper'></div>
+    <div class='wrapper'></div>
+    <div class='fade'>fade</div>
+    <div class='footer'></div>
+    <button id="btn">点我</button>
+
+    <script src="./myJq.js"></script>
+    <script>
+        $(document).ready(() => {
+            console.log('dom is ready')
+            $('#root').text('is div').attr('style', 'color: red')
+            $('.footer').text('is div 2')
+            $('.wrapper').each((item, index) => {
+                $(item).html(`<a>aaa${index}</a>`)
+            })
+
+            $('#btn').click((e) => {
+                let footer = $('.footer')
+                let showFlag = $('.footer').attr('showFlag')
+                if (showFlag === null || showFlag !== 'true') {
+                    $('.fade').fadeOut(1000);
+                    footer.attr('showFlag', true).hide();
+                }else{
+                    $('.fade').fadeIn(1000);
+                    footer.attr('showFlag', false).show();
+                }
+            })
+
+            $.format()
+            $.each([1, 2, 3], (item, index) => {
+                console.log(item)
+            })
+
+            $.a = function () { // 扩展到 类中
+                console.log('is extends a')
+            }
+            // 调用
+            $.a()
+
+            $.extends.b = function () { // 扩展到 $原型
+                console.log(this)
+            }
+            // 调用
+            $('.footer').b()
+        })
+
+        $(function () { // 等价于 $(document).ready()
+            console.log('dom is readyssss')
+        })
+    </script>
+</body>
+
+</html>

@@ -1,0 +1,25 @@
+<html lang='zh-cn'>
+<head>
+    <meta charset="utf-8"/>
+</head>
+<body>
+    <span id='btn' draggable="true">拖我</span>
+    <div id='box' style='width: 100px; height: 100px; background-color: #ddd;'></div>
+</body>
+<script>
+    if(document.readyState === 'complete')
+        console.log('dom is loaded')
+    window.onload = () => {
+        console.log('all is loaded')
+        var btn = document.getElementById('btn'),
+            box = document.getElementById('box');
+        btn.ondragstart = (e) => {e.dataTransfer.setData('data', 'aaa')}
+        box.addEventListener('drop', (e) => {console.log(e.dataTransfer.getData('data'), e.target.style.backgroundColor = '#ddd')})
+        box.addEventListener('dragover', (e) => {e.preventDefault()})    
+        // box.addEventListener('dragend', (e) => {console.log(e)})    
+        box.addEventListener('dragenter', (e) => {console.log(e.target.style.backgroundColor = '#fff')})    
+    }
+
+</script>
+
+</html>

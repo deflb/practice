@@ -1,0 +1,34 @@
+<html>
+
+<head></head>
+
+<body>
+    <button name='btn'>full screen</button>
+    <form id='form'>
+        <input type="text" name='a'>
+        <input type="text" name='b'>
+        <input type="file" name='c'>
+        <textarea name="d" id="" cols="30" rows="10"></textarea>
+        <input type="checkbox" name='e'>
+        <input type="radio" name='f'>
+        <button id='formSubBtn'>submit</button>
+    </form>
+</body>
+<script src="./weapon.js"></script>
+<script>
+    window.onload = () => {
+        let btn = document.querySelector("[name='btn']"),flag = true; 
+        btn.onclick = () => { 
+            flag ? weapon.fullScreen() : weapon.exitScreen(); flag = !flag 
+        }
+        console.log(weapon.formatDateTime(new Date()))
+        console.log(weapon.getusermediainfo())
+        let subBtn = document.getElementById('formSubBtn');
+        subBtn.onclick = (e) => {
+            e.preventDefault();
+            console.log(weapon.serialize('#form'))
+        }
+    }
+</script>
+
+</html>

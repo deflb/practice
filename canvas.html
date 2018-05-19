@@ -1,0 +1,55 @@
+<html style='width: 100%; height: 100%'>
+
+<head>
+
+</head>
+
+<body style='width: 100%; height: 100%; margin: 0; padding: 0;'>
+    <canvas id='canvas'></canvas>
+</body>
+<script>
+    window.onload = () => {
+        let canvas = document.getElementById('canvas'),
+            draw2d = canvas.getContext('2d'), angle = 0;
+        console.dir(draw2d);
+
+        // let timeId = setInterval(() => {
+        //     angle += 10
+        //     draw2d.save()
+        //     draw2d.translate(75, 75)
+        //     draw2d.rotate(angle * Math.PI / 180)
+        //     draw2d.strokeRect(-25, -25, 50, 50)
+        //     draw2d.restore()
+        //     if(angle >= 360) {
+        //         clearInterval(timeId)
+        //     }
+        // }, 1000)
+
+        // let timeId = setInterval(() => {
+        //     angle += 20
+        //     draw2d.beginPath()
+        //     draw2d.arc(50, 50, 25, angle * Math.PI / 180, (angle + 10) * Math.PI / 180)
+        //     draw2d.lineWidth = 4
+        //     draw2d.strokeStyle = 'green'
+        //     draw2d.stroke()
+        //     draw2d.closePath()
+        //     if(angle >= 360) {
+        //         clearInterval(timeId)
+        //     }
+        // }, 200)
+
+        // draw2d.lineWidth = 4
+        draw2d.beginPath()
+        draw2d.moveTo(20, 20)
+        draw2d.lineTo(60, 130)
+        draw2d.lineTo(100, 70)
+        draw2d.lineTo(140, 100)
+        draw2d.lineTo(180, 50)
+        // draw2d.closePath()
+        draw2d.stroke()
+
+    }
+
+</script>
+
+</html>

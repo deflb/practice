@@ -1,0 +1,22 @@
+<html>
+
+<body>
+    <!-- history模式 需要后端配合加以处理 -->
+    <button onclick="enterPage1()">page1</button>
+    <button onclick="enterPage2()">page2</button>
+    <div id='root'></div>
+</body>
+<script>
+    let root = document.getElementById('root')
+    let enterPage1 = () => {
+        history.pushState(null, null, 'page1')
+        root.innerText('page1')
+    }
+    let enterPage2 = () => {
+        history.pushState(null, null, 'page2')
+        root.innerText('page2')
+    }
+
+</script>
+
+</html>

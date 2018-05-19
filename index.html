@@ -1,0 +1,28 @@
+<html>
+<header></header>
+
+<body>
+
+</body>
+<script id='script'>
+    var loop = () => {
+        setTimeout(() => {
+            loop()
+        }, 3000)
+        self.postMessage(1, '*')
+    }
+    loop()
+</script>
+<script>
+    var workstr = document.getElementById('script').textContent,
+        workBlob = new Blob([workstr]),
+        workurl = window.URL.createObjectURL(workBlob)
+    work = new Worker(workurl)
+
+    work.onmessage = (event) => {
+        console.log(event.data)
+    }
+
+</script>
+
+</html>

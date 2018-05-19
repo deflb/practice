@@ -1,0 +1,60 @@
+<html>
+
+<head></head>
+
+<body>
+    <input value="" id="input">
+    <script>
+        window.onload = () => {
+            function format(ele) {
+                this.ele = ele
+                this.oldvalue = ''
+                this.init()
+            }
+            format.prototype.init = function () {
+                this.ele.addEventListener('input', (e) => {
+                    this.judge(e.target.value)
+                })
+                this.ele.addEventListener('blur', (e) => {
+                    this.complete()
+                })
+            }
+            format.prototype.judge = function (value) {
+                let reg = /(^0(\.\d{0,2})?$)|(^[1-9]\d*(\.\d{0,2})?$)/;
+                if (reg.test(value) || value === '') {
+                    this.oldvalue = value;
+                } else
+                    this.ele.value = this.oldvalue
+            }
+            format.prototype.complete = function () {
+                // let endDotTwoNumber = /\.\d{2}$/, endDotOneNumber = /\.\d{1}$/, endDot = /\.[^\d]?$/, endNumber = /^\d$/;
+                // if (endDotTwoNumber.test(value))
+                //     return;
+                // if (endDotOneNumber.test(value)) {
+                //     this.oldvalue = value + '0'
+                //     this.ele.value = value + '0'
+                // }
+                // if (endDot.test(value)) {
+                //     this.oldvalue = value + '00'
+                //     this.ele.value = value + '00'
+                // }
+                // if (endNumber.test(value)) {
+                //     this.oldvalue = value + '.00'
+                //     this.ele.value = value + '.00'
+                // }
+                // 上述正则判断补全太麻烦
+                if (this.oldvalue !== '') { //空 不补全
+                    let _completeV = Number(this.oldvalue).toFixed(2)
+                    this.oldvalue = _completeV
+                    this.ele.value = _completeV
+                }
+            }
+
+            let inputEle = document.getElementById('input');
+            new format(inputEle)
+
+        }
+    </script>
+</body>
+
+</html>

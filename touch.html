@@ -1,0 +1,236 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+            font-size: 14px;
+            text-align: center;
+        }
+
+        header,
+        footer {
+            height: 1rem
+        }
+
+        section {
+            flex: 1;
+            position: relative;
+            overflow: hidden;
+            border-top: 0.02rem solid #ddd;
+            border-bottom: 0.02rem solid #ddd;
+        }
+
+        ul {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            transition: transform 0.3 ease;
+        }
+
+        li {
+            list-style: none;
+            height: 1.5rem;
+            line-height: 1.5rem;
+            border-top: 0.02rem solid #ddd;
+        }
+
+        #box>li:first-child {
+            border-top: none;
+        }
+    </style>
+</head>
+
+<body>
+    <header>header</header>
+    <section id='wrapper'>
+        <ul id='box'></ul>
+    </section>
+    <footer>footer</footer>
+    <script>
+        window.onload = () => {
+            document.documentElement.style.fontSize = document.documentElement.clientWidth / 7.5 + 'px';
+            class touch {
+                constructor(props) {
+                    let { wrapperSelector, scrollSelector, len } = props, reg = /^[#]([^#]+)/
+                    if (reg.test(wrapperSelector) && reg.test(scrollSelector)) {
+                        this.wrapper = document.querySelector(wrapperSelector)
+                        this.ele = document.querySelector(scrollSelector)
+                        this.rowHeigth = 1.5 * Number(document.documentElement.style.fontSize.match(/.*(?=px)/)[0])
+                        this.len = len
+                    } else
+                        throw new Error('只接受ID选择器!')
+                }
+                touchstart(e) {
+                    let pos = this.getPos(e)
+                    this._pos.x = pos.x
+                    this._pos.y = pos.y
+                }
+                touchmove(e) {
+                    e.preventDefault()
+                    let pos = this.getPos(e), { y, move = 0 } = this._pos, tstY = pos.y - y, translateY = (move === 0 && pos.y >= y) || (move === this.wrapperHeight - this.eleHeight && pos.y <= y) ? tstY / Math.PI + move : tstY + move
+                    if ((move === 0 && pos.y >= y) || (move === this.wrapperHeight - this.eleHeight && pos.y <= y))
+                        this.speMoveDis = tstY / Math.PI
+                    if (move < 0 && pos.y - y >= -move) {
+                        this._pos.move = 0
+                        this._pos.y = pos.y
+                    }
+                    if (move > this.wrapperHeight - this.eleHeight && pos.y - y + move <= this.wrapperHeight - this.eleHeight) {
+                        this._pos.move = this.wrapperHeight - this.eleHeight
+                        this._pos.y = pos.y
+                    }
+                    this.style.transform = `translateY(${translateY}px)`
+                }
+                touchend(e) {
+                    let pos = this.getPos(e), { move = 0 } = this._pos
+                    this._pos.move = pos.y - this._pos.y + move
+                    if (this._pos.move >= 0) {
+                        if (this.speMoveDis >= this.rowHeigth) {
+                            this.firstElementChild.innerText = '刷新中...'
+                            this.pullRefreshHandle()
+                            let timeID_1 = setTimeout(() => {
+                                this.style.transform = 'translateY(0)'
+                                this._pos.move = 0
+                                this.firstElementChild.innerText = '下拉刷新'
+                                this.hidePullRefreshLoading()
+                                clearTimeout(timeID_1)
+                            }, 500)
+                        } else {
+                            this.style.transform = 'translateY(0)'
+                            this._pos.move = 0
+                        }
+                    }
+                    if (this._pos.move <= this.wrapperHeight - this.eleHeight) {
+                        if (-this.speMoveDis >= this.rowHeigth) {
+                            this.lastElementChild.innerText = '加载中...'
+                            let timeID_2 = setTimeout(() => {
+                                this.style.transform = `translateY(${this.wrapperHeight - this.eleHeight}px)`
+                                this._pos.move = this.wrapperHeight - this.eleHeight
+                                this.lastElementChild.innerText = '加载更多'
+                                this.addMoreHandle()
+                                clearTimeout(timeID_2)
+                            }, 500)
+                        } else {
+                            this.style.transform = `translateY(${this.wrapperHeight - this.eleHeight}px)`
+                            this._pos.move = this.wrapperHeight - this.eleHeight
+                        }
+                    }
+                }
+                renderAll() {
+                    let frag = document.createDocumentFragment(), contentEle = this.renderContentEle(), addMoreEle = this.renderAddMoreEle(), pullRefreshEle = this.renderPullRefreshEle()
+                    frag.appendChild(pullRefreshEle)
+                    frag.appendChild(contentEle)
+                    frag.appendChild(addMoreEle)
+                    this.ele.style.position = 'relative'
+                    this.ele.appendChild(frag)
+                }
+                renderContentEle() {
+                    let frag = document.createDocumentFragment(), i = 0;
+                    while (i++ < this.len) {
+                        let list = document.createElement('li')
+                        list.innerText = i
+                        frag.appendChild(list)
+                    }
+                    return frag
+                }
+                renderPullRefreshEle() {
+                    let pullRefreshEle = document.createElement('li')
+                    pullRefreshEle.textContent = '下拉刷新'
+                    pullRefreshEle.style.height = '1.5rem'
+                    pullRefreshEle.style.position = 'absolute'
+                    pullRefreshEle.style.top = '-1.5rem'
+                    pullRefreshEle.style.width = '100%'
+                    return pullRefreshEle
+                }
+                renderAddMoreEle() {
+                    let addMoreEle = document.createElement('li')
+                    addMoreEle.textContent = '加载更多'
+                    addMoreEle.style.height = '1.5rem'
+                    addMoreEle.style.position = 'absolute'
+                    addMoreEle.style.bottom = '-1.5rem'
+                    addMoreEle.style.width = '100%'
+                    return addMoreEle
+                }
+                getPos(e) {
+                    let x = e.changedTouches[0].clientX, y = e.changedTouches[0].clientY
+                    return { x, y }
+                }
+                addMoreHandle() {
+                    let frag = document.createDocumentFragment()
+                    for (let i = 0; i < 5; i++) {
+                        let li = document.createElement('li')
+                        li.innerText = 'new' + i;
+                        frag.appendChild(li)
+                    }
+                    this.lastElementChild.before(frag)
+                    this.eleHeight = this.offsetHeight
+                }
+                pullRefreshHandle() {
+                    let _loading = document.getElementById('loading')
+                    if (_loading) {
+                        _loading.style.display = 'block'
+                    } else {
+                        let loading = document.createElement('div')
+                        loading.setAttribute('id', 'loading')
+                        loading.style.position = 'fixed'
+                        loading.style.top = 0
+                        loading.style.right = 0
+                        loading.style.bottom = 0
+                        loading.style.left = 0
+                        loading.style.zIndex = 9999
+                        loading.style.backgroundImage = 'url("source/404.png")'
+                        loading.style.backgroundPosition = 'center center'
+                        loading.style.backgroundRepeat = 'no-repeat'
+                        loading.style.backgroundSize = '0.64rem'
+                        document.body.appendChild(loading)
+                    }
+                }
+                hidePullRefreshLoading() {
+                    document.getElementById('loading').style.display = 'none'
+                }
+                init() {
+                    this.renderAll()
+                    let _wrapper = this.wrapper, _ele = this.ele, _wrapperHeight = _wrapper.offsetHeight, _eleHeight = _ele.offsetHeight
+                    _ele.wrapperHeight = _wrapperHeight
+                    _ele.eleHeight = _eleHeight
+                    if (_wrapperHeight >= _eleHeight)
+                        return
+                    _ele._pos = {}
+                    _ele.getPos = this.getPos
+                    _ele.rowHeigth = this.rowHeigth
+                    _ele.pullRefreshHandle = this.pullRefreshHandle
+                    _ele.hidePullRefreshLoading = this.hidePullRefreshLoading
+                    _ele.addMoreHandle = this.addMoreHandle
+                    _ele.addEventListener('touchstart', this.touchstart, false)
+                    _ele.addEventListener('touchmove', this.touchmove, false)
+                    _ele.addEventListener('touchend', this.touchend, false)
+                }
+            }
+            let _touch = new touch({
+                wrapperSelector: '#wrapper',
+                scrollSelector: '#box',
+                len: 20
+            })
+            _touch.init()
+        }
+    </script>
+</body>
+
+</html>

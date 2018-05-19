@@ -1,0 +1,44 @@
+<html>
+
+<head></head>
+
+<body>
+    <button id="btn">open</button>
+</body>
+<script>
+    
+
+    window.addEventListener('load', () => { alert(123); console.log('is load') })
+    window.addEventListener('beforeunload', () => {
+        console.log('is beforeunload')
+    }
+    )
+    window.addEventListener('unload', () => { alert(123); console.log('is unload') })
+
+    // document.addEventListener('DOMContentLoaded', () => {
+    //     console.log('is DOMContentLoaded')
+    // })
+    // window.onload = () => {
+    //     let btn = document.getElementById('btn')
+    //     function openWindow() {
+    //         window.open(
+    //             '',
+    //             '_blank',
+    //             // height = 100,
+    //             // width = 400,
+    //             // top = 0,
+    //             // left = 0,
+    //             // toolbar = 0,
+    //             // menubar = 0,
+    //             // scrollbars = 1,
+    //             // resizable = 0,
+    //             // location = 0,
+    //             // status = 0
+    //         )
+    //     }
+    //     btn.onclick = openWindow
+    // }
+
+</script>
+
+</html>

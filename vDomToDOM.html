@@ -1,0 +1,166 @@
+<html>
+
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            font-size: 14px;
+            background-color: #fff;
+        }
+
+        #root {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header,
+        footer {
+            width: 100%;
+            line-height: 50px;
+            text-align: center;
+        }
+
+        content {
+            width: 100%;
+            flex: 1;
+        }
+
+        .content-wrapper a {
+            display: block;
+        }
+    </style>
+</head>
+
+<body>
+    <div id="root"></div>
+    <script>
+        let vDom = {
+            0: {
+                type: 'header',
+                props: { className: 'header', style: 'border-bottom: 1px solid #ddd;' },
+                child: 'header'
+            },
+            1: {
+                type: 'content',
+                props: { className: 'content' },
+                child: {
+                    0: {
+                        type: 'div',
+                        props: { className: 'content-wrapper', style: 'font-size: 14px', dataIndex: JSON.stringify({ data: { id: 123 } }) },
+                        child: {
+                            0: {
+                                type: 'a',
+                                props: { style: 'list-style: none' },
+                                child: 'is a'
+                            },
+                            1: {
+                                type: 'a',
+                                props: { style: 'list-style: none' },
+                                child: 'is a'
+                            },
+                            2: {
+                                type: 'a',
+                                props: { style: ';list-style: none' },
+                                child: 'is a'
+                            }
+                        }
+                    },
+                    1: {
+                        type: 'div',
+                        props: { style: 'font-size: 14px', dataIndex: JSON.stringify({ data: { id: 123 } }) },
+                        child: {
+                            0: {
+                                type: 'div',
+                                props: {},
+                                child: {
+                                    0: {
+                                        type: 'p',
+                                        props: {},
+                                        child: 'test'
+                                    },
+                                    1: {
+                                        type: 'p',
+                                        props: {},
+                                        child: 'test'
+                                    },
+                                    2: {
+                                        type: 'p',
+                                        props: {},
+                                        child: 'test'
+                                    },
+                                    3: {
+                                        type: 'p',
+                                        props: {},
+                                        child: 'test'
+                                    },
+                                    4: {
+                                        type: 'p',
+                                        props: {},
+                                        child: 'test'
+                                    },
+                                }
+                            }
+                        }
+                    },
+                }
+            },
+            2: {
+                type: 'footer',
+                props: { className: 'footer', style: 'border-top: 1px solid #ddd;' },
+                child: 'footer'
+            },
+        }
+
+        function toDom({ ele, vDom }) {
+            this.rootEle = document.querySelector(ele);
+            this.createEle(vDom);
+        }
+        toDom.prototype.createEle = function (vDom, parentEle) {
+            Object.keys(vDom).forEach((item, index) => {
+                let { type, props, child } = vDom[item]
+                if (typeof type === 'string') {
+                    let ele = document.createElement(type)
+                    this.setAttr(ele, props)
+                    if (typeof child === 'object') {
+                        this.createEle(child, ele)
+                    } else {
+                        ele.textContent = child
+                    }
+                    parentEle ? parentEle.appendChild(ele) : this.rootEle.appendChild(ele)
+                }
+            })
+        }
+        toDom.prototype.setAttr = function (ele, props) {
+            Object.keys(props).forEach((item, index) => {
+                if (item === 'className') {
+                    ele.setAttribute('class', props[item])
+                    return
+                }
+                if (/^data[A-Z]{1}/.test(item)) {
+                    let attr = 'data-' + item.split('data')[1].toLowerCase()
+                    ele.setAttribute(attr, props[item])
+                    return
+                }
+                ele.setAttribute(item, props[item])
+            })
+        }
+
+        new toDom({
+            ele: '#root',
+            vDom
+        })
+    </script>
+</body>
+
+</html>
