@@ -1,0 +1,136 @@
+<html>
+
+<head>
+    <style>
+        #btn {
+            position: relative;
+            -moz-appearance: none;
+            -ms-progress-appearance: none;
+            -webkit-appearance: none;
+            background-color: #f72359;
+            padding: 10px 40px;
+            border: none;
+            color: #fff;
+            cursor: pointer;
+            outline: none;
+            overflow: hidden;
+            border-radius: 16px;
+        }
+
+        #btn>span {
+            position: relative;
+        }
+
+        #btn>i {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 0;
+            background: radial-gradient(circle closest-side, #4405f7, transparent);
+            transform: translate(-50%, -50%);
+            transition: width .2s ease, heigth .2s ease;
+        }
+
+        #btn:hover i {
+            width: 200px;
+            height: 200px;
+        }
+    </style>
+</head>
+
+<body>
+    <button id='btn'><i></i><span>xxx</span></button>
+    <script>
+        let btn = document.getElementById('btn'),
+            i = btn.querySelector('i'),
+            pos = btn.getBoundingClientRect();
+        btn.addEventListener('mousemove', (e) => {
+            let x = e.clientX - pos.x, y = e.clientY - pos.y;
+            i.style.top = y + 'px';
+            i.style.left = x + 'px';
+        }, false)
+
+        // 通过 实例 获取 该 button
+        function animateBtn(...props) {
+            let { text } = props[0];
+            this.text = text;
+            return this.init()
+        }
+        animateBtn.prototype.init = function () {
+            this.createButton();
+            this.createGradientEle();
+            this.createTxtEle();
+            this.btn.appendChild(this.i)
+            this.btn.appendChild(this.span)
+            this.eventHandle();
+            return this.btn
+        }
+        animateBtn.prototype.createButton = function () {
+            let btn = document.createElement('button'), styleGather = {
+                position: 'relative',
+                backgroundColor: '#f72359',
+                padding: '10px 40px',
+                border: 'none',
+                color: '#fff',
+                cursor: 'pointer',
+                outline: 'none',
+                overflow: 'hidden',
+                borderRadius: '16px'
+            }
+            for (let key in styleGather) {
+                btn.style[key] = styleGather[key]
+            }
+            this.btn = btn
+        }
+        animateBtn.prototype.createGradientEle = function () {
+            let i = document.createElement('i'),
+                styleGather = {
+                    position: 'absolute',
+                    top: 0,
+                    left: 0,
+                    width: 0,
+                    height: 0,
+                    background: 'radial-gradient(circle closest-side, #4405f7, transparent)',
+                    transform: 'translate(-50%, -50%)',
+                    transition: 'width .2s ease, heigth .2s ease'
+                };
+            for (let key in styleGather) {
+                i.style[key] = styleGather[key]
+            }
+            this.i = i;
+        }
+        animateBtn.prototype.createTxtEle = function () {
+            let span = document.createElement('span');
+            span.textContent = this.text;
+            span.style.position = 'relative';
+            this.span = span;
+        }
+        animateBtn.prototype.eventHandle = function () {
+            let that = this, move = (e) => {
+                that.i.onmousemove = (e) => { e.stopPropagation() }
+                that.span.onmousemove = (e) => { e.stopPropagation() }
+                let x = e.pageX - e.target.offsetLeft, y = e.pageY - e.target.offsetTop;
+                that.i.style.top = y + 'px';
+                that.i.style.left = x + 'px';
+            }
+            this.btn.addEventListener('mouseenter', function (e) {
+                that.i.style.width = '200px';
+                that.i.style.height = '200px';
+                this.addEventListener('mousemove', move)
+            })
+            this.btn.addEventListener('mouseleave', function (e) {
+                that.i.style.width = 0;
+                that.i.style.height = 0;
+                this.removeEventListener('mousemove', move)
+            })
+        }
+
+        let _btn = new animateBtn({
+            text: 'aa'
+        })
+        document.body.appendChild(_btn)
+    </script>
+</body>
+
+</html>
