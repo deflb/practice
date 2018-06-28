@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <button id='btn0'>on custom event</button>
+    <button id='btn1'>emit custom event</button>
+    <button id='btn2'>off custom event</button>
+    <script>
+        let EventBus = {
+            on: function ({ target = window, eventName, callback }) { // 创建/监听
+                let eve = document.createEvent('HTMLEvents'); // HTMLEvents MouseEvents UIEvents
+                // eve.initUIEvent(eventName, false, false)
+                // eve.initMouseEvent(eventName, false, false)
+                eve.initEvent(eventName, false, false)
+                this.off() // 避免多次绑定
+                target.addEventListener(eventName, callback)
+                this.target = target;
+                this.eventName = eventName;
+                this.callback = callback;
+                this.eve = eve;
+            },
+            emit: function () { // 触发
+                this.eve && this.target.dispatchEvent(this.eve)
+            },
+            off: function () { // 解除
+                this.target && this.target.removeEventListener(this.eventName, this.callback)
+            },
+        }
+
+        btn0.onclick = function () {
+            EventBus.on({
+                target: document.body,
+                eventName: 'test',
+                callback: function () { console.log('customEvent is done') }
+            })
+        }
+        btn1.onclick = function () {
+            EventBus.emit()
+        }
+        btn2.onclick = EventBus.off.bind(EventBus)
+
+    </script>
+</body>
+
+</html>

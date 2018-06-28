@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <input type="text" id='input'>
+    <div style='height: 100px; border: 1px solid #ddd' id='div'></div>
+    <script>
+        function debounce(fn, delay = 300) { // debounce
+            let time = null;
+            return function (e) {
+                clearTimeout(time)
+                time = setTimeout(() => {
+                    fn(e)
+                }, delay)
+            }
+        }
+        input.oninput = debounce(e => { console.log(e.target.value) })
+
+
+        function throttle(fn, delay = 300) { // throttle
+            let now = new Date() - 0, time = null;
+            return function (e) {
+                clearTimeout(time)
+                let _now = new Date() - 0;
+                if (_now - now >= delay) {
+                    now = _now
+                    fn(e)
+                } else
+                    time = setTimeout(() => { // 事件脱离 执行最后一次
+                        fn(e)
+                    }, delay)
+            }
+        }
+        div.onmousemove = throttle(e => { console.log(e) }, 200)
+
+        var hiddenProperty = 'hidden' in document
+            ? 'hidden'
+            :
+            'webkitHidden' in document
+                ?
+                'webkitHidden'
+                :
+                'mozHidden' in document
+                    ?
+                    'mozHidden'
+                    :
+                    null;
+        var visibilitychangeEvent = hiddenProperty.replace(/hidden/i, 'visibilitychange');
+        console.log(hiddenProperty, visibilitychangeEvent)
+        document.addEventListener(visibilitychangeEvent, () => {
+            if (document[hiddenProperty]) {
+                localStorage.setItem('a', new Date())
+                console.log('is not active')
+            } else {
+                localStorage.removeItem('a')
+                console.log('is active')
+            }
+        })
+    </script>
+</body>
+
+</html>

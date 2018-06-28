@@ -1,0 +1,72 @@
+<html>
+
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: visible;
+        }
+
+        .box {
+            height: 500px;
+            overflow: auto;
+            overscroll-behavior: contain;
+            /* 阻止连锁滚动 */
+        }
+
+        .box>div {
+            height: 150%;
+        }
+
+        .foot {
+            margin-top: 50%;
+            height: 100%
+        }
+
+        span {
+            display: inline-block;
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ddd;
+            position: sticky;
+            /* 粘性布局 */
+            top: 100px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="box">
+        <div></div>
+        <span>is p and sticky</span>
+        <div style='background-color: #eee'></div>
+    </div>
+    <span>is p and sticky</span>
+    <div class="foot">xxx</div>
+    <script>
+        // 元素是否在可见视口中
+        let opts = {
+            threshold: [0, 0.5, 1], // 回调触发 比例 （元素可见比例）
+            // 元素在容器内 滚动时 的 参数设置
+            // root: element,
+            // rootMargin: top right bottom left;
+        }, observe = new IntersectionObserver(callback, opts), ele = document.getElementsByClassName('foot')[0];
+        observe.observe(ele)
+        // observe.unobserve(ele); // 停止观察
+        // observe.disconnect(); // 关闭观察器
+        function callback(entries) {
+            console.log(entries[0].intersectionRatio - 0 < 0.1 ? '0%' : entries[0].intersectionRatio - 0.5 < 0.1 ? '50%' : '100%')
+            ele.textContent = entries[0].isIntersecting ? 'is visible' : 'is hidden'
+        }
+    </script>
+</body>
+
+</html>

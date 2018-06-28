@@ -1,0 +1,64 @@
+<html>
+<header>
+    <link rel="stylesheet" href="./static/index.css">
+</header>
+
+<body>
+    <button id='login'>login</button>
+    <button id='logout'>logout</button>
+    <button id='product'>get product</button>
+</body>
+<script src="./static/index.js"></script>
+<script>
+    login.onclick = () => {
+        ajax({
+            url: '/login',
+            data: {
+                username: 'admin',
+                password: 'admin',
+            },
+            success: (data) => {
+                console.log(data)
+                alert(data.data)
+            },
+            fail: (err) => {
+                console.log(err)
+            },
+            responseType: 'json'
+        })
+    }
+    logout.onclick = () => {
+        ajax({
+            url: '/logout',
+            data: {
+                username: 'admin',
+                password: 'admin',
+            },
+            responseType: 'json',
+            success: (data) => {
+                console.log(data)
+                alert(data.data)
+            },
+            fail: (err) => {
+                console.log(err)
+            }
+        })
+    }
+    product.onclick = () => {
+        ajax({
+            url: '/product',
+            data: {
+                id: 'fruit',
+            },
+            responseType: 'json',
+            success: (data) => {
+                console.log(data)
+            },
+            fail: (err) => {
+                console.log(err)
+            }
+        })
+    }
+</script>
+
+</html>

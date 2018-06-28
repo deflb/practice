@@ -1,0 +1,79 @@
+<html>
+
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        .nav {
+            position: fixed;
+            top: 0;
+            left: 40%;
+            right: 40%;
+            width: 20%;
+            border: 1px solid #ddd;
+            background-color: #fff;
+        }
+
+        .nav>a {
+            display: inline-block;
+            width: 33.3%;
+            line-height: 50px;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .box {
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            scroll-behavior: smooth;
+            /*锚点平滑过度*/
+            -ms-overflow-style: none;
+            /* ie */
+        }
+
+        .box>li {
+            display: table;
+            width: 100%;
+            height: 100%;
+            font-size: 20px;
+            text-align: center;
+        }
+
+        .box>li>span{
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        .box::-webkit-scrollbar {
+            /* webkit系列 */
+            display: none;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="nav">
+        <a href="#a">a</a><a href="#b">b</a><a href="#c">c</a>
+    </div>
+    <ul class="box">
+        <li id="a">
+            <span>A</span>
+        </li>
+        <li id='b'><span>B</span></li>
+        <li id='c'><span>C</span></li>
+    </ul>
+</body>
+
+</html>

@@ -1,18 +1,52 @@
 <html>
 
-<head></head>
+<head>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+        body{
+            padding-top: 50px;
+            position: relative;
+        }
+        header{
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 50px;
+            line-height: 50px;
+            text-align: center;
+        }
+    </style>
+</head>
 
 <body>
-    <div>is body</div>
-    <iframe name='iframe' src="./bothwaybind.html" frameborder="0">
-
+    <header>
+            header
+    </header>
+    <iframe width="100%" height="100%" id='iframe' name='iframe' src='http://192.168.1.152:3000?targetUrl=/frmOrdMsts&loginType=1&pageType=crm&username=1008611&uuid=d5cadf38-c668-4bdc-bcf3-b7cdd14cf28b'
+        frameborder="0">
     </iframe>
-    <script>
-        window.onload = () => {
-            let idoc = window.frames['iframe'].document
-            console.log(idoc.body.innerHTML)
+    <!-- <script>
+        window.onload = () => { // ?targetUrl=/frmOrdMsts&loginType=1&pageType=crm&username=1008611&uuid=a312715f-7a23-448a-a680-6b6049b11971
+            let iw = window.frames['iframe'].window || document.getElementById('iframe').contentWindow;
+            iw.postMessage({
+                targetUrl: "/frmOrdMsts",
+                loginType: 1,
+                pageType: 'crm',
+                username: "1008611",
+                uuid: "e8faee75-ab3b-43d2-8c12-5d40d9f337c5"
+            }, '*')
         }
-    </script>
+    </script> -->
 </body>
 
 </html>

@@ -1,0 +1,102 @@
+<html>
+
+<head>
+    <title>不定宽高左右垂直居中</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+            box-sizing: border-box;
+        }
+
+        .wrapper {
+            height: 100%;
+        }
+
+        .wrapper>li {
+            width: 100%;
+            height: 30%;
+            border: 1px solid #ddd;
+        }
+
+        /* flex -- 优点： 简单易用 不用为垂直居中的元素进行包裹 缺陷：兼容问题 不过手机端支持较好 */
+
+        .wrapper>.flex {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .wrapper>.flex>p{
+            flex: 0 0 25%;
+        }
+        .wrapper>.flex>pre{
+            flex: 1;
+            overflow: auto;
+        }
+
+        /* table table-cell 优点：兼容性好 缺陷：需要为垂直居中元素进行一层包裹 */
+
+        .wrapper>.table_table-cell {
+            display: table;
+            text-align: center;
+        }
+
+        .wrapper>.table_table-cell>span {
+            display: table-cell;
+            vertical-align: middle;
+        }
+
+        /* transform translate position 优点：适中 缺点：兼容问题 */
+
+        .wrapper>.transform_translate_absolute {
+            position: relative;
+        }
+
+        .wrapper>.transform_translate_absolute>span {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+    </style>
+</head>
+
+<body>
+    <ul class="wrapper">
+        <li class="flex">
+            <p>aaaaaaaa</p>
+            <pre><code>
+                let _move3D = new move3D();
+                _move3D.init({
+                    ele: document.getElementById('box')
+                });
+            </code></pre>
+        </li>
+        <li class="table_table-cell">
+            <span>
+                xxxx
+                <p>aaaaaaaa</p>
+            </span>
+        </li>
+        <li class="transform_translate_absolute">
+            <span>
+                xxxx
+                <p>aaaaaaaa</p>
+            </span>
+        </li>
+    </ul>
+    <span style='vertical-align: top'>aaa</span>sgjxxx
+    <script>
+        let str = "let _move3D = new move3D();\n_move3D.init({\r\nele: document.getElementById('box')\n});"
+        document.write(str)
+    </script>
+</body>
+
+</html>

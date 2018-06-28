@@ -1,9 +1,17 @@
 (function () {
+    const toString = Object.prototype.toString;
+    function isFunction(param) {
+        return toString.call(param) === '[object Function]'
+    }
+    function isString(param) {
+        return toString.call(param) === '[object String]'
+    }
+
     function init(selector) { // selector 一般都为DOM元素,DOM选择器
         this.selector = selector;
-        if (typeof selector === 'function') { // 为方法时 $(function(){...}) 等价于 $(document).ready(function(){...})
+        if (isFunction(selector)) { // 为方法时 $(function(){...}) 等价于 $(document).ready(function(){...})
             this.ready(selector)
-        } else if (typeof selector === 'string') { // 为string时 即 选择器时
+        } else if (isString(selector)) { // 为string时 即 选择器时
             this.select(selector)
         } else if (selector.nodeType === 1) { // 为DOM 元素 时
             this[0] = selector
@@ -35,7 +43,7 @@
     }
     $.prototype.select = function (selector) {
         let nodeList = document.querySelectorAll(selector), length = nodeList.length
-        for(let i = 0; i<= length - 1; i++){
+        for (let i = 0; i <= length - 1; i++) {
             this[i] = nodeList[i]
         }
         this.context = document
@@ -47,6 +55,7 @@
     }
     $.prototype.html = function (html) {
         this[0].innerHTML = html
+        return this;
     }
     $.prototype.each = function (fn) {
         for (let i = 0; i <= this.length - 1; i++) {
@@ -79,18 +88,18 @@
                 this[0].style.opacity = opacity
             } else
                 clearInterval(timeId)
-        }, time/10)
+        }, time / 10)
     }
     $.prototype.fadeOut = function (time = 500) {
         let opacity = 1, timeId = setInterval(() => {
             opacity = (opacity - 0.1).toFixed(1)
             if (opacity >= 0) {
                 this[0].style.opacity = opacity
-            } else{
+            } else {
                 this[0].style.display = 'none'
                 clearInterval(timeId)
             }
-        }, time/10)
+        }, time / 10)
     }
     $.prototype.format = function () {
         console.log('is $ format fun')

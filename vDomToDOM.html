@@ -62,17 +62,23 @@
                             0: {
                                 type: 'a',
                                 props: { style: 'list-style: none' },
-                                child: 'is a'
+                                child: 'is vDom -> Dom'
                             },
                             1: {
-                                type: 'a',
-                                props: { style: 'list-style: none' },
-                                child: 'is a'
+                                type: 'div',
+                                props: {},
+                                child: {
+                                    0: {
+                                        type: 'b',
+                                        props: {},
+                                        child: 'is vDom -> Dom'
+                                    }
+                                }
                             },
                             2: {
                                 type: 'a',
-                                props: { style: ';list-style: none' },
-                                child: 'is a'
+                                props: { style: 'list-style: none' },
+                                child: 'is vDom -> Dom'
                             }
                         }
                     },

@@ -1,0 +1,62 @@
+<html>
+
+<head>
+    <style>
+        .box {
+            width: 100px;
+            height: 100px;
+            filter: blur(4px);
+            background-image: url('./source/404.png');
+            background-size: cover;
+            background-repeat: no-repeat;
+        }
+
+        .img {
+            transform: translateX(-100%);
+            /* transition: all linear .16s; */
+            /* requestAnimationFrame 会自动根据浏览器的绘制间隔进行执行 不会导致过度绘制以及掉帧的问题 也不需要设置 过渡效果*/
+        }
+    </style>
+</head>
+
+<body>
+    <svg id='svgImg'>
+        <defs>
+            <filter id='f1' x='0' y='0'>
+                <feGaussianBlur in='SourceGraphic' stdDeviation='5,0' class="feGaussianBlur" />
+            </filter>
+        </defs>
+        <image xlink:href='./source/404.png' filter='url(#f1)' class="img" />
+    </svg>
+    <svg>
+        <defs>
+            <filter id='f1' x='0' y='0'>
+                <feGaussianBlur in='SourceGraphic' stdDeviation='10,0' />
+            </filter>
+        </defs>
+        <rect width='90' height='90' stroke='#fff' fill='green' filter='url(#f1)' />
+        <text x='0' y='15' fill='red' stroke='#000' filter='url(#f1)'>xxxxxxx</text>
+    </svg>
+    <div class="box"></div>
+    <button onclick="clickHander()">clike me</button>
+</body>
+<script>
+    let move = 0, v = 10;
+    function clickHander() {
+        let svgImg = document.getElementById('svgImg'),
+            img = svgImg.querySelector('.img'),
+            feGaussianBlur = svgImg.querySelector('.feGaussianBlur');
+        function run() {
+            v -= 0.1;
+            img.style.transform = `translateX(${move}px)`
+            feGaussianBlur.setAttribute('stdDeviation', `${v},0`)
+            if (v >= 0) {
+                move += 0.5
+                window.requestAnimationFrame(run)
+            }
+        }
+        run()
+    }
+</script>
+
+</html>

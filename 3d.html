@@ -1,0 +1,159 @@
+<html>
+
+<head>
+    <meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no">
+    <style>
+        @keyframes d {
+            0% {
+                transform: translateY(-50%) rotateY(0deg);
+            }
+            25% {
+                transform: translateY(-50%) rotateY(90deg);
+            }
+            50% {
+                transform: translateY(-50%) rotateY(180deg);
+            }
+            75% {
+                transform: translateY(-50%) rotateY(270deg);
+            }
+            100% {
+                transform: translateY(-50%) rotateY(360deg);
+            }
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        #wrapper {
+            position: relative;
+            perspective: 1200px;
+            height: 2rem;
+        }
+
+        #box {
+            transform-style: preserve-3d;
+            position: absolute;
+            width: 4rem;
+            height: 100%;
+            background-color: transparent;
+            left: 50%;
+            /* top: 50%; */
+            transform: translateX(-50%) rotateY(0deg);
+            transition: transform ease-out .3s;
+            cursor: pointer;
+            /* animation: d 3s infinite linear; */
+        }
+
+        #box>div {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 90%;
+            border: 1px solid #ddd;
+            background-image: url('./source/404.png');
+            background-size: cover;
+            background-position: center;
+        }
+
+        #box>div:nth-child(1) {
+            transform: rotateY(0deg) translateZ(4rem)
+        }
+
+        #box>div:nth-child(2) {
+            transform: rotateY(60deg) translateZ(4rem)
+        }
+
+        #box>div:nth-child(3) {
+            transform: rotateY(120deg) translateZ(4rem)
+        }
+
+        #box>div:nth-child(4) {
+            transform: rotateY(180deg) translateZ(4rem)
+        }
+
+        #box>div:nth-child(5) {
+            transform: rotateY(240deg) translateZ(4rem);
+        }
+
+        #box>div:nth-child(6) {
+            transform: rotateY(300deg) translateZ(4rem)
+        }
+    </style>
+</head>
+
+<body>
+    <div id='wrapper'>
+        <div id="box">
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+        </div>
+    </div>
+    <content>
+        
+    </content>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            document.documentElement.style.fontSize = document.documentElement.clientWidth / 7.5 + 'px';
+            class move3D {
+                constructor() {
+                    this.move = 0;
+                    this.moveCache = 0;
+                    this.events={
+                        start: 'mousedown',
+                        move: 'mousemove',
+                        end: 'mouseup',
+                    }
+                }
+                deviceFlag(){
+                    let info = window.navigator.userAgent;
+                    if(info.indexOf('Android') !== -1 || info.indexOf('iPhone') !== -1){
+                        this.events.start = 'touchstart'
+                        this.events.move = 'touchmove'
+                        this.events.end = 'touchend'
+                    }
+                }
+                init(props) {
+                    this.ele = props.ele;
+                    this.deviceFlag();
+                    this.eventHandle()
+                }
+                eventHandle() {
+                    let that = this, move = (e) => {
+                        e.preventDefault()
+                        let pageX = e.pageX || e.changedTouches[0].pageX,
+                            distance = that.moveCache + pageX - that.move;
+                        that.ele.style.transform = 'translateX(-50%) rotateY(' + distance + 'deg)'
+                    }
+                    this.ele.addEventListener(this.events.start, e => {
+                        this.move = e.pageX || e.changedTouches[0].pageX;
+                        this.ele.addEventListener(this.events.move, move, false)
+                    }, false)
+                    this.ele.addEventListener(this.events.end, e => {
+                        let pageX = e.pageX || e.changedTouches[0].pageX,
+                            distance = this.moveCache + pageX - this.move;
+                        this.moveCache = distance
+                        this.ele.style.transform = 'translateX(-50%) rotateY(' + distance + 'deg)'
+                        this.ele.removeEventListener(this.events.move, move, false)
+                    }, false)
+                    this.ele.addEventListener('mouseleave', e => {
+                        this.ele.removeEventListener(this.events.move, move, false)
+                    })
+                }
+            }
+            let _move3D = new move3D();
+            _move3D.init({
+                ele: document.getElementById('box')
+            });
+        }, false)
+    </script>
+</body>
+
+</html>

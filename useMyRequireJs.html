@@ -1,0 +1,33 @@
+<html>
+
+<head></head>
+
+<body>
+    <div id='div'></div>
+    <script src="./myRequireJS.js"></script>
+    <script>
+        require.config([
+            {
+                name: 'myJq',
+                alias: '$',
+            }
+        ])
+        require([
+            './requireModules/test.js',
+            './myJq.js',
+            './requireModules/utlis.js',
+            './requireModules/a.js',
+        ], function (test, $, utlis, a) {
+            test.decs()
+            utlis.add()
+            a.a()
+            $.format()
+            
+            let script = $(document.getElementsByTagName('script'))
+            console.log(script)
+            $(document.getElementById('div')).html('<p>123</p>').click(() => {console.log('div is click')})
+        })
+    </script>
+</body>
+
+</html>
