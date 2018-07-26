@@ -25,7 +25,7 @@
     function require(...props) {
         let firstMeta = props[0]
         if (isArray(firstMeta)) {
-            let _firstMeta = Array.from(new Set(firstMeta)) // 去重
+            let _firstMeta = [...new Set(firstMeta)] // 去重
             if (_firstMeta.length !== firstMeta.length)
                 throwError('require module has repeat, please check!')
             firstMeta.forEach((item, index) => {

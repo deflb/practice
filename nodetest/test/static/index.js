@@ -1,8 +1,8 @@
-let work = new Worker('/static/worker.js')
+let work = new Worker('/test/static/worker.js')
 work.postMessage(1)
 
 work.onmessage = (event) => {
-    alert('web worker is done' + event.data)
+    console.log('web worker is done' + event.data)
 }
 
 function ajax({

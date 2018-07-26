@@ -36,10 +36,10 @@
         }
 
         v.prototype.obverse = function (obj) {
-            let value, that = this;
+            let that = this;
             for (let key in obj) {
                 if (hasOwnProperty(obj, key)) {
-                    value = obj[key]
+                    let value = obj[key];
                     isObject(value) && this.observe(value)
                     Object.defineProperty(obj, key, {
                         enumerable: true,

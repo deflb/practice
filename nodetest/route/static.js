@@ -2,9 +2,9 @@ const fs = require('fs')
 const path = require('path')
 const mime = {
     '.css': 'text/css',
-    '.html': 'text/html',
+    '.html': 'text/html;charset=utf-8',
     '.json': 'application/json',
-    '.js': 'text/javascript',
+    '.js': 'text/javascript;charset=utf-8',
     '.svg': 'image/svg+xml',
     '.jpg': 'image/jpg',
     '.jpeg': 'image/jpeg',

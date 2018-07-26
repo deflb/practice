@@ -11,7 +11,8 @@ const mime = {
     '.png': 'image/png',
     '.woff': 'application/x-font-woff',
     '.eot': 'application/vnd.ms-fontobject',
-    '.ttf': 'application/actet-stream',
+    '.ttf': 'application/octet-stream',
+    '.ico': 'application/octet-stream',
 }
 
 const staticMiddleWare = (pathname, res) => {

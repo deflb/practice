@@ -48,7 +48,71 @@ getArrItemByDecs()
 // 函数参数 默认值 以及 参数是否可选
 function a({ name = 'jike', age = 18 } = {}) { console.log(name + age) }
 a()
-a({name: 'joe'})
+a({ name: 'joe' })
 
 // 平铺数组 concat 打散 & 展开运算符 打散
-console.log([].concat(...[1,[2],[3,4]]))
+console.log([].concat(...[1, [2], [3, 4]]))
+
+function compareArr(arr1, arr2) { // arr2 以 arr1 为基准 进行增删
+    return arr1.map(item => {
+        let findItem = arr2.find(val => val.key === item)
+        return findItem ? findItem : { key: item }
+    })
+}
+console.log(...compareArr(['a', 'b', 'c'], [{ key: 'a' }, { key: 'b' }]))
+
+function arrCountLen(arr) { // 数组最大连续长度
+    let result = [], start = 0;
+    arr.push(arr[arr.length - 1] + 2)
+    for (let i = 1; i < arr.length; i++) {
+        if (arr[i] - arr[i - 1] !== 1) {
+            result.push({
+                source: arr.slice(start, i),
+                len: i - start
+            })
+            start = i
+        }
+    }
+    let maxLength = Math.max(...result.map(item => item.len));
+    return {
+        maxLength,
+        source: result.filter(item => item.len === maxLength)
+    }
+}
+arrCountLen([0, 1, 2, 3, 5, 6, 8, 9, 10, 11, 13])
+
+'btnHotTapBp'.replace(/[A-Z]/g, (v) => '-' + v).toLowerCase()
+'btn-hot-bp-ht'.replace(/-\w/g, (v) => v.replace('-', '').toUpperCase())
+
+let aa = [1, 2, 3];
+console.log(aa.map(item => item + '=').join('&'))
+console.log(aa)
+
+console.log(Array.prototype.reduce.call([{ a: 1, b: 10 }, { a: 5 }, { a: 3 }], (pre, next) => {
+    return pre += next.a
+}, 0))
+
+let arr = [1, 2, 3, 4];
+console.log(arr.slice(-1))
+console.log(arr)
+console.log(arr.splice(0, 0)) // 返回被删除的元素 改变原数组
+console.log(arr)
+
+let p = () => new Promise((resolve, reject) => {
+    setTimeout(() => resolve(123), 0) // Promise 只能有一种 状态 onfulfilled | onrejected
+    setTimeout(() => reject(456), 0) // 此处将不执行
+})
+
+// then 接受两个函数 作为 参数 第一个参数 处理 onfulfilled状态 第二个参数 处理 onrejected状态
+p().then(res => { console.log(res) }, err => { console.log(err) }) // 等价 catch 为 then 的语法糖
+p().catch(err => { console.log(err) })
+
+
+let str = '';
+for (let x = 1; x <= 9; x++) {
+    for (let y = 1; y <= x; y++) {
+        str += x + 'x' + y + '=' + x * y + ' '
+    }
+    str += ' '
+}
+console.log(str)

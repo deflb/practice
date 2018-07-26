@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+
+<body>
+    <script>
+        (function () {
+            const toString = Object.prototype.toString
+            function isFunc(f) {
+                return toString.call(f) === '[object Function]'
+            }
+            try {
+                new window.Event('custom')
+            } catch (error) {
+                window.Event = function (type, bubbing, defaults) {
+                    let event = document.createEvent('CustomEvent')
+                    return event.initCustomEvent(type, bubbing, defaults)
+                }
+            }
+            function Mock() {
+                this.MOCK_EVENTS = 'readystatechange loadstart progress abort error load timeout loadend'.split(' ');
+                this.MOCK_PROPERTY = 'readyState responseURL status statusText responseType response responseText responseXML'.split(' ');
+            }
+            Mock.config = []; // 挂载在类上的普通属性
+            Mock.mock = function (method, url, response) {  // 挂载在类上的方法属性
+                let _config = { method, url, response }
+                this.config.push(_config)
+            }
+            Mock.prototype.open = function (method, url, async) {
+                this.currentUrl = url;
+            }
+            Mock.prototype.send = function (data) {
+                
+            }
+            Mock.prototype.addEventListener = function (){
+                for (let i = 0; i < this.MOCK_EVENTS.length; i++) {
+                    if (isFunc(this['on' + this.MOCK_EVENTS[i]])) {
+                        this['on' + this.MOCK_EVENTS[i]](Mock.config.find(item => item.url === this.currentUrl).response())
+                    }
+                }
+            }
+            Mock.prototype.dispatchEvent = function (){
+                dispatchEvent(new Event('error',false,false))
+            }
+            window.Mock = Mock
+            window.XMLHttpRequest = Mock;
+        }())
+
+        Mock.mock('post', 'http://192.168.5.105:9999/knowledge/list', function () {
+            return { a: 123 }
+        })
+        Mock.mock('post', 'http://192.168.5.105:9999/knowledge/tip', function () {
+            return { a: 456 }
+        })
+
+        function ajax({
+            method,
+            url,
+            data,
+            async = true,
+        }) {
+            return new Promise((reslove, reject) => {
+                const xhr = new XMLHttpRequest();
+                xhr.onreadystatechange = function (res) {
+                    reslove(res)
+                }
+                xhr.onerror = function (err) {
+                    reject(err)
+                }
+                xhr.open(method, url, async)
+                xhr.send(data)
+            })
+        }
+
+        let getList = ajax({
+            method: 'post',
+            url: 'http://192.168.5.105:9999/knowledge/list',
+            data: {
+                "categoryIds": ["7713c79953d84bf6b1d6fbb6ef586f66"],
+                "type": 0,
+                "pageNo": 1,
+                "pageSize": 10
+            }
+        }), getTip = ajax({
+            method: 'post',
+            url: 'http://192.168.5.105:9999/knowledge/tip',
+            data: {
+                "categoryIds": ["7713c79953d84bf6b1d6fbb6ef586f66"],
+                "type": 0,
+                "pageNo": 1,
+                "pageSize": 10
+            }
+        })
+        Promise.all([getList, getTip]).then(res => {
+            console.log(res)
+        }).catch(err => { console.log(err) })
+    </script>
+</body>
+
+</html>

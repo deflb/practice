@@ -10,7 +10,7 @@ http.createServer((req, res) => {
     let pathname = url.parse(req.url, true).pathname, staticReg = /\.(html|css|js|jpg|jpeg|png|svg|woff|ttf|eot)/;
     if (staticReg.test(pathname)) {
         // 交给 静态资源 中间件处理
-        static.staticMiddleWare(path.resolve('test') + pathname, res)
+        static.staticMiddleWare(path.resolve()+pathname, res)
     } else {
         switch (req.method) {
             case 'OPTIONS':

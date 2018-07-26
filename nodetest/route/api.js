@@ -37,9 +37,37 @@ const getParsePostData = (req, res, callback) => {
 const handleGet = {
     '/': (req, res) => {
         res.writeHead(302, {
-            'Location': '/index.html'
+            'Location': '/test/index.html'
         })
         res.end()
+    },
+    '/script': (req, res) => {
+        let query = url.parse(req.url, true).query
+        res.writeHead(200, {
+            'content-type': 'text/plain'
+        })
+        res.end(`${query.callback}(${JSON.stringify({ callback: query.callback })})`)
+    },
+    '/iframe': (req, res) => {
+        res.writeHead(200, {
+            'content-type': 'text/html;charset=UTF-8'
+        })
+
+        res.end(`
+        <!DOCTYPE html>
+                    <html>
+                        <head>
+                            <title>render</title>
+                        </head>
+                        <body>
+                            ${new Date()}
+                        </body>
+                        <script>
+                        window.top.iframeToLoop(${JSON.stringify({ name: new Date() })})
+                        </script>
+                    </html>
+        `)
+
     },
     '/serverRender': (req, res) => {
         let pathname = url.parse(req.url).pathname, query = url.parse(req.url, true).query;
@@ -144,8 +172,9 @@ const handleError = {
 const get = (req, res) => {
     let pathname = url.parse(req.url).pathname
     pathname = pathname === '/' ? '/' : pathname.match(/^\/\w+/)[0]
-    if (utils.toString.call(handleGet[pathname]) === '[object Function]') {
-        handleGet[pathname](req, res)
+    if (utils.toString.call(handleGet[pathname.split('?')[0]]) === '[object Function]') {
+        console.log(pathname.split('?')[0])
+        handleGet[pathname.split('?')[0]](req, res)
     } else
         handleError['/404'](req, res)
 }

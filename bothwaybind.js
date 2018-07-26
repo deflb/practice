@@ -11,25 +11,22 @@ function canUseDefineProperty() {
     return flag
 }
 
-function isObject(val){
+function isObject(val) {
     return val !== null && typeof val === 'object'
 }
 
 if (canUseDefineProperty()) {
     function _observe(obj) {
-        let value;
         for (let key in obj) {
-            value = obj[key]
+            let value = obj[key]
             isObject(value) && _observe(value)
             Object.defineProperty(obj, key, {
                 enumerable: true,
                 configurable: true,
-                get(value) {
-                    console.log('is get value')
+                get() {
                     return value
                 },
                 set(newValue) {
-                    console.log(newValue)
                     if (value !== newValue)
                         value = newValue
                 }
@@ -38,6 +35,8 @@ if (canUseDefineProperty()) {
     }
 }
 
-let obj = { a: 1, b: {bb: 2} }
+let obj = { a: 1, b: { bb: 2 } }
 _observe(obj)
+console.log(obj.a)
 obj.a = 2
+console.log(obj.a)

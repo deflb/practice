@@ -1,64 +1,155 @@
 <html>
 <header>
-    <link rel="stylesheet" href="./static/index.css">
+    <link rel="stylesheet" href="/test/static/index.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+
+        html,
+        body {
+            width: 100%;
+            height: 100%;
+        }
+
+        body {
+            overflow: auto;
+        }
+
+        .img-wrapper img {
+            width: 100px;
+            height: 100px;
+            border: 1px solid #ddd;
+        }
+    </style>
 </header>
 
 <body>
     <button id='login'>login</button>
     <button id='logout'>logout</button>
-    <button id='product'>get product</button>
+    <button id='openIframeLoop'>open iframe loop</button>
+    <button id='openAjaxLoop'>open ajax loop</button>
+    <div style="height: 30%">
+        <input type="text" id='username'>
+    </div>
+    <div class="img-wrapper">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8407.png' alt="">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8427.png' alt="">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8431.jpg' alt="">
+    </div>
+    <div style="height: 30%"></div>
+    <div class="img-wrapper">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8407.png' alt="">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8427.png' alt="">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8431.jpg' alt="">
+    </div>
+    <div style="height: 30%"></div>
+    <div class="img-wrapper">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8407.png' alt="">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8427.png' alt="">
+        <img src="/test/static/img/empty.png" old='/test/static/img/empty.png' origin='/test/static/img/u8431.jpg' alt="">
+    </div>
+
+    <script src="/test/static/jquery-1.7.2.min.js"></script>
+    <script src="/test/static/index.js"></script>
+    <!-- 轮询: ifram ajax socket -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/test/sw.js').then(res => {
+                console.log(res)
+            }).catch(err => { console.log(err) })
+        }
+        login.onclick = () => {
+            ajax({
+                url: '/login',
+                data: {
+                    username: 'admin',
+                    password: 'admin',
+                },
+                success: (data) => {
+                    console.log(data)
+                    alert(data.data)
+                },
+                fail: (err) => {
+                    console.log(err)
+                },
+                responseType: 'json'
+            })
+        }
+        logout.onclick = () => {
+            ajax({
+                url: '/logout',
+                data: {
+                    username: 'admin',
+                    password: 'admin',
+                },
+                responseType: 'json',
+                success: (data) => {
+                    console.log(data)
+                    alert(data.data)
+                },
+                fail: (err) => {
+                    console.log(err)
+                }
+            })
+        }
+        openAjaxLoop.onclick = ajaxLoop
+        openIframeLoop.onclick = iframeLoop
+        function ajaxLoop() { // ajax loop
+            ajax({
+                url: '/product',
+                data: {
+                    id: 'fruit',
+                },
+                responseType: 'json',
+                success: (data) => {
+                    console.log(data)
+                    ajaxLoop()
+                },
+                fail: (err) => {
+                    console.log(err)
+                }
+            })
+        }
+        function iframeLoop() { // iframe loop
+            if (!document.getElementsByTagName('iframe').length) {
+                function iframeToLoop(data) { // iframe loop
+                    console.log(data)
+                    let topIframe = document.getElementsByTagName('iframe')[0], time = null;
+                    time = setTimeout(() => {
+                        let _iframe = document.createElement('iframe')
+                        _iframe.src = 'http://localhost:8888/iframe'
+                        document.body.removeChild(topIframe)
+                        document.body.appendChild(_iframe)
+                        clearTimeout(time)
+                        time = null;
+                    }, 1000)
+                }
+                window.iframeToLoop = iframeToLoop
+                let _iframe = document.createElement('iframe')
+                _iframe.src = 'http://localhost:8888/iframe'
+                document.body.appendChild(_iframe)
+            }
+        }
+    </script>
+    <script>
+        function jsonp(data) {
+            console.log(data)
+        }
+    </script>
+    <script src='http://localhost:8888/script?callback=jsonp'></script>
+    <!-- 浏览器原生模块化 -->
+    <script type="module">
+        import * as i from '/test/static/utils/index.js';
+        import { debounce } from '/test/static/utils/base.js';
+        i.loadingImgByIO('.img-wrapper')
+        // loadingImgByScroll('.img-wrapper')
+        username.oninput = debounce(function (e) {
+            // this, e
+            // do something that you want
+        }, 270)
+    </script>
 </body>
-<script src="./static/index.js"></script>
-<script>
-    login.onclick = () => {
-        ajax({
-            url: '/login',
-            data: {
-                username: 'admin',
-                password: 'admin',
-            },
-            success: (data) => {
-                console.log(data)
-                alert(data.data)
-            },
-            fail: (err) => {
-                console.log(err)
-            },
-            responseType: 'json'
-        })
-    }
-    logout.onclick = () => {
-        ajax({
-            url: '/logout',
-            data: {
-                username: 'admin',
-                password: 'admin',
-            },
-            responseType: 'json',
-            success: (data) => {
-                console.log(data)
-                alert(data.data)
-            },
-            fail: (err) => {
-                console.log(err)
-            }
-        })
-    }
-    product.onclick = () => {
-        ajax({
-            url: '/product',
-            data: {
-                id: 'fruit',
-            },
-            responseType: 'json',
-            success: (data) => {
-                console.log(data)
-            },
-            fail: (err) => {
-                console.log(err)
-            }
-        })
-    }
-</script>
 
 </html>
