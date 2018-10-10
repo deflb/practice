@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            outline: none;
+        }
+
+        .div {
+            position: relative;
+            padding-right: 40px;
+            height: 40px;
+        }
+
+        .div>input {
+            display: inline-block;
+            width: 100%;
+            height: 100%;
+        }
+
+        .div>input:focus-within+button {
+            background-color: blue;
+        }
+
+        .div>input:not(:placeholder-shown)+button {
+            background-color: #fff;
+        }
+
+        .div>button {
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 40px;
+            height: 100%;
+        }
+
+        .div>button:focus-within {
+            color: #fff;
+        }
+
+        .div2 {
+            width: 100px;
+            height: 42px;
+            position: relative;
+        }
+
+        .div2>.title {
+            display: inline-block;
+            width: 50%;
+        }
+
+        .div2>.title:focus-within {
+            background-color: #e4393c;
+            color: #fff;
+        }
+
+        .div2>.title:focus-within+div {
+            display: none;
+        }
+
+        .div2>.title:not(:focus-within)+div {
+            display: block;
+        }
+
+        .box1,
+        .box2 {
+            position: absolute;
+            top: 21px;
+            left: 0;
+            width: 100%;
+            background-color: #fff;
+        }
+
+        .box1 {
+            z-index: 1;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="div">
+        <input placeholder="aaaa" />
+        <button>go</button>
+    </div>
+    <div class="div2">
+        <span tabindex="10" class="title">a</span><span class="title" tabindex="11">b</span>
+        <div class="box1">
+            a
+        </div>
+        <div class="box2">
+            b
+        </div>
+    </div>
+    <div class="div2">
+            <button autofocus class="title">a</button><button class="title">b</button>
+            <div class="box1">
+                a
+            </div>
+            <div class="box2">
+                b
+            </div>
+        </div>
+</body>
+
+</html>

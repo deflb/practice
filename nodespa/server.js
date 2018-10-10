@@ -9,7 +9,7 @@ let server = http.createServer((req, res) => {
     let pathname = url.parse(req.url).pathname, staticReg = /\.(html|css|js|jpg|jpeg|png|svg|woff|ttf|eot|ico)/;
     if (staticReg.test(pathname)) {
         // 静态资源 中间件处理
-        static.staticMiddleWare(path.resolve() + pathname, res)
+        static.staticMiddleWare(path.resolve() + '/test' + pathname, res)
     } else {
         fs.readFile(path.resolve(__dirname, 'test', 'index.html'), 'utf-8', (err, data) => {
             if (!err) {
@@ -25,7 +25,6 @@ let server = http.createServer((req, res) => {
             }
         })
     };
-
 })
 server.listen(PORT, () => {
     console.log('server is start http://localhost:9999')

@@ -1,4 +1,4 @@
-const VERSON = 'v1', // 修改 VERSON ——> 更新缓存
+const VERSON = 'v2.0', // 修改 VERSON ——> 更新缓存
     urlToCache = [ // 单页资源 初始化为空 动态添加
     ];
 self.addEventListener('install', (e) => {

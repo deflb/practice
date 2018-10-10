@@ -24,7 +24,9 @@ const staticMiddleWare = (pathname, res) => {
             res.end()
         } else {
             res.writeHead(200, {
-                'content-type': mime[path.extname(pathname)]
+                'content-type': mime[path.extname(pathname)],
+                // 设置此响应头字段 文件会被浏览器直接下载 不设置则浏览器打开文件
+                // 'Content-Disposition': 'attachment;filename=' + path.basename(pathname),
             })
             res.write(content)
             res.end()

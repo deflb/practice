@@ -19,7 +19,7 @@ function replaceFilter(arr) {
 }
 let filterRes = replaceFilter([8, 9, 10, 11, 23])
 
-// Set 数组去重 
+// Set 数组去重
 function takeOutRepetition(arr) {
     return [...new Set(arr)]
 }
@@ -116,3 +116,40 @@ for (let x = 1; x <= 9; x++) {
     str += ' '
 }
 console.log(str)
+
+// 多维数组转一维
+console.log(JSON.parse(`[${JSON.stringify([1, [2, [3, [4, ['5']]]]]).replace(/\[|]/g, (val) => {
+    console.log(val)
+    return ''
+})}]`))
+
+function loop(item) {
+    return Array.isArray(item) ? [].concat(...item.map(loop)) : item
+}
+console.log(loop([1, [2, [3, [4, ['5']]]]]))
+
+console.log('a123456_b'.replace(/^(.{1}).+(.{1})$/, ($0, $1, $2) => {
+    return $1 + '****' + $2
+}))
+
+function getRandom(min, max) {
+    return Math.random() * (max - min) + min
+}
+
+function formatToDateTime({ val = '', ymdSeparator = '-', hmsSeparator = ':', hasTime = false }) {
+    if (reg.allNumber.test(val)) {
+        const date = new Date(val),
+            ymd = [date.getFullYear(), date.getMonth() + 1, date.getDay()],
+            hms = [date.getHours(), date.getMinutes(), date.getSeconds()],
+            formatYmd = ymd.join(ymdSeparator).replace(/\d{1}/g, (props) => {
+                console.log(props)
+                return 'xx'
+            }),
+            formatHms = hms.join(hmsSeparator);
+        if (!hasTime) return formatYmd
+        return formatYmd + ' ' + formatHms
+    } else
+        return val
+}
+
+console.log(new Date(2018,10,1,8,30,30),Date.now())

@@ -84,17 +84,17 @@
             })
         }
 
-        function updateView(el, way, examples, attr) {
+        function updateView(el, way, instance, attr) {
             this.el = el;
             this.way = way;
-            this.examples = examples // 实例
+            this.instance = instance // 实例
             this.attr = attr;
 
             this.init()
         }
 
         updateView.prototype.init = function () {
-            this.el[this.way] = this.examples.data[this.attr]
+            this.el[this.way] = this.instance.data[this.attr]
         }
 
         new v({

@@ -163,7 +163,6 @@ onmessage = function (e) {
             for (let name in values) {
                 let nameArr = name.split("_")
                 if (name.indexOf("fpropertyname_") !== -1) {//洞口属性
-
                     let fpropertycode = nameArr[nameArr.length - 1]
                     let attr = doorAttr.find(
                         item => item.fpropertycode.toString()
@@ -187,9 +186,10 @@ onmessage = function (e) {
                     propdataval.push(propdataObj)
                 }
                 else if (name.indexOf("fstcpropname_") !== -1) {//洞口项次
-                    if (values[name] !== "") {
+                    if (values[name] !== "" && name.indexOf("system") === -1) {
+                        //不要加上追加产品
                         let stcgoodsObj = {};
-
+                        //if (fpropertycode.indexOf("system") === -1) {
                         let fstcpropcode = nameArr[nameArr.length - 1];
                         stcgoodsObj.fstcpropcode = fstcpropcode
                         let DoorItem = doorItemOp.find((item => {
@@ -209,6 +209,7 @@ onmessage = function (e) {
             }
             let getStcUnitQtyUrl = "/order/door/getStcUnitQty";
             let option = getInitOption(header, "POST", params)
+            //   console.log(option.body)
             fetch(address + getStcUnitQtyUrl, option).then((res) => {
                 return res.json()
             }).then((res) => {

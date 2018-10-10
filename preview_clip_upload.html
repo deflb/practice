@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+
+<body>
+    <input type="file" id='file'>
+    <div id='canvasBox'></div>
+    <div id='result'></div>
+    <span id='upload'>上传</span>
+    <script>
+        (function () {
+            function fn() {
+                const gather = {
+                    createImgEle(url, callback) {
+                        if (!url) throw Error('图片路径不能为空')
+                        const ele = new Image();
+                        ele.src = url;
+                        ele.onload = function () {
+                            callback(ele)
+                        }
+                    },
+                    fileToUrl(file, callback) {
+                        if (!file) throw Error('文件不能为空')
+                        if ('Blob' in window && 'URL' in window && 'createObjectURL' in URL) {
+                            callback(URL.createObjectURL(new Blob([file])))
+                        } else if ('FileReader' in window) {
+                            let fileRender = new FileReader();
+                            fileRender.readAsDataURL(file)
+                            fileRender.onload = function (e) {
+                                callback(e.target.result)
+                            }
+                        } else
+                            throw Error('浏览器不支持文件处理')
+                    },
+                    createCanvasEle() {
+                        return document.createElement('canvas')
+                    },
+                    draw(img, callback) {
+                        let canvas = this.createCanvasEle(),
+                            context = canvas.getContext('2d');
+                        console.dir(context)
+                        canvas.width = img.width;
+                        canvas.height = img.height;
+                        context.drawImage(img, 0, 0)
+                        gather.eventSelect(canvas, context, img)
+                        callback(canvas)
+                    },
+                    eventSelect(canvas, context, img) {
+                        let startPos = {
+                            x: 0,
+                            y: 0,
+                        }, movePos = {
+                            x: 0,
+                            y: 0,
+                        }
+                        function move(e) {
+                            let moveX = e.offsetX - startPos.x, moveY = e.offsetY - startPos.y;
+                            movePos.x = moveX;
+                            movePos.y = moveY;
+                            gather.drawLine(context, startPos.x, startPos.y, moveX, moveY, img)
+                        }
+                        function down(e) {
+                            this.addEventListener('mousemove', move)
+                            startPos.x = e.offsetX;
+                            startPos.y = e.offsetY;
+                        }
+                        canvas.addEventListener('mousedown', down)
+                        canvas.addEventListener('mouseup', function () {
+                            this.removeEventListener('mousemove', move)
+                            let imgdata = context.getImageData(startPos.x, startPos.y, movePos.x, movePos.y)
+                            gather.drawResult(imgdata)
+                        })
+                    },
+                    drawResult(imgdata) {
+                        let canvas = gather.createCanvasEle(),
+                            context = canvas.getContext('2d');
+                        canvas.width = imgdata.width;
+                        canvas.height = imgdata.height;
+                        context.putImageData(imgdata, 0, 0)
+                        gather.renderResult(canvas.toDataURL('image/jpeg'))
+                    },
+                    renderResult(url) {
+                        gather.source = url;
+                        let img = new Image();
+                        gather.url = url;
+                        img.src = url;
+                        img.onload = function () {
+                            result.innerHTML = '';
+                            result.appendChild(img)
+                        }
+                    },
+                    drawLine(context, x, y, moveX, moveY, img) {
+                        context.strokeStyle = '#fff'
+                        context.clearRect(0, 0, img.width, img.height)
+                        context.drawImage(img, 0, 0)
+                        context.strokeRect(x, y, moveX, moveY)
+                    },
+                    upload(config = {}) {
+                        let source = gather.source;
+                        if (!source) throw Error('文件不能为空')
+                        if ('FormData' in window) {
+                            let formData = new FormData();
+                            formData.append('img', source)
+                            // console.log(formData.getAll('img'))
+                            source = formData
+                        }
+                        console.log(source)
+                    },
+                    fileChangeHandle(e) {
+                        let file = e.target.files[0]
+                        gather.source = file
+                        gather.fileToUrl(file, function (url) {
+                            gather.createImgEle(url, function (imgEle) {
+                                gather.draw(imgEle, function (canvasEle) {
+                                    canvasBox.innerHTML = ''
+                                    canvasBox.appendChild(canvasEle)
+                                })
+                            });
+                        })
+                    }
+                }
+                file.addEventListener('change', gather.fileChangeHandle)
+                upload.addEventListener('click', gather.upload)
+            }
+            document.addEventListener('DOMContentLoaded', fn)
+        }())
+    </script>
+</body>
+
+</html>

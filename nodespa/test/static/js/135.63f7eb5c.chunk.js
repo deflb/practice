@@ -1,0 +1,1 @@
+webpackJsonp([135],{1979:function(e,n,t){"use strict";Object.defineProperty(n,"__esModule",{value:!0});var a=t(72),r=(t.n(a),t(56)),c=t.n(r),i=t(1),o=t.n(i);n.default=function(e){return o.a.createElement("div",null,"\u8bbf\u95ee\u7684\u5185\u5bb9\u4e0d\u5b58\u5728",o.a.createElement(c.a,{type:"primary",onClick:function(n){e.history.goBack()}},"\u8fd4\u56de"))}}});
