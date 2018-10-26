@@ -1,0 +1,28 @@
+@import '../../../style/mixin.less';
+.wrapper{
+    display: flex;
+    align-items: center;
+    padding: 0 8px;
+    text-align: center;
+    color: @shallowGrey;
+    &>li{
+        flex: 1;
+        &>div{
+            border-right: 1px dashed @normalGrey;
+        }
+        &::after{
+            content: '';
+            display: block;
+            width: 50%;
+            height: 1px;
+            margin: 4px auto auto auto;
+            background-color: transparent;
+        }
+    }
+    .active{
+        color: @red;
+        &::after{
+            background-color: @red;
+        }
+    }
+}

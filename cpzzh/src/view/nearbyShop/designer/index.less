@@ -1,0 +1,51 @@
+@import '../../../style/mixin.less';
+.wrapper{
+    height: 100%;
+    overflow-y: auto;
+    &_info{
+        position: relative;
+        padding: 50px 15px 0;
+        &_avator{
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 80px;
+            height: 80px;
+            margin: -40px 0 0 -40px;
+            padding: 1px;
+            border-radius: 50%;
+            background-color: @bgGrey;
+            img{
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+            }
+        }
+        &_detail{
+            text-align: center;
+            padding-bottom: 8px;
+            .xReal1px(after, dashed);
+            &_name{
+                .fontSize(title);
+            }
+            &_address{
+                .fontSize(text);
+                color: @shallowGrey;
+            }
+        }
+    }
+    &_filter{
+        .fontSize(text);
+        color: @white;
+        margin: 10px 0;
+        &>li{
+            display: inline-block;
+            padding: 4px 6px;
+            margin-right: 4px;
+            background-color: #ECECEC;
+        }
+        .active{
+            color: @shallowGrey;
+        }
+    }
+}

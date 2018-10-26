@@ -1,0 +1,33 @@
+@import '../../style/mixin.less';
+.wrapper{
+    position: relative;
+    &>img{
+        display: block;
+        width: 100%;
+        height: 3rem;
+        max-height: 400px;
+    }
+    &_info{
+        position: absolute;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        display: flex;
+        align-items: center;
+        width: 100%;
+        padding: 0 15px;
+        .fontSize(normal);
+        color: @white;
+        background-color: rgba(0, 0, 0, 0.3);
+        &>li{
+            flex: 1;
+            .whichRowsOverflowOmit(1);
+        }
+        &>li:first-child{
+            .fontSize(title);
+        }
+        &>li:nth-child(n+4){
+            .fontSize(text);
+        }
+    }
+}

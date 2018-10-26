@@ -1,0 +1,129 @@
+@hd: 1px; // 基本单位
+
+// 移动端设备最大最小宽度
+@minWidth: 320px; // iphone5/SE
+@maxWidth: 1024px; // ipad pro
+
+// 字体
+@font-size-base-sm: 12 * @hd;
+@font-size-base-md: 14 * @hd;
+@font-size-base-lg: 16 * @hd;
+
+@font-size-text-sm: 12 * @hd;
+@font-size-text-md: 13 * @hd;
+@font-size-text-lg: 15 * @hd;
+@font-size-normal-sm: 14 * @hd;
+@font-size-normal-md: 15 * @hd;
+@font-size-normal-lg: 17 * @hd;
+@font-size-title-sm: 16 * @hd;
+@font-size-title-md: 17 * @hd;
+@font-size-title-lg: 19 * @hd;
+@font-size-high-sm: 18 * @hd;
+@font-size-high-md: 19 * @hd;
+@font-size-high-lg: 20 * @hd;
+
+@black: #000;
+@red: #FF0000;
+@shallowRed: #FF4463;
+@white: #FFF;
+@normalGrey: #DDD;
+@bgGrey: #F7F7F7;
+@shallowGrey: #AEAEAE;
+@blobGrey: #DFDFDF;
+@blue: #34A5EA;
+@green: #2FCE31;
+
+.fontSize(@which: text){ // text normal title high
+    @var-sm: "font-size-@{which}-sm";
+    @var-md: "font-size-@{which}-md";
+    @var-lg: "font-size-@{which}-lg";
+    @media screen and (max-width: 321px){ /*小*/
+        font-size: @@var-sm
+    }
+    @media screen and (min-width: 321px) and (max-width: 400px){ /*中*/
+        font-size: @@var-md
+    }
+    @media screen and (min-width: 400px){ /*大*/
+        font-size: @@var-lg
+    }
+}
+
+.oneRowOverflowOmit(){ // 单行超出省略
+    max-width: 100%;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.whichRowsOverflowOmit(@row: 2){ // 单行到多行超出省略 兼容性一般 适用移动端
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: @row;
+}
+
+.real1px(@bg, @flag, @which, @type){
+    position: relative;
+    &::before,&::after{
+        content: '';
+        position: absolute;
+        display: block;
+        z-index: 1;
+        & when (@flag = x){
+            width: 100%;
+            border-top: 1px @type @bg;
+            left: 0;
+            right: 0;
+        }
+        & when (@flag = y){
+            border-left: 1px @type @bg;
+            height: 100%;
+            top: 0;
+            bottom: 0;
+        }
+    }
+    &::before{
+        & when (@which = after){
+            display: none;
+        }
+        & when (@flag = x){
+            top: 0;
+        }
+        & when (@flag = y){
+            left: 0;
+        }
+    }
+    &::after{
+        & when (@which = before){
+            display: none;
+        }
+        & when (@flag = x){
+            bottom: 0;
+        }
+        & when (@flag = y){
+            right: 0;
+        }
+    }
+    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
+        & when (@flag = x){
+            &::before,&::after{transform: scaleY(0.5)}
+        }
+        & when (@flag = y){
+            &::before,&::after{transform: scaleX(0.5)}
+        }
+    }
+    @media (-webkit-min-device-pixel-ratio: 2) and (-webkit-min-device-pixel-ratio: 3), (min-resolution: 2dppx) and (min-resolution: 3dppx){
+        & when (@flag = x){
+            &::before,&::after{transform: scaleY(0.33)}
+        }
+        & when (@flag = y){
+            &::before,&::after{transform: scaleX(0.33)}
+        }
+    }
+}
+.xReal1px(@which: both, @type: solid, @bg: @normalGrey){ // 横轴
+    .real1px(@bg, x, @which, @type);
+}
+.yReal1px(@which: both, @type: solid, @bg: @normalGrey) { // 纵轴
+    .real1px(@bg, y, @which, @type);
+}
