@@ -76,7 +76,19 @@ export default class palette extends Component {
         this.getPaletteList()
     }
 
-    onRefresh = ({ ...props }) => { console.log(props) }
+    updateList = () => { // 更新list (下拉刷新)
+        const { dataBlobs, dataSource, bid, keyword } = this.state,
+            len = dataBlobs.length;
+        request({ url: api.boardDetailList, data: { pageNo: 1, pageSize: len, status: 1, bid, keyword } }).then(res => {
+            const { list, pageTurn } = res,
+                { rowCount } = pageTurn;
+            this.setState({
+                hasMore: list.length >= rowCount ? false : true,
+                dataBlobs: list,
+                dataSource: dataSource.cloneWithRows(list),
+            })
+        }).catch(error => { })
+    }
 
     onSearch = keyword => {
         if (keyword !== this.state.keyword)
@@ -138,7 +150,7 @@ export default class palette extends Component {
                         pullToRefresh={<PullToRefresh
                             direction='down'
                             distanceToRefresh={40}
-                            onRefresh={this.onRefresh}
+                            onRefresh={this.updateList}
                         />}
                     />
                 </div>

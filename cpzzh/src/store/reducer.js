@@ -1,4 +1,4 @@
-import { LOCATION_CHANGE, SELECTION_CASE } from './type';
+import { LOCATION_CHANGE, SELECTION_CASE, USER_INFO } from './type';
 
 const routeState = (state = '/', action) => { // 路由状态
     if (action.type === LOCATION_CHANGE)
@@ -14,7 +14,15 @@ const selectionCase = (state = [], action) => { // 精选方案
         return state
 }
 
+const userInfo = (state = {}, action) => { // 当前用户信息
+    if (action.type === USER_INFO)
+        return action.data
+    else
+        return state
+}
+
 export default {
     routeState,
-    selectionCase
+    selectionCase,
+    userInfo
 }

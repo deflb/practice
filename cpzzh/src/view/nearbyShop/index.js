@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+// import BMap from 'BMap';
 import { Route } from 'react-router';
 import { ListView } from 'antd-mobile';
 import asyncC from '../../component/asyncC';
@@ -51,6 +52,13 @@ export default class nearbyShop extends Component { // 此页调用 wx js-sdk �
         const hei = document.documentElement.clientHeight - ReactDOM.findDOMNode(this.lv).getBoundingClientRect().top;
         this.setState({ height: hei })
         this.getNearShop()
+        // var map = new BMap.Map("map");
+        // var point = new BMap.Point(113.732756,22.992516);
+        // var mk = new BMap.Marker(point);
+        // map.addControl(new BMap.NavigationControl());
+        // map.addOverlay(mk);
+        // map.centerAndZoom(point, 18);
+        // map.enableScrollWheelZoom(true);
     }
 
     onEndReached = (event) => {

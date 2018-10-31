@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button } from 'antd-mobile';
+import { Button, Toast } from 'antd-mobile';
 import { getDisplayName } from '../../../utlis';
 import styles from './fullC.less';
 
@@ -8,12 +8,15 @@ export default flag => WrappedComponent => class extends Component {
     static displayName = `HOC${getDisplayName(WrappedComponent)}`;
 
     goToAppointment = () => {
-        const { match, history, location } = this.props,
+        const { match, history, location, userInfo } = this.props,
             { state = {} } = location;
-        history.push({
-            pathname: match.path + '/measureRoom',
-            state: { ...state, flag }
-        })
+        if (userInfo.customerId)
+            history.push({
+                pathname: match.path + '/measureRoom',
+                state: { ...state, flag }
+            })
+        else
+            Toast.info('请前往个人中心进行验证后再进行操作!')
     }
 
     render() {

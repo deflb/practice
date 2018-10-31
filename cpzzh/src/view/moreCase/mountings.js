@@ -103,7 +103,19 @@ export default class mountings extends Component {
         this.getMountingsList()
     }
 
-    onRefresh = ({ ...props }) => { console.log(props) }
+    updateList = () => { // 更新list (下拉刷新)
+        const { dataBlobs, dataSource, pid, brandname, keyword } = this.state,
+            len = dataBlobs.length;
+        request({ url: api.partDetailList, data: { pageNo: 1, pageSize: len, status: 1, pid, brandname, keyword } }).then(res => {
+            const { list, pageTurn } = res,
+                { rowCount } = pageTurn;
+            this.setState({
+                hasMore: list.length >= rowCount ? false : true,
+                dataBlobs: list,
+                dataSource: dataSource.cloneWithRows(list),
+            })
+        }).catch(error => { })
+    }
 
     onSearch = keyword => {
         if (keyword !== this.state.keyword)
@@ -168,7 +180,7 @@ export default class mountings extends Component {
                         pullToRefresh={<PullToRefresh
                             direction='down'
                             distanceToRefresh={40}
-                            onRefresh={this.onRefresh}
+                            onRefresh={this.updateList}
                         />}
                     />
                 </div>

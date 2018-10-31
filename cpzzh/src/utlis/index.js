@@ -35,6 +35,15 @@ const formatDate = (date, fmt = 'YYYY-MM-DD') => {
     return fmt;
 }
 
+const regExp = {
+    intagerReg: /^(0?|[1-9][0-9]*)$/,
+    floatReg: /^(0?|[1-9][0-9]*)?(\.(\d*))?$/,
+    allNumber: /^\d+$/,
+    phone: /^(13[0-9]|14[5|7]|15[0|1|2|3|5|6|7|8|9]|18[0|1|2|3|5|6|7|8|9])\d{8}$/,
+    email: /^\w+([-+.])*@\w+([-.]\w+)*\.\w+([-.]\w+)*$/,
+    removeEmpty: /\s/g,
+}
+
 const getDisplayName = WrappedComponent => WrappedComponent.displayName || WrappedComponent.name || 'Component';
 const isBoolean = val => Object.prototype.toString.call(val) === '[object Boolean]'
 const isString = val => Object.prototype.toString.call(val) === '[object String]'
@@ -44,6 +53,7 @@ export {
     getCookie,
     delCookie,
     formatDate,
+    regExp,
     getDisplayName,
     isBoolean,
     isString

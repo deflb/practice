@@ -1,10 +1,21 @@
 export default {
+    // CRM的C#文件获取路径
+    crmFileUrl: (filepath, filename) => {
+        const base = '/javascript/kindeditor/asp.net/appfile_download.ashx';
+        return filename ? `${base}?filepath=${filepath}&filename=${filename}` : `${base}?filepath=${filepath}`;
+    },
+
     getPublicKey: '/auth/sso/publicKey', // 从服务器获取公钥
     login: '/auth/sso/login', // 统一登录接口
     logout: '/auth/sso/logout', // 统一退出接口
     getPhoneCode: ' /auth/sso/getValidCode', // 获取手机校验码
     fileUpload: '/upc/upload?type=1', // 普通上传，支持所有文件，不支持断点续传 (0文件需登录访问；1文件无需登录访问)
     fileDelete: '/upc/delete', // 删除文件
+
+    userInfo: '/order/wechat/user/userInfo', // 获取用户信息
+    bindPhone: '/order/wechat/user/bindPhone', // 绑定手机号
+    sendValidCode: '/order/wechat/user/sendValidCode', // 获取手机验证码
+    levelInfo: '/order/wechat/user/levelInfo', // 获取用户等级详情
 
     // 沟通宝
     caseBaseList: '/case/data/list', // 案例基础数据

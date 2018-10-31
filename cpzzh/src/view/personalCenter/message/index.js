@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Route } from 'react-router';
-import { ListView, Card } from 'antd-mobile';
+import { ListView, Card, PullToRefresh } from 'antd-mobile';
 import asyncC from '../../../component/asyncC';
 import { request } from '../../../request';
 import api from '../../../request/api';
@@ -45,6 +45,20 @@ export default class message extends Component {
         }).catch(err => { this.setState({ isLoading: false }) })
     }
 
+    updateList = () => { // 更新list (下拉刷新)
+        const { dataBlobs, dataSource } = this.state,
+            len = dataBlobs.length;
+        request({ url: api.getMessages, data: { pageNo: 1, pageSize: len } }).then(res => {
+            const { list, pageTurn } = res,
+                { rowCount } = pageTurn;
+            this.setState({
+                hasMore: list.length >= rowCount ? false : true,
+                dataBlobs: list,
+                dataSource: dataSource.cloneWithRows(list),
+            })
+        }).catch(error => { })
+    }
+
     onEndReached = (event) => {
         const { isLoading, hasMore } = this.state;
         if (isLoading || !hasMore)
@@ -74,7 +88,7 @@ export default class message extends Component {
     }
 
     render() {
-        const { dataSource, height } = this.state,
+        const { dataSource, height, isLoading } = this.state,
             { match } = this.props;
         return (
             <div className='bg_grey_list_view'>
@@ -98,7 +112,13 @@ export default class message extends Component {
                     </div>}
                     style={{ height }}
                     onEndReached={this.onEndReached}
-                    onEndReachedThreshold={30}
+                    onEndReachedThreshold={60}
+                    pullToRefresh={<PullToRefresh
+                        refreshing={isLoading}
+                        direction='down'
+                        distanceToRefresh={40}
+                        onRefresh={this.updateList}
+                    />}
                 />
                 <Route path={match.path + '/detail'} component={Detail} />
             </div>

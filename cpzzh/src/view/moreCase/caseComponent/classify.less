@@ -5,10 +5,12 @@
     padding: 0 8px;
     text-align: center;
     color: @shallowGrey;
+    .fontSize(normal);
+    .xReal1px(after);
     &>li{
         flex: 1;
         &>div{
-            border-right: 1px dashed @normalGrey;
+            .yReal1px(after,dashed);
         }
         &::after{
             content: '';
@@ -17,6 +19,11 @@
             height: 1px;
             margin: 4px auto auto auto;
             background-color: transparent;
+        }
+    }
+    &>li:last-child{
+        &>div::after{
+            display: none;
         }
     }
     .active{

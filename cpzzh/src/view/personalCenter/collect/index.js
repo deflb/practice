@@ -2,6 +2,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { List, SwipeAction, ListView, Modal, PullToRefresh, Toast } from 'antd-mobile';
 import NoResult from '../../../component/noResult';
+import CasePdLook from '../../../component/casePdLook';
 import { request } from '../../../request';
 import api from '../../../request/api';
 import { imgAddress } from '../../../request/baseURL';
@@ -40,10 +41,9 @@ export default class collect extends Component {
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
                 pageNo: nextPage,
                 dataBlobs: _dataBlobs,
-                dataSource: dataSource.cloneWithRows([..._dataBlobs]),
+                dataSource: dataSource.cloneWithRows(_dataBlobs),
                 isLoading: false,
             })
-            pageNo === 1 && this.lv.scrollTo(0, 0)
         }).catch(err => { this.setState({ isLoading: false }) })
     }
 
@@ -60,34 +60,56 @@ export default class collect extends Component {
         this.getCaseList()
     }
 
-    onRefresh = ({ ...props }) => { console.log(props) }
-
-    del = (rowData, index) => {
-        request({ url: api.saveCollects, data: { id: rowData.id, status: 0 } }).then(res => {
-            Toast.success(res, 0.7)
-            const { dataBlobs, dataSource } = this.state,
-                _dataBlobs = [...dataBlobs];
-            _dataBlobs.splice(index, 1)
+    updateList = () => { // 更新list (删除|下拉刷新)
+        const { dataBlobs, dataSource, keyword } = this.state,
+            len = dataBlobs.length;
+        request({ url: api.caseCollectList, data: { pageNo: 1, pageSize: len, keyword } }).then(res => {
+            const { list, pageTurn } = res,
+                { rowCount } = pageTurn;
             this.setState({
-                dataBlobs: _dataBlobs,
-                dataSource: dataSource.cloneWithRows(_dataBlobs)
+                hasMore: list.length >= rowCount ? false : true,
+                dataBlobs: list,
+                dataSource: dataSource.cloneWithRows(list),
             })
+        }).catch(error => { })
+    }
+
+    del = (rowData) => {
+        request({ url: api.saveCollects, data: { id: rowData.id, status: 0 } }).then(res => {
+            Toast.success(res, 0.7);
+            this.updateList()
         }).catch(err => { })
     }
 
+    updateCurrentItem = (field, index) => { // views comments likes
+        if (!field) return;
+        const { dataBlobs, dataSource } = this.state,
+            _dataBlobs = [...dataBlobs],
+            currentRow = { ..._dataBlobs[index] };
+        currentRow[field]++;
+        _dataBlobs.splice(index, 1, currentRow)
+        this.setState({
+            dataBlobs: _dataBlobs,
+            dataSource: dataSource.cloneWithRows(_dataBlobs)
+        })
+    }
+
     render() {
-        const { height, dataBlobs, dataSource } = this.state, row = (rowData, sectionID, index) => {
+        const { height, dataBlobs, dataSource, isLoading } = this.state, row = (rowData, sectionID, index) => {
+            rowData.index = index;
+            rowData.des = rowData.styleName;
+            rowData.imgUrl = imgAddress + rowData.surfacePlotUrl;
             return (
                 <SwipeAction
-                    key={index}
-                    style={{ marginBottom: '0.2rem' }}
+                    key={rowData.id}
+                    style={{ marginBottom: 10 }}
                     right={[
                         {
                             text: '删除',
                             onPress: (e) => {
                                 alert('提示', '确认删除?', [
                                     { text: '取消', onPress: () => { } },
-                                    { text: '确认', onPress: this.del.bind(this, rowData, index) },
+                                    { text: '确认', onPress: this.del.bind(this, rowData) },
                                 ])
                             },
                             className: styles.del
@@ -95,16 +117,10 @@ export default class collect extends Component {
                     ]}
                 >
                     <List.Item>
-                        <div className={styles.product}>
-                            <img src={imgAddress + rowData.surfacePlotUrl} alt={rowData.id} />
-                            <p className='titleFontSizeC oneRowOverflowOmit'>{rowData.title}</p>
-                            <p className='textFontSizeC twoRowsOverflowOmit'>{rowData.remark}</p>
-                            <div className={`${styles.extra} textFontSizeC`}>
-                                <span><i className='iconfont icon-chakan' />{rowData.views}</span>
-                                <span className='yBoth1px'><i className='iconfont icon-xiaoxi' />{rowData.comments}</span>
-                                <span><i className='iconfont icon-i-good' />{rowData.likes}</span>
-                            </div>
-                        </div>
+                        <CasePdLook
+                            rowData={rowData}
+                            updateCurrentItem={this.updateCurrentItem}
+                        />
                     </List.Item>
                 </SwipeAction>
             );
@@ -121,11 +137,12 @@ export default class collect extends Component {
                         height
                     }}
                     onEndReached={this.onEndReached}
-                    onEndReachedThreshold={80}
+                    onEndReachedThreshold={10}
                     pullToRefresh={<PullToRefresh
+                        refreshing={isLoading}
                         direction='down'
                         distanceToRefresh={40}
-                        onRefresh={this.onRefresh}
+                        onRefresh={this.updateList}
                     />}
                 />
             </div>

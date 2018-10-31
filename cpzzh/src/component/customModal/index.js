@@ -46,18 +46,20 @@ export default class customModal extends Component {
             </div>,
             this.modal,
             () => {
-                let timer = null;
+                let timer = null,
+                    ele = this.dialog;
+                if (!ele) return
                 if (visible) {
-                    this.dialog.style.display = 'block';
+                    ele.style.display = 'block';
                     timer = setTimeout(() => {
-                        this.dialog.style.transform = "translateX(0)";
+                        ele.style.transform = "translateX(0)";
                         clearTimeout(timer)
                         timer = null;
                     }, 0)
-                }else{
-                    this.dialog.style.transform = "translateX(100%)";
+                } else {
+                    ele.style.transform = "translateX(100%)";
                     timer = setTimeout(() => {
-                        this.dialog.style.display = "none";
+                        ele.style.display = "none";
                         clearTimeout(timer)
                         timer = null;
                     }, 200)

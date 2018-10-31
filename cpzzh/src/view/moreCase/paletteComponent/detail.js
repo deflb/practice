@@ -13,10 +13,13 @@ export default fullScreen(class paletteDetail extends Component {
     }
 
     componentDidMount() {
-        const { location } = this.props, { state } = location;
-        request({ url: api.boardDetail, data: { id: state.id } }).then(res => {
-            this.setState({ detail: res })
-        }).catch(err => { console.log(err) })
+        const { location } = this.props,
+            { state = {} } = location,
+            { id } = state;
+        if (id)
+            request({ url: api.boardDetail, data: { id } }).then(res => {
+                this.setState({ detail: res })
+            }).catch(err => { console.log(err) })
     }
 
     render() {

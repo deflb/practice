@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
-import { Carousel, ListView } from 'antd-mobile';
+import { connect } from 'react-redux';
+import { Carousel, ListView, Toast } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import InfoList from '../../../component/infoList';
 import TitleContent from '../../../component/titleContent';
@@ -12,7 +13,9 @@ import api from '../../../request/api';
 import { imgAddress } from '../../../request/baseURL';
 import styles from './index.less';
 
-export default fullC('设计师')(class designer extends Component {
+export default connect(state => ({
+    userInfo: state.userInfo
+}))(fullC('设计师')(class designer extends Component {
     state = {
         pageNo: 1,
         pageSize: 10,
@@ -31,7 +34,7 @@ export default fullC('设计师')(class designer extends Component {
     componentDidMount() {
         const { location } = this.props,
             { state = {} } = location,
-            { fsalesname = '设计师详情', fsalesid,fusrid } = state;
+            { fsalesname = '设计师详情', fsalesid, fusrid } = state;
         document.title = '设计师 ' + fsalesname;
         this.getCaseList({ fusrid })
         this.getShopStaffDetail(fsalesid)
@@ -72,6 +75,21 @@ export default fullC('设计师')(class designer extends Component {
         if (isLoading || !hasMore)
             return;
         this.getCaseList()
+    }
+
+    onLikes = (rowData, index) => { // 点赞
+        request({ url: api.saveLikes, data: { id: rowData.id, status: 1 } }).then(res => {
+            Toast.success(res, 0.7)
+            const { dataBlobs, dataSource } = this.state,
+                _dataBlobs = [...dataBlobs],
+                currentRow = { ..._dataBlobs[index] };
+            currentRow.likes++;
+            _dataBlobs.splice(index, 1, currentRow)
+            this.setState({
+                dataBlobs: _dataBlobs,
+                dataSource: dataSource.cloneWithRows(_dataBlobs)
+            })
+        }).catch(err => { })
     }
 
     render() {
@@ -136,6 +154,7 @@ export default fullC('设计师')(class designer extends Component {
                                 return <CasePdLook
                                     style={{ marginBottom: 10 }}
                                     rowData={rowData}
+                                    likeClick={this.onLikes.bind(this, rowData, index)}
                                 />
                             }}
                             style={{
@@ -150,4 +169,4 @@ export default fullC('设计师')(class designer extends Component {
             </div>
         );
     }
-})
+}))

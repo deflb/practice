@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Route } from 'react-router';
-import { ListView, PullToRefresh, Toast } from 'antd-mobile';
+import { ListView, PullToRefresh } from 'antd-mobile';
 import asyncC from '../../component/asyncC';
 import NoResult from '../../component/noResult';
 import CasePdLook from '../../component/casePdLook';
@@ -36,13 +36,6 @@ export default class designCase extends Component {
 
         // 基础数据列表
         caseBaseList: [],
-    }
-    goToDetail = rowData => {
-        const { history, match } = this.props;
-        history.push({
-            pathname: match.path + '/case',
-            state: rowData
-        })
     }
 
     getCaseBaseList = () => { // 基础数据
@@ -87,7 +80,19 @@ export default class designCase extends Component {
         this.getCaseList()
     }
 
-    onRefresh = ({ ...props }) => { console.log(props) }
+    updateList = () => { // 更新list (下拉刷新)
+        const { dataBlobs, dataSource, keyword, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, sortColumn } = this.state,
+            len = dataBlobs.length;
+        request({ url: api.pageCase, data: { pageNo: 1, pageSize: len, keyword, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, sortColumn } }).then(res => {
+            const { list, pageTurn } = res,
+                { rowCount } = pageTurn;
+            this.setState({
+                hasMore: list.length >= rowCount ? false : true,
+                dataBlobs: list,
+                dataSource: dataSource.cloneWithRows(list),
+            })
+        }).catch(error => { })
+    }
 
     onSearch = keyword => {
         if (keyword !== this.state.keyword)
@@ -123,22 +128,18 @@ export default class designCase extends Component {
         }
     }
 
-    onComment = (rowData) => { // 评价
-        this.goToDetail(rowData)
-    }
-    onLikes = (rowData, index) => { // 点赞
-        request({ url: api.saveLikes, data: { id: rowData.id, status: 1 } }).then(res => {
-            Toast.success(res, 0.7)
-            const { dataBlobs, dataSource } = this.state,
-                _dataBlobs = [...dataBlobs],
-                currentRow = { ..._dataBlobs[index] };
-            currentRow.likes++;
-            _dataBlobs.splice(index, 1, currentRow)
-            this.setState({
-                dataBlobs: _dataBlobs,
-                dataSource: dataSource.cloneWithRows(_dataBlobs)
-            })
-        }).catch(err => { })
+    // 为了性能考虑 字段方面的更新 前端直接处理 不去拉取数据
+    updateCurrentItem = (field, index) => { // views comments likes
+        if (!field) return;
+        const { dataBlobs, dataSource } = this.state,
+            _dataBlobs = [...dataBlobs],
+            currentRow = { ..._dataBlobs[index] };
+        currentRow[field]++;
+        _dataBlobs.splice(index, 1, currentRow)
+        this.setState({
+            dataBlobs: _dataBlobs,
+            dataSource: dataSource.cloneWithRows(_dataBlobs)
+        })
     }
 
     render() {
@@ -228,29 +229,26 @@ export default class designCase extends Component {
                         dataSource={dataSource}
                         renderHeader={() => dataBlobs.length ? null : <NoResult />}
                         renderRow={(rowData, sectionID, index) => {
+                            rowData.index = index;
                             rowData.des = rowData.styleName;
                             rowData.imgUrl = imgAddress + rowData.surfacePlotUrl;
                             return <CasePdLook
                                 style={{ marginBottom: 10 }}
                                 rowData={rowData}
-                                onClick={this.goToDetail.bind(this, rowData)}
-                                commentClick={this.onComment.bind(this, rowData)}
-                                likeClick={this.onLikes.bind(this, rowData, index)}
+                                updateCurrentItem={this.updateCurrentItem}
                             />
                         }}
-                        style={{
-                            height
-                        }}
+                        style={{ height }}
                         onEndReached={this.onEndReached}
                         onEndReachedThreshold={80}
                         pullToRefresh={<PullToRefresh
                             direction='down'
                             distanceToRefresh={40}
-                            onRefresh={this.onRefresh}
+                            onRefresh={this.updateList}
                         />}
                     />
                 </div>
-                <Route path={match.path + '/case'} component={Detail} />
+                <Route path={match.path + '/case'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} />} />
             </div>
         );
     }

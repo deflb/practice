@@ -1,25 +1,36 @@
 @import '../../style/mixin.less';
 .wrapper{
+    position: absolute;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 1;
+    width: 100%;
     height: 100%;
-    overflow-y: auto;
-    &_personal{
-        padding: 10px 15px;
-        &_header{
-            display: flex;
-            &::before{
-                content: '';
-                width: 4px;
-                margin-right: 10px;
-                background-color: @red;
+    background-color: @white;
+    &_container{
+        height: 100%;
+        overflow-y: auto;
+        &_personal{
+            padding: 10px 15px;
+            &_header{
+                display: flex;
+                &::before{
+                    content: '';
+                    width: 4px;
+                    margin-right: 10px;
+                    background-color: @red;
+                }
             }
-        }
-        &_body{
-            margin-top: 10px;
-            &_item{
-                border-radius: 6px;
-                width: 32%;
-                img{
+            &_body{
+                margin-top: 10px;
+                &_item{
                     border-radius: 6px;
+                    width: 32%;
+                    img{
+                        border-radius: 6px;
+                    }
                 }
             }
         }

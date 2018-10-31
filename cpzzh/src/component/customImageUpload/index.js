@@ -31,7 +31,7 @@ export default class customImageUpload extends Component {
                 }
             }).then(res => {
                 changeHandle([
-                    ...this.props.files, // 事件队列加闭包
+                    ...this.props.files, // 获取已更新的 (onChange 的循环执行在同步执行栈 ajax,setState为异步任务在事件队列)
                     { ...res, url: uploadRow.url, fileUrl: res.url }
                 ])
             }).catch(err => { })
@@ -43,7 +43,7 @@ export default class customImageUpload extends Component {
                     baseURL: fileaddress
                 }
             }).then(res => {
-                let _files = [...this.props.files];  // 事件队列加闭包
+                let _files = [...this.props.files];  // 同上
                 _files.splice(index, 1);
                 changeHandle(_files)
             }).catch(err => { })

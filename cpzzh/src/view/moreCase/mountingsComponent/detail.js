@@ -8,16 +8,19 @@ import { request } from '../../../request';
 import api from '../../../request/api';
 import { imgAddress } from '../../../request/baseURL';
 
-export default fullScreen(class mountionsDetail extends Component {
+export default fullScreen(class mountingsDetail extends Component {
     state = {
         detail: {}
     }
 
     componentDidMount() {
-        const { location } = this.props, { state } = location;
-        request({ url: api.partDetail, data: { id: state.id } }).then(res => {
-            this.setState({ detail: res })
-        }).catch(err => { console.log(err) })
+        const { location } = this.props,
+            { state = {} } = location,
+            { id } = state;
+        if (id)
+            request({ url: api.partDetail, data: { id } }).then(res => {
+                this.setState({ detail: res })
+            }).catch(err => { console.log(err) })
     }
 
     render() {

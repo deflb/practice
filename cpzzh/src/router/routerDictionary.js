@@ -1,4 +1,6 @@
-export default {
+import routerBase from './routerBase';
+
+const _routerDictionary = {
     '/personalCenter': '个人中心',
     '/personalCenter/grade': '我的等级',
     '/personalCenter/collect': '我的收藏',
@@ -17,4 +19,17 @@ export default {
     '/moreCase/case': '案例详情',
     '/moreCase/palette': '色板详情',
     '/moreCase/mountings': '配件详情',
-}
+    '/checkTrue': '产品验真',
+};
+
+let routerDictionary = {};
+
+if (routerBase === '')
+    routerDictionary = _routerDictionary;
+else
+    Object.keys(_routerDictionary).forEach(item => {
+        routerDictionary[routerBase + item] = _routerDictionary[item]
+    })
+
+
+export default routerDictionary

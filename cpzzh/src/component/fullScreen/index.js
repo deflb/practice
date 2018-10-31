@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom';
 import { getDisplayName } from '../../utlis';
 import styles from './index.less';
 
-export default WrappedComponent => class extends Component {
+export default WrappedComponent => class extends Component { // 父级有transform属性下使用
 
     static displayName = `HOC${getDisplayName(WrappedComponent)}`;
 

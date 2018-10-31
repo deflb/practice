@@ -29,7 +29,7 @@ export default class classify extends Component {
     render() {
         const { current } = this.state,
             { source, itemClick } = this.props;
-        return <ul className={`${styles.wrapper} normalFontSizeC xBottom1px`}>{
+        return <ul className={styles.wrapper}>{
             source.map((item, index) => <li
                 key={item.val}
                 className={current === item.val ? styles.active : null}

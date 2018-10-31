@@ -43,6 +43,7 @@ axios.interceptors.response.use(function (response) {
     Toast.fail(data, 1);
     return Promise.reject({ msgcode, data });
 }, function (error) {
+    Toast.fail('网络错误', 1);
     return Promise.reject(error);
 })
 
@@ -69,6 +70,7 @@ request.login = async ({ captcha = '', merchantCode, userName, password }) => {
             setCookie('userName', userName);
             setCookie('uuid', res);
             axios.defaults.headers.common['Authorization'] = 'Bearer ' + res;
+            axios.defaults.headers.common['X_Requested_Key'] = '2,';
             return res;
         })
     }
@@ -81,12 +83,14 @@ request.logout = () => {
         delCookie('userName')
         delCookie('uuid')
         delete axios.defaults.headers.common['Authorization'];
+        delete axios.defaults.headers.common['X_Requested_Key'];
         return res;
     })
 }
 
 request.setAuthorization = uuid => {
     axios.defaults.headers.common['Authorization'] = 'Bearer ' + uuid;
+    axios.defaults.headers.common['X_Requested_Key'] = '2,';
 }
 
 export {

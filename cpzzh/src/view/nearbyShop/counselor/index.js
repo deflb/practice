@@ -13,7 +13,8 @@ import { imgAddress } from '../../../request/baseURL';
 import styles from './index.less';
 
 export default connect(state => ({
-    selectionCase: state.selectionCase
+    selectionCase: state.selectionCase,
+    userInfo: state.userInfo
 }))(fullC('顾问')(class counselor extends Component {
     state = {
         shopStaffDetail: {} // 顾问详情
