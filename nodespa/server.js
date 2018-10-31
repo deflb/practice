@@ -6,12 +6,15 @@ const static = require('./serverStatic')
 const PORT = 9999
 
 let server = http.createServer((req, res) => {
-    let pathname = url.parse(req.url).pathname, staticReg = /\.(html|css|js|jpg|jpeg|png|svg|woff|ttf|eot|ico)/;
+    let pathname = url.parse(req.url).pathname,
+        staticReg = /\.(html|css|js|jpg|jpeg|png|svg|woff|ttf|eot|ico)/,
+        baseUrl = pathname.match(/^\/[^\/]*/)[0];
+    console.log(req.headers.host)
     if (staticReg.test(pathname)) {
         // 静态资源 中间件处理
-        static.staticMiddleWare(path.resolve() + '/test' + pathname, res)
+        static.staticMiddleWare(__dirname + pathname, res)
     } else {
-        fs.readFile(path.resolve(__dirname, 'test', 'index.html'), 'utf-8', (err, data) => {
+        fs.readFile(__dirname + baseUrl + '/index.html', 'utf-8', (err, data) => {
             if (!err) {
                 res.writeHead(200, {
                     'Content-Type': 'text/html;charset=utf-8',
