@@ -1,0 +1,37 @@
+
+.title{
+    padding: 8px;
+    background: #ccc;
+    color:#838383;
+    line-height: 16px;
+
+}
+.row{
+    font-size: 0.25rem;
+    padding: 8px 0;
+    padding-left: 2%;
+ 
+    .floatBox{
+        overflow: hidden;
+    }
+    .left{
+        float: left;
+        width: 20%;
+        :global(label){
+            border-left: 3px solid #34A5EA;
+            display: block;
+            height: 16px;
+            line-height: 14px;
+            margin-top: 4px;
+            padding-left: 4px;
+            white-space: nowrap;            
+        }
+    }
+    .right{
+        float: left;
+        width: 78%;
+        :global(div){
+            margin-bottom: 8px;
+        }
+    }
+}

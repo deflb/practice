@@ -1,0 +1,31 @@
+@import '../../style/mixin.less';
+.wrapper{
+    height: 100%;
+    :global(#map){
+        height: 60%;
+        .xReal1px(after)
+    }
+    &_list{
+        height: 40%;
+        &_item{
+            padding: 10px 15px;
+            .xReal1px(after);
+            &_title{
+                display: flex;
+                .fontSize(title);
+                &_pos{
+                    flex: 1;
+                    &_tip{
+                        .fontSize(text);
+                        color: @red;
+                        margin-left: 6px;
+                    }
+                }
+            }
+            &_address{
+                .fontSize(text);
+                color: @shallowGrey;
+            }
+        }
+    }
+}
