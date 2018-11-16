@@ -76,8 +76,8 @@ export default createForm()(class goToVerify extends Component {
         const { visible, getCodeText, second, current } = this.state,
             { getFieldProps } = this.props.form;
         return (<List>
-            <List.Item extra={<span
-                className={styles.wrapper}
+            <List.Item className={styles.item} extra={<span
+                className={styles.item_btn}
                 onClick={this.onOpen}
             >去验证</span>}>验证成功后，订单信息一手掌握</List.Item>
             <Modal

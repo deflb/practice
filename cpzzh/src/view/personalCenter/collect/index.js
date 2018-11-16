@@ -1,15 +1,22 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { List, SwipeAction, ListView, Modal, PullToRefresh, Toast } from 'antd-mobile';
-import NoResult from '../../../component/noResult';
+import { Route } from 'react-router';
+import {
+    List, SwipeAction, ListView, Modal,
+    // PullToRefresh,
+    Toast
+} from 'antd-mobile';
+import { connect } from 'react-redux';
+import { globalLoadingToggle } from '../../../store/action';
 import CasePdLook from '../../../component/casePdLook';
+import asyncC from '../../../component/asyncC';
 import { request } from '../../../request';
 import api from '../../../request/api';
-import { imgAddress } from '../../../request/baseURL';
 import styles from './index.less';
+const Detail = asyncC(() => import('../../moreCase/caseComponent/detail'));
 const { alert } = Modal;
 
-export default class collect extends Component {
+export default connect()(class collect extends Component {
     constructor(props) {
         super(props);
         this.state = {
@@ -31,12 +38,15 @@ export default class collect extends Component {
         keyword = this.state.keyword,
         dataBlobs = this.state.dataBlobs,
     } = {}) => {
-        const { pageSize, dataSource } = this.state;
+        const { pageSize, dataSource } = this.state,
+            { dispatch } = this.props;
+        dispatch(globalLoadingToggle(true));
         this.setState({ isLoading: true, keyword })
         request({ url: api.caseCollectList, data: { pageNo, pageSize, keyword } }).then(res => {
             const { list, pageTurn } = res,
                 { nextPage, rowCount } = pageTurn,
                 _dataBlobs = [...dataBlobs, ...list];
+            dispatch(globalLoadingToggle(false));
             this.setState({
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
                 pageNo: nextPage,
@@ -44,7 +54,10 @@ export default class collect extends Component {
                 dataSource: dataSource.cloneWithRows(_dataBlobs),
                 isLoading: false,
             })
-        }).catch(err => { this.setState({ isLoading: false }) })
+        }).catch(err => {
+            this.setState({ isLoading: false });
+            dispatch(globalLoadingToggle(false));
+        })
     }
 
     componentDidMount() {
@@ -95,57 +108,64 @@ export default class collect extends Component {
     }
 
     render() {
-        const { height, dataBlobs, dataSource, isLoading } = this.state, row = (rowData, sectionID, index) => {
-            rowData.index = index;
-            rowData.des = rowData.styleName;
-            rowData.imgUrl = imgAddress + rowData.surfacePlotUrl;
-            return (
-                <SwipeAction
-                    key={rowData.id}
-                    style={{ marginBottom: 10 }}
-                    right={[
-                        {
-                            text: '删除',
-                            onPress: (e) => {
-                                alert('提示', '确认删除?', [
-                                    { text: '取消', onPress: () => { } },
-                                    { text: '确认', onPress: this.del.bind(this, rowData) },
-                                ])
-                            },
-                            className: styles.del
-                        }
-                    ]}
-                >
-                    <List.Item>
-                        <CasePdLook
-                            rowData={rowData}
-                            updateCurrentItem={this.updateCurrentItem}
-                        />
-                    </List.Item>
-                </SwipeAction>
-            );
-        };
+        const { height, dataBlobs, dataSource, isLoading } = this.state,
+            { match, history } = this.props,
+            row = (rowData, sectionID, index) => {
+                const { id, surfacePlotUrl, title, styleName, views, comments, likes } = rowData;
+                return (
+                    <SwipeAction
+                        key={id}
+                        style={{ marginBottom: 10 }}
+                        right={[
+                            {
+                                text: '删除',
+                                onPress: (e) => {
+                                    alert('提示', '确认删除?', [
+                                        { text: '取消', onPress: () => { } },
+                                        { text: '确认', onPress: this.del.bind(this, rowData) },
+                                    ])
+                                },
+                                className: styles.del
+                            }
+                        ]}
+                    >
+                        <List.Item>
+                            <CasePdLook
+                                rowClick={() => {
+                                    history.push({
+                                        pathname: match.path + '/caseDetail',
+                                        state: { id, index }
+                                    })
+                                }}
+                                rowData={{ index, id, surfacePlotUrl, title, styleName, views, comments, likes }}
+                                updateCurrentItem={this.updateCurrentItem}
+                            />
+                        </List.Item>
+                    </SwipeAction>
+                );
+            };
 
         return (
             <div className='bg_grey_list_view'>
                 <ListView
                     ref={el => this.lv = el}
                     dataSource={dataSource}
-                    renderHeader={() => dataBlobs.length ? null : <NoResult />}
+                    renderFooter={() => isLoading ? '加载中...' : dataBlobs.length ? '我是有底线的' : '暂无结果'}
                     renderRow={row}
                     style={{
                         height
                     }}
                     onEndReached={this.onEndReached}
-                    onEndReachedThreshold={10}
-                    pullToRefresh={<PullToRefresh
-                        refreshing={isLoading}
-                        direction='down'
-                        distanceToRefresh={40}
-                        onRefresh={this.updateList}
-                    />}
+                // onEndReachedThreshold={10}
+                // pullToRefresh={<PullToRefresh
+                //     refreshing={isLoading}
+                //     direction='down'
+                //     distanceToRefresh={40}
+                //     onRefresh={this.updateList}
+                // />}
                 />
+                <Route path={match.path + '/caseDetail'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} />} />
             </div>
         );
     }
-}
+})

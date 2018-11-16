@@ -2,13 +2,12 @@ import React, { Component } from 'react';
 import { Card } from 'antd-mobile';
 import InfoList from '../../../component/infoList';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
-import DetailCarousel from '../common/detailCarousel';
-import fullScreen from '../../../component/fullScreen';
+import CustomCarousel from '../../../component/customCarousel';
+import hasTransformFullScreen from '../../../component/fullScreen/hasTransformFullScreen';
 import { request } from '../../../request';
 import api from '../../../request/api';
-import { imgAddress } from '../../../request/baseURL';
 
-export default fullScreen(class mountingsDetail extends Component {
+export default hasTransformFullScreen(class mountingsDetail extends Component {
     state = {
         detail: {}
     }
@@ -27,8 +26,8 @@ export default fullScreen(class mountingsDetail extends Component {
         const { detail } = this.state,
             { name, imgUrlList = [], details, brandname, sortname, specification } = detail;
         return <div>
-            <DetailCarousel
-                source={imgUrlList.map(item => imgAddress + item)}
+            <CustomCarousel
+                source={imgUrlList}
             />
             <Card full>
                 <Card.Header

@@ -1,4 +1,4 @@
-import { LOCATION_CHANGE, SELECTION_CASE, USER_INFO } from './type';
+import { LOCATION_CHANGE, SELECTION_CASE, USER_INFO, USER_LEVEL_INFO, GLOBAL_LOADING } from './type';
 
 const routeState = (state = '/', action) => { // 路由状态
     if (action.type === LOCATION_CHANGE)
@@ -21,8 +21,24 @@ const userInfo = (state = {}, action) => { // 当前用户信息
         return state
 }
 
+const userLevelInfo = (state = {}, action) => { // 当前用户等级信息
+    if (action.type === USER_LEVEL_INFO)
+        return action.data
+    else
+        return state
+}
+
+const globalLoading = (state = false, action) => { // 全局loading
+    if (action.type === GLOBAL_LOADING)
+        return action.data
+    else
+        return state
+}
+
 export default {
     routeState,
     selectionCase,
-    userInfo
+    userInfo,
+    userLevelInfo,
+    globalLoading
 }

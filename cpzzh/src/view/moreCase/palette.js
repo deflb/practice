@@ -1,15 +1,17 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Route } from 'react-router';
-import { ListView, PullToRefresh } from 'antd-mobile';
+import {
+    ListView,
+    // PullToRefresh
+} from 'antd-mobile';
+import { globalLoadingToggle } from '../../store/action';
 import asyncC from '../../component/asyncC';
 import TextMaskImageBox from '../../component/textMaskImageBox';
-import NoResult from '../../component/noResult';
 import SearchBar from './common/searchBar';
 import Filter from './common/filter';
 import { request } from '../../request';
 import api from '../../request/api';
-import { imgAddress } from '../../request/baseURL';
 import styles from './palette.less';
 const Detail = asyncC(() => import('./paletteComponent/detail'));
 
@@ -45,12 +47,15 @@ export default class palette extends Component {
     }
 
     getPaletteList = ({ pageNo = this.state.pageNo, keyword = this.state.keyword, dataBlobs = this.state.dataBlobs } = {}) => {
-        const { pageSize, bid, dataSource } = this.state;
+        const { pageSize, bid, dataSource } = this.state,
+            { dispatch } = this.props;
+        dispatch(globalLoadingToggle(true));
         this.setState({ isLoading: true, bid, keyword })
         request({ url: api.boardDetailList, data: { pageNo, pageSize, status: 1, bid, keyword } }).then(res => {
             const { list, pageTurn } = res,
                 { nextPage, rowCount } = pageTurn,
                 _dataBlobs = [...dataBlobs, ...list];
+            dispatch(globalLoadingToggle(false));
             this.setState({
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
                 pageNo: nextPage,
@@ -59,7 +64,10 @@ export default class palette extends Component {
                 isLoading: false,
             })
             pageNo === 1 && this.lv.scrollTo(0, 0)
-        }).catch(err => { console.log(err); this.setState({ isLoading: false }) })
+        }).catch(err => {
+            this.setState({ isLoading: false });
+            dispatch(globalLoadingToggle(false));
+        })
     }
 
     componentDidMount() {
@@ -76,19 +84,19 @@ export default class palette extends Component {
         this.getPaletteList()
     }
 
-    updateList = () => { // 更新list (下拉刷新)
-        const { dataBlobs, dataSource, bid, keyword } = this.state,
-            len = dataBlobs.length;
-        request({ url: api.boardDetailList, data: { pageNo: 1, pageSize: len, status: 1, bid, keyword } }).then(res => {
-            const { list, pageTurn } = res,
-                { rowCount } = pageTurn;
-            this.setState({
-                hasMore: list.length >= rowCount ? false : true,
-                dataBlobs: list,
-                dataSource: dataSource.cloneWithRows(list),
-            })
-        }).catch(error => { })
-    }
+    // updateList = () => { // 更新list (下拉刷新)
+    //     const { dataBlobs, dataSource, bid, keyword } = this.state,
+    //         len = dataBlobs.length;
+    //     request({ url: api.boardDetailList, data: { pageNo: 1, pageSize: len, status: 1, bid, keyword } }).then(res => {
+    //         const { list, pageTurn } = res,
+    //             { rowCount } = pageTurn;
+    //         this.setState({
+    //             hasMore: list.length >= rowCount ? false : true,
+    //             dataBlobs: list,
+    //             dataSource: dataSource.cloneWithRows(list),
+    //         })
+    //     }).catch(error => { })
+    // }
 
     onSearch = keyword => {
         if (keyword !== this.state.keyword)
@@ -105,7 +113,8 @@ export default class palette extends Component {
             bid,
             dataBlobs,
             dataSource,
-            height
+            height,
+            isLoading,
         } = this.state, { match } = this.props;
         return (
             <div>
@@ -119,12 +128,12 @@ export default class palette extends Component {
                         }}
                         onOk={this.onOk}
                     >
-                        <ul className={`${styles.filter_wrapper} normalFontSizeC`}>
+                        <ul className={styles.filter_wrapper}>
                             {[
                                 { id: '', name: '全部' },
                                 ...classifyList
                             ].map(item => <li
-                                className={bid === item.id ? 'redColor xBottom1px' : 'xBottom1px'}
+                                className={bid === item.id ? styles.active : null}
                                 key={item.id}
                                 onClick={e => { this.setState({ bid: item.id }) }}
                             >{item.name}</li>)}
@@ -136,22 +145,25 @@ export default class palette extends Component {
                     <ListView
                         ref={el => this.lv = el}
                         dataSource={dataSource}
-                        renderHeader={() => dataBlobs.length ? null : <NoResult />}
-                        renderRow={(rowData, sectionID, rowID) => <TextMaskImageBox
-                            style={{ width: '49%', marginRight: rowID % 2 === 0 ? '2%' : null }}
-                            onClick={this.goToDetail.bind(this, rowData)}
-                            rowData={{ imgUrl: imgAddress + rowData.imgUrl, title: rowData.title }}
-                        />}
+                        renderFooter={() => isLoading ? '加载中...' : dataBlobs.length ? '我是有底线的' : '暂无结果'}
+                        renderRow={(rowData, sectionID, rowID) => {
+                            const { id, imgUrl, title } = rowData;
+                            return <TextMaskImageBox
+                                style={{ width: '49%', marginRight: rowID % 2 === 0 ? '2%' : null, marginBottom: 10 }}
+                                onClick={this.goToDetail.bind(this, { id })}
+                                rowData={{ imgUrl, title }}
+                            />
+                        }}
                         style={{
                             height
                         }}
                         onEndReached={this.onEndReached}
-                        onEndReachedThreshold={60}
-                        pullToRefresh={<PullToRefresh
-                            direction='down'
-                            distanceToRefresh={40}
-                            onRefresh={this.updateList}
-                        />}
+                    // onEndReachedThreshold={60}
+                    // pullToRefresh={<PullToRefresh
+                    //     direction='down'
+                    //     distanceToRefresh={40}
+                    //     onRefresh={this.updateList}
+                    // />}
                     />
                 </div>
                 <Route path={match.path + '/palette'} component={Detail} />

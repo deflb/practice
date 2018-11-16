@@ -1,0 +1,48 @@
+@import '../../../style/mixin.less';
+.wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    &_content{
+        flex: 1;
+        overflow: auto;
+        &_title{
+            .whichRowsOverflowOmit(1);
+        }
+        &_info{
+            display: flex;
+            &_user{
+                flex: 1;
+                padding-right: 15px;
+                display: flex;
+                &_avator{
+                    flex: 0 0 50px;
+                    height: 50px;
+                    background-color: @bgGrey;
+                    border-radius: 50%;
+                    margin-right: 15px;
+                    &>img{
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 50%;
+                    }
+                }
+                &_info{
+                    flex: 1;
+                    &_name{
+                        .fontSize(title);
+                    }
+                    &_address{
+                        .fontSize(text);
+                        color: @lightGrey;
+                    }
+                }
+            }
+            &_collect{
+                flex: 0 0 60px;
+                text-align: center;
+                .fontSize(normal);
+            }
+        }
+    }
+}

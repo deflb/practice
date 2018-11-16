@@ -6,7 +6,10 @@ import api from './api';
 import { setCookie, delCookie } from '../utlis';
 import { Toast } from 'antd-mobile';
 
+let Authorization = '';
 const timeout = 5000;
+const X_Requested_Key = '2,';
+
 // 基础
 const request = ({ method = 'post', url, data = {}, config = {} }) => { // config 里的字段为 axios 可配置字段
     return axios({
@@ -15,21 +18,13 @@ const request = ({ method = 'post', url, data = {}, config = {} }) => { // confi
         data,
         timeout,
         baseURL: address,
-        ...config
+        ...config,
+        headers: {
+            'Authorization': Authorization,
+            X_Requested_Key
+        }
     })
 }
-// form 格式 (x-www-form-urlencoded)
-const request_form = ({ method, url, data }) => request({
-    method,
-    url,
-    data,
-    config: {
-        transformRequest: [function (data) {
-            return encode(data)
-        }]
-    }
-})
-
 axios.interceptors.request.use(function (config) {
     return config;
 }, function (error) {
@@ -47,7 +42,32 @@ axios.interceptors.response.use(function (response) {
     return Promise.reject(error);
 })
 
-const _getPublicKey = (merchantCode, userName) => request_form({ url: api.getPublicKey, data: { merchantCode, userName } }).then(res => res).catch(err => null),
+// form 格式 (x-www-form-urlencoded)
+const request_form = axios.create({
+    timeout,
+    baseURL: address,
+    transformRequest: [function (data) {
+        return encode(data)
+    }]
+})
+request_form.interceptors.request.use(function (config) {
+    return config;
+}, function (error) {
+    return Promise.reject(error);
+})
+request_form.interceptors.response.use(function (response) {
+    const { msgcode, data } = response.data;
+    if (msgcode === 0)
+        return data;
+    // 其他状态 提示 错误信息
+    Toast.fail(data, 1);
+    return Promise.reject({ msgcode, data });
+}, function (error) {
+    Toast.fail('网络错误', 1);
+    return Promise.reject(error);
+})
+
+const _getPublicKey = (merchantCode, userName) => request_form.post(api.getPublicKey, { merchantCode, userName }).then(res => res).catch(err => null),
     _encodePassword = ({ publicKey, password }) => {
         const crypt = new jsencrypt.JSEncrypt({ default_key_size: 1024 });
         crypt.setPrivateKey(publicKey);
@@ -65,13 +85,10 @@ request.login = async ({ captcha = '', merchantCode, userName, password }) => {
             userName,
         };
         param.password = _encodePassword({ publicKey, password });
-        return request_form({ url: api.login, data: param }).then(res => {
-            setCookie('merchantCode', merchantCode);
-            setCookie('userName', userName);
-            setCookie('uuid', res);
-            axios.defaults.headers.common['Authorization'] = 'Bearer ' + res;
-            axios.defaults.headers.common['X_Requested_Key'] = '2,';
-            return res;
+        return request_form.post(api.login, param).then(uuid => {
+            setCookie('uuid', uuid);
+            Authorization = 'Bearer ' + uuid;
+            return uuid;
         })
     }
     return Promise.reject('error')
@@ -79,18 +96,21 @@ request.login = async ({ captcha = '', merchantCode, userName, password }) => {
 
 request.logout = () => {
     return request({ method: 'get', url: api.logout }).then(res => {
-        delCookie('merchantCode')
-        delCookie('userName')
         delCookie('uuid')
-        delete axios.defaults.headers.common['Authorization'];
-        delete axios.defaults.headers.common['X_Requested_Key'];
+        Authorization = '';
         return res;
     })
 }
 
 request.setAuthorization = uuid => {
-    axios.defaults.headers.common['Authorization'] = 'Bearer ' + uuid;
-    axios.defaults.headers.common['X_Requested_Key'] = '2,';
+    setCookie('uuid', uuid);
+    Authorization = 'Bearer ' + uuid;
+}
+
+// 内网(模拟外网环境)测试配置(发起授权 获取uuid)
+request.getAuthUrl = async () => {
+    const uuid = await request.login({ merchantCode: 'mt', userName: 'leibo_wxtest', password: '123456' });
+    window.location.href = window.location.href.split('?')[0] + '?uuid=' + uuid;
 }
 
 export {

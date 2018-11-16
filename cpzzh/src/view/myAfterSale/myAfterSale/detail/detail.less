@@ -1,0 +1,83 @@
+@import '../../../../style/mixin.less';
+
+.myAfterSaleDetail{
+    background: #f2f2f2;
+    overflow: hidden;
+}
+
+.historyTop{
+    background: #fff;
+    .icon{
+            color: #999;
+            font-weight: normal;
+            margin-top: -8px;
+        }
+}
+ 
+.tabBody{
+    background: #f2f2f2;
+    overflow: hidden;
+    padding-top: 8px;
+    :global(.am-grid-icon){
+        width:100% !important;
+    }
+    .item{
+        margin-bottom: 2px;
+        background: #fff;
+        padding:8px 16px;
+        
+        :global(label){
+            margin-right: 16px;
+            width: 25%;
+            display: inline-block;
+            color:rgb(51, 51, 51);
+        }
+        :global(span){
+            color:#999;
+        }
+        .before{
+            min-height: 120px;
+            padding-top:8px;
+            
+            margin-bottom: 8px;
+            font-size: 14px;
+            &.border{
+                border-bottom: 1px solid #CCC;
+            }
+        }
+    }
+} 
+.mt8{
+    margin-top: 8px;
+}
+.mb_8{
+    margin-bottom: 8px;
+}
+.mr_8{
+    margin-right: 8px;
+}
+.plusBtn{
+    position: absolute;
+    top: 75%;
+    right: 10%;
+    width: 48px;
+    height:48px;
+    background:#21bc8a;
+    color: #fff;
+    text-align: center;
+    line-height: 2.5;
+    font-size: 20px;
+    font-weight:bold;
+    border-radius: 50%;
+}
+.iconImg{
+    width: 100% !important;
+    height: auto !important;
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%,-50%);
+    border: 1px solid #ccc;
+    padding: 4px;
+    overflow: hidden;
+}

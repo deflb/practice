@@ -9,7 +9,8 @@ const OnlineCustomService = asyncC(() => import('../view/onlineCustomService'));
 const MyOrder = asyncC(() => import('../view/myOrder')); // 我的订单
 const MyAfterSale = asyncC(() => import('../view/myAfterSale')); // 我的售后
 const MoreCase = asyncC(() => import('../view/moreCase')); // 万套案例
-const CheckTrue = asyncC(() => import('../view/checkTrue')); // 万套案例
+const CheckTrue = asyncC(() => import('../view/checkTrue')); // 产品验证
+const ShowHome = asyncC(() => import('../view/showHome')); // 晒家有礼
 
 export default () => <Switch>
     <Route path={routerBase + '/personalCenter'} component={PersonalCenter} />
@@ -19,5 +20,6 @@ export default () => <Switch>
     <Route path={routerBase + '/myAfterSale'} component={MyAfterSale} />
     <Route path={routerBase + '/moreCase'} component={MoreCase} />
     <Route path={routerBase + '/checkTrue'} component={CheckTrue} />
+    <Route path={routerBase + '/showHome'} component={ShowHome} />
     <Route component={Page404} />
 </Switch>

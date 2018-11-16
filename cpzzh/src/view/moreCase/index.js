@@ -22,7 +22,7 @@ export default connect(state => ({
     }
 
     render() {
-        const { page } = this.state, { history, match } = this.props;
+        const { page } = this.state, { history, match, dispatch } = this.props;
         return <Tabs
             tabs={[
                 { key: 'case', title: '设计案例' },
@@ -36,9 +36,9 @@ export default connect(state => ({
             page={page}
             onChange={({ ...props }) => { this.setState({ page: props.key }) }}
         >
-            <Case key='case' history={history} match={match} />
-            <Palette key='palette' history={history} match={match} />
-            <Mountings key='mountings' history={history} match={match} />
+            <Case key='case' history={history} match={match} dispatch={dispatch} />
+            <Palette key='palette' history={history} match={match} dispatch={dispatch} />
+            <Mountings key='mountings' history={history} match={match} dispatch={dispatch} />
         </Tabs>
     }
 })

@@ -1,8 +1,16 @@
 @import '../../../style/mixin.less';
-.wrapper{
-    padding: 4px 8px;
-    color: @white;
-    background-color: @red;
+.item{
+    :global(.am-list-line){
+        :global(.am-list-content){
+            .fontSize(title);
+        }
+    }
+    &_btn{
+        padding: 4px 8px;
+        color: @white;
+        background-color: @red;
+        .fontSize(normal);
+    }
 }
 .verify_modal{
     &_title{

@@ -30,9 +30,11 @@
 @bgGrey: #F7F7F7;
 @shallowGrey: #AEAEAE;
 @blobGrey: #DFDFDF;
+@lightGrey: #797979;
 @blue: #34A5EA;
 @blobBlue: #0066CC;
 @green: #2FCE31;
+@blodGreen: #26C392;
 @yellow: #FFCC33;
 
 .fontSize(@which: text){ // text normal title high
@@ -128,4 +130,13 @@
 }
 .yReal1px(@which: both, @type: solid, @bg: @normalGrey) { // 纵轴
     .real1px(@bg, y, @which, @type);
+}
+
+// 清除浮动
+.clearBoth(){
+    &::after{
+        content: '';
+        display: block;
+        clear: both;
+    }
 }

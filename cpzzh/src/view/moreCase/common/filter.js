@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import CustomModal from '../../../component/customModal';
+import MaskAndSlide from './maskAndSlide';
 import styles from './filter.less';
 
 export default class filter extends Component {
@@ -22,7 +22,7 @@ export default class filter extends Component {
         return (
             <span onClick={e => { this.setState({ visible: true }) }}>
                 <i className='iconfont icon-filter' style={{ fontSize: 22 }} />
-                <CustomModal
+                <MaskAndSlide
                     visible={visible}
                     onCancel={this.onCancel}
                 >
@@ -38,7 +38,7 @@ export default class filter extends Component {
                             }}>确定</span>
                         </div>
                     </div>
-                </CustomModal>
+                </MaskAndSlide>
             </span>
         );
     }

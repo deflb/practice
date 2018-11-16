@@ -1,8 +1,8 @@
 import React, { Component } from 'react';
 import { Card } from 'antd-mobile';
-import normalFullScreen from '../../../component/normalFullScreen';
+import fullScreen from '../../../component/fullScreen';
 
-export default normalFullScreen(class messageDetail extends Component {
+export default fullScreen(class messageDetail extends Component {
     render() {
         const { location } = this.props,
             { state } = location;

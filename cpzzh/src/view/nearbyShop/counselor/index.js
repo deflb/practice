@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { connect } from 'react-redux';
-import { Carousel, List } from 'antd-mobile';
+import { List } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import TitleContent from '../../../component/titleContent';
 import SelectionCaseLook from '../../../component/selectionCaseLook';
+import CustomCarousel from '../../../component/customCarousel';
+import asyncC from '../../../component/asyncC';
 import fullC from '../common/fullC';
 import MeasureRoom from '../measureRoom';
 import { request } from '../../../request';
 import api from '../../../request/api';
-import { imgAddress } from '../../../request/baseURL';
 import styles from './index.less';
+const Detail = asyncC(() => import('../../moreCase/caseComponent/detail'));
 
 export default connect(state => ({
     selectionCase: state.selectionCase,
@@ -28,38 +30,33 @@ export default connect(state => ({
         this.getShopStaffDetail(fsalesid)
     }
 
+    componentWillReceiveProps(nextProps) {
+        const { location, match } = nextProps,
+            { pathname, state } = location;
+        if (pathname === match.path)
+            document.title = '家居顾问 ' + state.fsalesname;
+    }
+
     getShopStaffDetail = fsalesid => {
         request({ url: api.shopStaffDetail, data: { fsalesid } }).then(res => {
             this.setState({ shopStaffDetail: res })
         }).catch(err => { })
     }
 
+    updateCurrentItem = (field, index) => {
+        const { selectionCase } = this.props;
+        selectionCase[index][field]++;
+    }
+
     render() {
         const { shopStaffDetail } = this.state,
-            { selectionCase, match } = this.props;
+            { selectionCase, match, location, history } = this.props,
+            { state = {} } = location;
         return (
             <div className={styles.wrapper}>
-                <Carousel
-                    autoplay={false}
-                    infinite
-                    className='carousel_common'
-                >
-                    {[].map((val, index) => (
-                        <span
-                            key={index}
-                            className='carousel_common_item'
-                        >
-                            <img
-                                src={val}
-                                alt=""
-                                onLoad={() => {
-                                    // fire window resize event to change height
-                                    window.dispatchEvent(new Event('resize'));
-                                }}
-                            />
-                        </span>
-                    ))}
-                </Carousel>
+                <CustomCarousel
+                    source={[]}
+                />
                 <List renderHeader={() => <ul className={styles.wrapper_info}>
                     <li>
                         <div>
@@ -78,10 +75,24 @@ export default connect(state => ({
                 <CustomWhiteSpace />
                 <TitleContent title='精选方案'>
                     <div>
-                        {selectionCase.map(item => <SelectionCaseLook style={{ marginBottom: 10 }} key={item.id} data={{ ...item, imgUrl: imgAddress + item.surfacePlotUrl }} />)}
+                        {selectionCase.map((item, index) => {
+                            const { id, styleName, buildName, creator, views, createTime, surfacePlotUrl } = item;
+                            return <SelectionCaseLook
+                                style={{ marginBottom: 10 }}
+                                key={id}
+                                rowClick={() => {
+                                    history.push({
+                                        pathname: match.path + '/caseDetail',
+                                        state: { id, index, ...state }
+                                    })
+                                }}
+                                data={{ styleName, buildName, creator, views, createTime, surfacePlotUrl }}
+                            />
+                        })}
                     </div>
                 </TitleContent>
                 <Route path={match.path + '/measureRoom'} component={MeasureRoom} />
+                <Route path={match.path + '/caseDetail'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} />} />
             </div>
         );
     }

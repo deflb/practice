@@ -17,11 +17,11 @@ export default class personalCenterIndex extends Component {
             <Switch>
                 <Route exact path={match.path} component={PersonalCenter} />
                 <Route exact path={match.path + '/grade'} component={Grade} />
-                <Route exact path={match.path + '/collect'} component={Collect} />
+                <Route path={match.path + '/collect'} component={Collect} />
                 <Route exact path={match.path + '/suggestionFeedback'} component={SuggestionFeedback} />
                 <Route exact path={match.path + '/integral'} component={Integral} />
                 <Route path={match.path + '/message'} component={Message} />
-                <Route exact path={match.path + '/discountCoupon'} component={DiscountCoupon} />
+                <Route path={match.path + '/discountCoupon'} component={DiscountCoupon} />
                 <Route component={Page404} />
             </Switch>
         );

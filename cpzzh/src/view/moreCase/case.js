@@ -1,16 +1,18 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Route } from 'react-router';
-import { ListView, PullToRefresh } from 'antd-mobile';
+import {
+    ListView,
+    // PullToRefresh
+} from 'antd-mobile';
+import { globalLoadingToggle } from '../../store/action';
 import asyncC from '../../component/asyncC';
-import NoResult from '../../component/noResult';
 import CasePdLook from '../../component/casePdLook';
+import TypesClassifySelect from '../../component/typesClassifySelect';
 import SearchBar from './common/searchBar';
 import Filter from './common/filter';
-import Classify from './caseComponent/classify';
 import { request } from '../../request';
 import api from '../../request/api';
-import { imgAddress } from '../../request/baseURL';
 import styles from './case.less';
 const Detail = asyncC(() => import('./caseComponent/detail'));
 
@@ -50,12 +52,15 @@ export default class designCase extends Component {
         dataBlobs = this.state.dataBlobs,
         sortColumn = this.state.sortColumn,
     } = {}) => {
-        const { pageSize, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, dataSource } = this.state;
+        const { pageSize, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, dataSource } = this.state,
+            { dispatch } = this.props;
+        dispatch(globalLoadingToggle(true));
         this.setState({ isLoading: true, keyword, sortColumn })
         request({ url: api.pageCase, data: { pageNo, pageSize, keyword, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, sortColumn } }).then(res => {
             const { list, pageTurn } = res,
                 { nextPage, rowCount } = pageTurn,
                 _dataBlobs = [...dataBlobs, ...list];
+            dispatch(globalLoadingToggle(false));
             this.setState({
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
                 pageNo: nextPage,
@@ -64,7 +69,10 @@ export default class designCase extends Component {
                 isLoading: false,
             })
             pageNo === 1 && this.lv.scrollTo(0, 0)
-        }).catch(err => { this.setState({ isLoading: false }) })
+        }).catch(err => {
+            this.setState({ isLoading: false });
+            dispatch(globalLoadingToggle(false));
+        })
     }
 
     componentDidMount() {
@@ -80,19 +88,19 @@ export default class designCase extends Component {
         this.getCaseList()
     }
 
-    updateList = () => { // 更新list (下拉刷新)
-        const { dataBlobs, dataSource, keyword, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, sortColumn } = this.state,
-            len = dataBlobs.length;
-        request({ url: api.pageCase, data: { pageNo: 1, pageSize: len, keyword, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, sortColumn } }).then(res => {
-            const { list, pageTurn } = res,
-                { rowCount } = pageTurn;
-            this.setState({
-                hasMore: list.length >= rowCount ? false : true,
-                dataBlobs: list,
-                dataSource: dataSource.cloneWithRows(list),
-            })
-        }).catch(error => { })
-    }
+    // updateList = () => { // 更新list (下拉刷新)
+    //     const { dataBlobs, dataSource, keyword, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, sortColumn } = this.state,
+    //         len = dataBlobs.length;
+    //     request({ url: api.pageCase, data: { pageNo: 1, pageSize: len, keyword, sceneId, areaIdList, huxingIdList, meritsIdList, priceIdList, styleIdList, sortColumn } }).then(res => {
+    //         const { list, pageTurn } = res,
+    //             { rowCount } = pageTurn;
+    //         this.setState({
+    //             hasMore: list.length >= rowCount ? false : true,
+    //             dataBlobs: list,
+    //             dataSource: dataSource.cloneWithRows(list),
+    //         })
+    //     }).catch(error => { })
+    // }
 
     onSearch = keyword => {
         if (keyword !== this.state.keyword)
@@ -153,8 +161,9 @@ export default class designCase extends Component {
             dataBlobs,
             dataSource,
             height,
+            isLoading,
         } = this.state,
-            { match } = this.props;
+            { match, history } = this.props;
         let current;
         return (
             <div className={styles.wrapper}>
@@ -185,9 +194,9 @@ export default class designCase extends Component {
                                     () => { current = huxingIdList },
                                 )
                                 return <ul key={item.key} className={styles.filter_wrapper}>
-                                    <li className='titleFontSizeC'>{item.name}</li>
-                                    <li>
-                                        <ul className={`${styles.filter_item_wrapper} normalFontSizeC`}>
+                                    <li className={styles.filter_wrapper_title}>{item.name}</li>
+                                    <li className={styles.filter_wrapper_content}>
+                                        <ul className={styles.filter_item_wrapper}>
                                             {item.data.map(row => {
                                                 return <li
                                                     key={row.id}
@@ -214,7 +223,7 @@ export default class designCase extends Component {
                     </Filter>}
                     onSearch={this.onSearch}
                 />
-                <Classify
+                <TypesClassifySelect
                     source={[
                         { title: '最新', val: 'a.create_time' },
                         { title: '人气', val: 'b.intents' },
@@ -227,25 +236,29 @@ export default class designCase extends Component {
                     <ListView
                         ref={el => this.lv = el}
                         dataSource={dataSource}
-                        renderHeader={() => dataBlobs.length ? null : <NoResult />}
+                        renderFooter={() => isLoading ? '加载中...' : dataBlobs.length ? '我是有底线的' : '暂无结果'}
                         renderRow={(rowData, sectionID, index) => {
-                            rowData.index = index;
-                            rowData.des = rowData.styleName;
-                            rowData.imgUrl = imgAddress + rowData.surfacePlotUrl;
+                            const { id, surfacePlotUrl, title, styleName, views, comments, likes } = rowData;
                             return <CasePdLook
                                 style={{ marginBottom: 10 }}
-                                rowData={rowData}
+                                rowClick={() => {
+                                    history.push({
+                                        pathname: match.path + '/case',
+                                        state: { id, index }
+                                    })
+                                }}
+                                rowData={{ index, id, surfacePlotUrl, title, styleName, views, comments, likes }}
                                 updateCurrentItem={this.updateCurrentItem}
                             />
                         }}
                         style={{ height }}
                         onEndReached={this.onEndReached}
-                        onEndReachedThreshold={80}
-                        pullToRefresh={<PullToRefresh
-                            direction='down'
-                            distanceToRefresh={40}
-                            onRefresh={this.updateList}
-                        />}
+                    // onEndReachedThreshold={100}
+                    // pullToRefresh={<PullToRefresh
+                    //     direction='down'
+                    //     distanceToRefresh={40}
+                    //     onRefresh={this.updateList}
+                    // />}
                     />
                 </div>
                 <Route path={match.path + '/case'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} />} />

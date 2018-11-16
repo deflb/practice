@@ -1,28 +1,15 @@
 import React, { Component } from 'react';
+import { connect } from 'react-redux';
 import { Card, List } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import GoToVerify from './goToVerify';
-import portrait_png from '../../../assets/image/portrait.png';
 import list_thumb_png from '../../../assets/image/list_thumb.png';
-import { request } from '../../../request';
-import api from '../../../request/api';
+import routerBase from '../../../router/routerBase';
 import styles from './index.less';
 
-export default class personalCenter extends Component {
-
-    state = {
-        hadVerify: false
-    }
-
-    getLevelInfo = () => {
-        request({ url: api.levelInfo }).then(res => {
-            console.log(res)
-        }).catch(err => { })
-    }
-
-    componentDidMount() {
-        this.state.hadVerify && this.getLevelInfo()
-    }
+export default connect(state => ({
+    userInfo: state.userInfo
+}))(class personalCenter extends Component {
 
     jumpTo = ({ pathname, state = {} }) => {
         const { history } = this.props;
@@ -33,34 +20,42 @@ export default class personalCenter extends Component {
     }
 
     render() {
-        const { hadVerify } = this.state,
-            { match } = this.props, { path } = match;
+        const { match, userInfo } = this.props,
+            { path } = match,
+            { avatar, name, userLevel, growthValue, needValue, nextLevel, couponCount, score, isAuth, orderCount, claimCount } = userInfo;
         return (
             <div>
-                {hadVerify ? <Card full className={styles.had_verify}>
+                {isAuth === 1 ? <Card full className={styles.had_verify}>
                     <Card.Header
                         thumb={<div className={styles.had_verify_avator}>
-                            <img src={portrait_png} alt='' />
+                            {avatar ? <img src={avatar} alt='' /> : null}
                         </div>}
-                        title={<div>
-                            <div className='highFontSizeC'>陈莉莉 <span className={`textFontSizeC ${styles.had_verify_level}`}>普通会员</span></div>
-                            <div className='textFontSizeC shallowGreyColor'>再有<span className='redColor'>3200</span>成长值即可升级为铜牌会员</div>
+                        title={<div className={styles.had_verify_title}>
+                            <div className={styles.had_verify_title_header}>
+                                <div className={styles.had_verify_title_header_info}>{name} {userLevel ? <span className={styles.had_verify_title_header_info_level}>{userLevel}</span> : null}</div>
+                                <i className='iconfont icon-message' onClick={this.jumpTo.bind(this, { pathname: path + '/message' })} />
+                            </div>
+                            <div className={styles.had_verify_title_footer}>再有<span className={styles.had_verify_title_footer_tip}>{needValue}</span>成长值即可升级为{nextLevel}</div>
                         </div>}
-                        extra={<i onClick={this.jumpTo.bind(this, { pathname: path + '/message' })} className='iconfont icon-message highFontSizeC' />}
                     />
                     <Card.Body>
                         <div className={styles.had_verify_options}>
-                            <div onClick={this.jumpTo.bind(this, { pathname: path + '/grade' })}>
-                                <div className='titleFontSizeC redColor'>30000</div>
-                                <div className='textFontSizeC shallowGreyColor'>成长值</div>
+                            <div className={styles.had_verify_options_item} onClick={this.jumpTo.bind(this, { pathname: path + '/grade', state: { avatar, name, userLevel } })}>
+                                <div className={`${styles.had_verify_options_item_text} ${styles.growth_value}`}>{growthValue}</div>
+                                <div className={styles.had_verify_options_item_title}>成长值</div>
                             </div>
-                            <div className='yBoth1px' onClick={this.jumpTo.bind(this, { pathname: path + '/discountCoupon' })}>
-                                <div className='titleFontSizeC'>5</div>
-                                <div className='textFontSizeC shallowGreyColor'>优惠券</div>
+                            <div className={styles.had_verify_options_item}
+                                onClick={this.jumpTo.bind(this, { pathname: path + '/discountCoupon' })}
+                            >
+                                <div className={styles.had_verify_options_item_text}>{couponCount}</div>
+                                <div className={styles.had_verify_options_item_title}>优惠券</div>
                             </div>
-                            <div onClick={this.jumpTo.bind(this, { pathname: path + '/integral' })}>
-                                <div className='titleFontSizeC'>256</div>
-                                <div className='textFontSizeC shallowGreyColor'>积分</div>
+                            <div
+                                className={styles.had_verify_options_item}
+                            // onClick={this.jumpTo.bind(this, { pathname: path + '/integral' })}
+                            >
+                                <div className={styles.had_verify_options_item_text}>{score}</div>
+                                <div className={styles.had_verify_options_item_title}>积分</div>
                             </div>
                         </div>
                     </Card.Body>
@@ -68,37 +63,37 @@ export default class personalCenter extends Component {
                     :
                     <div className={styles.no_verify}>
                         <div className={styles.no_verify_info}>
-                            <i className='iconfont icon-message highFontSizeC' onClick={this.jumpTo.bind(this, { pathname: path + '/message' })} />
+                            <i className='iconfont icon-message' onClick={this.jumpTo.bind(this, { pathname: path + '/message' })} />
                             <div className={styles.no_verify_info_avator}>
-                                {/* <img src={portrait_png} alt='' /> */}
+                                {avatar ? <img src={avatar} alt='' /> : null}
                             </div>
-                            <p className='highFontSizeC'>陈莉莉</p>
+                            <p>{name}</p>
                         </div>
                         <CustomWhiteSpace />
                         <GoToVerify />
                     </div>
                 }
-                <CustomWhiteSpace />
-                <List className={styles.operate}>
+                {isAuth === 1 ? <CustomWhiteSpace /> : null}
+                {isAuth === 1 ? <List className={styles.operate}>
                     <List.Item
                         className={styles.operate_item}
                         arrow="horizontal"
                         thumb={list_thumb_png}
-                        extra={<span className={`${styles.list_item_extra} textFontSizeC`}>2</span>}
-                        onClick={this.jumpTo.bind(this, { pathname: '/myOrder' })}
+                        extra={<span className={styles.list_item_extra}>{orderCount}</span>}
+                        onClick={this.jumpTo.bind(this, { pathname: routerBase + '/myOrder' })}
                     >
-                        <span className='titleFontSizeC'>我的订单</span>
+                        <span className={styles.operate_item_text}>我的订单</span>
                     </List.Item>
                     <List.Item
                         className={styles.operate_item}
                         arrow="horizontal"
                         thumb={list_thumb_png}
-                        extra={<span className={`${styles.list_item_extra} textFontSizeC`}>1</span>}
-                        onClick={this.jumpTo.bind(this, { pathname: '/myAfterSale' })}
+                        extra={<span className={styles.list_item_extra}>{claimCount}</span>}
+                        onClick={this.jumpTo.bind(this, { pathname: routerBase + '/myAfterSale' })}
                     >
-                        <span className='titleFontSizeC'>我的售后</span>
+                        <span className={styles.operate_item_text}>我的售后</span>
                     </List.Item>
-                </List>
+                </List> : null}
                 <CustomWhiteSpace />
                 <List>
                     <List.Item
@@ -107,7 +102,7 @@ export default class personalCenter extends Component {
                         thumb={list_thumb_png}
                         onClick={this.jumpTo.bind(this, { pathname: path + '/collect' })}
                     >
-                        <span className='titleFontSizeC'>我的收藏</span>
+                        <span className={styles.operate_item_text}>我的收藏</span>
                     </List.Item>
                     <List.Item
                         className={styles.operate_item}
@@ -115,10 +110,10 @@ export default class personalCenter extends Component {
                         thumb={list_thumb_png}
                         onClick={this.jumpTo.bind(this, { pathname: path + '/suggestionFeedback' })}
                     >
-                        <span className='titleFontSizeC'>意见反馈</span>
+                        <span className={styles.operate_item_text}>意见反馈</span>
                     </List.Item>
                 </List>
             </div>
         );
     }
-}
+})

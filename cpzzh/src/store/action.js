@@ -1,4 +1,5 @@
-import { SELECTION_CASE, USER_INFO } from './type';
+import { SELECTION_CASE, USER_INFO, USER_LEVEL_INFO, GLOBAL_LOADING } from './type';
+import { isObject } from '../utlis';
 import { request } from '../request';
 import api from '../request/api';
 // _ 为私有action
@@ -13,6 +14,11 @@ const _saveUserInfo = data => ({
     data
 })
 
+const _saveUserLevelInfo = data => ({
+    type: USER_LEVEL_INFO,
+    data
+})
+
 const getSelectionCase = () => dispatch => {
     request({ url: api.pageCase, data: { pageNo: 1, pageSize: 10, sceneId: '' } }).then(res => {
         const list = res.list || [];
@@ -23,10 +29,23 @@ const getSelectionCase = () => dispatch => {
 const getUserInfo = () => dispatch => {
     request({ url: api.userInfo }).then(res => {
         dispatch(_saveUserInfo(res))
-    }).catch(err => { })
+        if (res.isAuth === 1)
+            request({ url: api.levelInfo }).then(data => {
+                dispatch(_saveUserLevelInfo(data))
+            }).catch(err => { })
+    }).catch(err => {
+        if (isObject(err) && err.msgcode === 710001)
+            request.getAuthUrl()
+    })
 }
+
+const globalLoadingToggle = data => ({
+    type: GLOBAL_LOADING,
+    data
+})
 
 export {
     getSelectionCase,
-    getUserInfo
+    getUserInfo,
+    globalLoadingToggle
 }

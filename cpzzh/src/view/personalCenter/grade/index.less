@@ -3,7 +3,7 @@
     position: relative;
     padding: 20px 15px;
     text-align: center;
-    &_question{
+    :global(.iconfont){
         position: absolute;
         top: 10px;
         right: 15px;
@@ -20,23 +20,39 @@
             border-radius: 50%;
         }
     }
+    &_name{
+        .fontSize(high);
+    }
     &_tip{
         padding: 2px;
         border-radius: 4px;
         background-color: @red;
         color: @white;
+        .fontSize(text);
     }
 }
-.card_body{
-    display: flex;
-    flex-wrap: wrap;
-    &>div{
-        flex: 0 0 33.3%;
-        text-align: center;
-        margin-bottom: 12px;
-        &>img{
-            width: 50px;
-            height: 50px;
+.power{
+    &_title{
+        .fontSize(title);
+    }
+    &_content{
+        display: flex;
+        flex-wrap: wrap;
+        &_item{
+            flex: 0 0 33.3%;
+            text-align: center;
+            margin-bottom: 12px;
+            &_thumb{
+                width: 50px;
+                height: 50px;
+            }
+            &_title{
+                .fontSize(normal);
+            }
+            &_extra{
+                .fontSize(text);
+                color: @red;
+            }
         }
     }
 }

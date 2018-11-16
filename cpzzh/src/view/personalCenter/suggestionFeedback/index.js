@@ -2,22 +2,23 @@ import React, { Component } from 'react';
 import { createForm } from 'rc-form';
 import { List, TextareaItem, Button, WingBlank, Toast } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
-import CustomImageUpload from '../../../component/customImageUpload';
+import CustomUpload from '../../../component/customUpload';
 import { request } from '../../../request';
 import api from '../../../request/api';
 import styles from './index.less';
 
 export default createForm()(class suggestionFeedback extends Component {
     state = {
-        imgList: [],
+        length: 0,
         maxLength: 10,
     }
 
     saveFeedback = () => {
         this.props.form.validateFields({ force: true }, (error, values) => {
             if (!error) {
+                const { ffeedtext, imgList } = values;
                 request({
-                    url: api.saveFeedback, data: { ...values, imgList: this.state.imgList.map(item => item.fileName) }
+                    url: api.saveFeedback, data: { ffeedtext, imgList: imgList.map(item => item.fileName) }
                 }).then(res => {
                     Toast.success('提交成功!', 1)
                     let timer = setTimeout(() => {
@@ -31,8 +32,7 @@ export default createForm()(class suggestionFeedback extends Component {
     }
 
     render() {
-        const { imgList, maxLength } = this.state,
-            len = imgList.length,
+        const { length, maxLength } = this.state,
             { getFieldProps } = this.props.form;
         return (
             <div className={styles.wrapper}>
@@ -50,17 +50,16 @@ export default createForm()(class suggestionFeedback extends Component {
                         placeholder='请输入反馈内容'
                     />
                 </List>
-                <List renderHeader={() => <div className='titleFontSizeC'>拍照上传<span className='textFontSizeC shallowGreyColor'>{`（${len}/${maxLength}）`}</span></div>}>
+                <List renderHeader={() => <div className={styles.wrapper_upload_header}>拍照上传<span className={styles.wrapper_upload_header_tip}>{`（${length}/${maxLength}）`}</span></div>}>
                     <List.Item>
-                        <CustomImageUpload
-                            maxLength={10}
-                            changeHandle={(val) => {
-                                this.setState({
-                                    imgList: val
-                                })
-                            }}
-                            selectable={len < maxLength}
-                            files={imgList}
+                        <CustomUpload
+                            {...getFieldProps('imgList', {
+                                rules: [
+                                    { required: false }
+                                ],
+                            })}
+                            getLength={length => { this.setState({ length }) }}
+                            maxLength={maxLength}
                         />
                     </List.Item>
                 </List>

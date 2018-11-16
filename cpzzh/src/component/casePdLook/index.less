@@ -1,11 +1,14 @@
 @import '../../style/mixin.less';
 .wrapper{
-    .xReal1px(after);
-    &>img{
-        display: block;
-        width: 100%;
+    .xReal1px();
+    &_image{
         height: 4.5rem;
         max-height: 500px;
+        .yReal1px();
+        img{
+            width: 100%;
+            height: 100%;
+        }
     }
     &_content{
         background-color: @white;

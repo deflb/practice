@@ -9,11 +9,12 @@ export default flag => WrappedComponent => class extends Component {
 
     goToAppointment = () => {
         const { match, history, location, userInfo } = this.props,
+            { customerId } = userInfo,
             { state = {} } = location;
-        if (userInfo.customerId)
+        if (customerId)
             history.push({
                 pathname: match.path + '/measureRoom',
-                state: { ...state, flag }
+                state: { ...state, flag, customerId }
             })
         else
             Toast.info('请前往个人中心进行验证后再进行操作!')

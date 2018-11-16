@@ -20,10 +20,10 @@ export default createForm()(class measureRoom extends Component {
                         text: '提交', onPress: () => {
                             const { fcname, fmobile } = values,
                                 param = { fcname, fmobile: fmobile.replace(regExp.removeEmpty, '') },
-                                { location, userInfo } = this.props,
+                                { location } = this.props,
                                 { state = {} } = location,
-                                { flag, fsalesid } = state;
-                            param.fcstid = userInfo.customerId;
+                                { flag, fsalesid, customerId } = state;
+                            param.fcstid = customerId;
                             if (flag === '设计师')
                                 param.fdesignerid = fsalesid;
                             if (flag === '顾问')

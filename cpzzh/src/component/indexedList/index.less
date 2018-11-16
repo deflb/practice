@@ -1,0 +1,20 @@
+@import '../../style/mixin.less';
+:global(.am-indexed-list-container){
+    position: relative;
+    .wrapper{
+        padding-right: 30px;
+        &_section{
+            margin-bottom: 10px;
+            &_header{
+                font-weight: bold;
+                color: @black;
+            }
+        }
+    }
+    :global(.am-indexed-list-quick-search-bar){
+        position: absolute;
+        top: 50%;
+        transform: translateY(-50%);
+        .fontSize(text);
+    }
+}

@@ -17,6 +17,9 @@ export default {
     sendValidCode: '/order/wechat/user/sendValidCode', // 获取手机验证码
     levelInfo: '/order/wechat/user/levelInfo', // 获取用户等级详情
 
+    getWxConfig: '/order/wechat/getWxConfig', // 获取wx.config参数
+    getAuthUrl: '/order/wechat/getAuthUrl', // 向后台发起微信授权
+
     // 沟通宝
     caseBaseList: '/case/data/list', // 案例基础数据
     pageCase: '/case/detail/pageCase', // 案例更多方案列表
@@ -40,8 +43,27 @@ export default {
     // 个人中心
     getMessages: '/storejps/News/GetMessages', // 消息列表
     updateMessageRead: '/storejps/News/UpdateMessageRead', // 更新消息为已读
-
+    myCoupon: '/order/wechat/user/myCoupon', // 优惠券列表
     saveFeedback: '/storejps/feedback/save', // 保存意见反馈
+
+    //售后服务
+    getStoreList: '/storejps/claim/list',//售后列表
+    getStoreDetail: '/storejps/claim/getById',//售后详情
+    getBaseDataList: '/storejps/common/getBaseDataList',//获取诉求下拉
+    saveStore: '/storejps/claim/save',//保存售后
+
+    //订单服务
+    getOrderList:"/storejps/Orders/getCusOrderList",//订单列表
+    getOrderDetail:'/storejps/Orders/GetPreorderInfo?orderNo=',//预订单详情
+    getOfficalDetail:'/storejps/Orders/GetSaleOrder?orderNo=',//正式详情
+    getOrderProgress:"/storejps/Orders/getOrderProgress",//获取任务进度
+    getOrderserve:"/storejps/SerPrj/getOrderSerPrjList",//获取订单服务
+    getTaskCompleteInfo:'/storejps/tasks/getTaskCompleteInfo',//进度详情信息
+
+    //评价功能
+    saveEvaluate:"/storejps/evaluate/evaluateCus",//提交评价
+    getEvaluateTemp:'/storejps/evaluate/getCusEvaluateTemp',//获取模板
+    getSalesEvaluateDetail:"/storejps/evaluate/getSalesEvaluateDetail",
 
     // 附近门店
     nearShop: '/storejps/shop/nearShop', // 附近门店列表
@@ -51,4 +73,12 @@ export default {
     shopDetail: '/storejps/shop/shopDetail', // 门店详情
     appointMeasure: '/storejps/shop/appointMeasure', // 预约量房
 
+    // 晒家有礼
+    houseShowList: '/manage/houseShow/searchPage', // 晒家列表
+    HouseShowDetail: '/manage/houseShow/getHouseShow', // 晒家详情
+    saveHouseShow: '/manage/houseShow/appSave', // 保存晒家
+    pageHsCommentList: '/manage/houseShow/comment/pageHsCommentList', // 获取评论列表
+    saveHsComment: '/manage/houseShow/comment/saveHsComment', // 发表评论
+    saveHsCommentReply: '/manage/houseShow/comment/saveHsCommentReply', // 发表评论回复
+    houseShowLike: '/manage/houseShow/like', // 点赞/取消点赞
 }

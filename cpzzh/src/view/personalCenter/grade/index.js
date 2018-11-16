@@ -2,43 +2,36 @@ import React, { Component } from 'react';
 import { Card } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import CustomProgress from '../../../component/customProgress';
-import portrait_png from '../../../assets/image/portrait.png';
-import list_thumb_png from '../../../assets/image/list_thumb.png';
 import styles from './index.less';
 
 export default class grade extends Component {
     render() {
+        const { location } = this.props,
+            { state = {} } = location,
+            { avatar, name, userLevel } = state;
         return (
             <div>
                 <div className={styles.grade_wrapper}>
-                    <i className={`iconfont icon-question ${styles.grade_wrapper_question}`} />
-                    <div className={styles.grade_wrapper_avator}><img src={portrait_png} alt='' /></div>
-                    <p className='highFontSizeC'>陈莉莉</p>
-                    <span className={`textFontSizeC ${styles.grade_wrapper_tip}`}>银牌会员</span>
-                    <CustomProgress
-                        current={8000}
-                        total={28000}
-                        step={[
-                            { val: 0, title: <span className='shallowGreyColor textFontSizeC'>普通会员</span>, extra: <span className='redColor textFontSizeC'>0</span> },
-                            { val: 14000, title: <span className='shallowGreyColor textFontSizeC'>银牌会员</span>, extra: <span className='redColor textFontSizeC'>14000</span> },
-                            { val: 28000, title: <span className='shallowGreyColor textFontSizeC'>金牌会员</span>, extra: <span className='redColor textFontSizeC'>28000</span> },
-                        ]}
-                    />
+                    <i className='iconfont icon-question' />
+                    <div className={styles.grade_wrapper_avator}>{avatar ? <img src={avatar} alt='' /> : null}</div>
+                    <p className={styles.grade_wrapper_name}>{name}</p>
+                    <span className={styles.grade_wrapper_tip}>{userLevel}</span>
+                    <CustomProgress />
                 </div>
                 <CustomWhiteSpace />
-                <Card full>
-                    <Card.Header title={<span className='titleFontSizeC'>会员尊享权益</span>} />
-                    <Card.Body className={styles.card_body}>
-                        {[
+                <Card full className={styles.power}>
+                    <Card.Header title={<span className={styles.power_title}>会员尊享权益</span>} />
+                    <Card.Body className={styles.power_content}>
+                        {/* {[
                             { title: '下单获积分', extra: '' },
                             { title: '每月送积分', extra: '' },
                             { title: '积分兑换', extra: '' },
                             { title: '专属客服', extra: '金牌会员专享' },
-                        ].map(item => <div key={item.title}>
-                            <img src={list_thumb_png} alt={item.title} />
-                            <p className='normalFontSizeC'>{item.title}</p>
-                            <p className='textFontSizeC redColor'>{item.extra}</p>
-                        </div>)}
+                        ].map(item => <div key={item.title} className={styles.power_content_item}>
+                            <img className={styles.power_content_item_thumb} src={list_thumb_png} alt={item.title} />
+                            <p className={styles.power_content_item_title}>{item.title}</p>
+                            <p className={styles.power_content_item_extra}>{item.extra}</p>
+                        </div>)} */}
                     </Card.Body>
                 </Card>
             </div>

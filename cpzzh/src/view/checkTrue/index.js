@@ -6,8 +6,10 @@ import styles from './index.less';
 
 export default createForm()(class checkTrue extends Component {
 
-    componentDidMount(){ // 挂载时 进行wx.config 配置
-
+    componentDidMount() { // 挂载时 进行wx.config 配置
+        const { href } = window.location,
+            url = href.replace(/#.*/, '');
+        console.log(url)
     }
 
     goToScan = () => { // wx.

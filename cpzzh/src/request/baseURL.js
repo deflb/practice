@@ -1,7 +1,15 @@
-let address = "http://192.168.5.77:9999";//一般的请求地址
-let fileaddress = "http://192.168.5.77:62506";//文件上传地址
+// let address = "http://125.93.252.232:9999";//一般的请求地址
+// let fileaddress = "http://125.93.252.232:9991";//文件上传地址
+// let crmFileAddress = "http://125.93.252.232:8888";//CRM的C#上传文件地址
+// let imgAddress = 'http://125.93.252.232:9991/'; //富文本编辑器之类的 直接获取图片
+
+
+let address = "http://192.168.5.177:9999";//一般的请求地址
+let fileaddress = "http://192.168.5.177:62506";//文件上传地址
 let crmFileAddress = "http://192.168.2.6:8060";//CRM的C#上传文件地址
-let imgAddress = 'http://192.168.5.77/'; //富文本编辑器之类的 直接获取图片
+let imgAddress = 'http://192.168.5.177/';
+
+
 // http://125.93.252.232:9999
 // http://125.93.252.232:1203
 

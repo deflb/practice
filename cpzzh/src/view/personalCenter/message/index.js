@@ -1,7 +1,12 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { Route } from 'react-router';
-import { ListView, Card, PullToRefresh } from 'antd-mobile';
+import { connect } from 'react-redux';
+import {
+    ListView, Card,
+    // PullToRefresh
+} from 'antd-mobile';
+import { globalLoadingToggle } from '../../../store/action';
 import asyncC from '../../../component/asyncC';
 import { request } from '../../../request';
 import api from '../../../request/api';
@@ -9,7 +14,7 @@ import { formatDate } from '../../../utlis';
 import styles from './index.less';
 const Detail = asyncC(() => import('./detail'));
 
-export default class message extends Component {
+export default connect()(class message extends Component {
     state = {
         pageNo: 1,
         pageSize: 10,
@@ -29,12 +34,15 @@ export default class message extends Component {
     }
 
     getMessages = () => { // 获取消息列表
-        const { pageNo, pageSize, dataBlobs, dataSource } = this.state;
+        const { pageNo, pageSize, dataBlobs, dataSource } = this.state,
+            { dispatch } = this.props;
+        dispatch(globalLoadingToggle(true));
         this.setState({ isLoading: true })
         request({ url: api.getMessages, data: { pageNo, pageSize } }).then(res => {
             const { list, pageTurn } = res,
                 { nextPage, rowCount } = pageTurn,
                 _dataBlobs = [...dataBlobs, ...list];
+            dispatch(globalLoadingToggle(false));
             this.setState({
                 dataBlobs: _dataBlobs,
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
@@ -42,22 +50,25 @@ export default class message extends Component {
                 dataSource: dataSource.cloneWithRows(_dataBlobs),
                 isLoading: false
             })
-        }).catch(err => { this.setState({ isLoading: false }) })
+        }).catch(err => {
+            this.setState({ isLoading: false });
+            dispatch(globalLoadingToggle(false));
+        })
     }
 
-    updateList = () => { // 更新list (下拉刷新)
-        const { dataBlobs, dataSource } = this.state,
-            len = dataBlobs.length;
-        request({ url: api.getMessages, data: { pageNo: 1, pageSize: len } }).then(res => {
-            const { list, pageTurn } = res,
-                { rowCount } = pageTurn;
-            this.setState({
-                hasMore: list.length >= rowCount ? false : true,
-                dataBlobs: list,
-                dataSource: dataSource.cloneWithRows(list),
-            })
-        }).catch(error => { })
-    }
+    // updateList = () => { // 更新list (下拉刷新)
+    //     const { dataBlobs, dataSource } = this.state,
+    //         len = dataBlobs.length;
+    //     request({ url: api.getMessages, data: { pageNo: 1, pageSize: len } }).then(res => {
+    //         const { list, pageTurn } = res,
+    //             { rowCount } = pageTurn;
+    //         this.setState({
+    //             hasMore: list.length >= rowCount ? false : true,
+    //             dataBlobs: list,
+    //             dataSource: dataSource.cloneWithRows(list),
+    //         })
+    //     }).catch(error => { })
+    // }
 
     onEndReached = (event) => {
         const { isLoading, hasMore } = this.state;
@@ -88,13 +99,15 @@ export default class message extends Component {
     }
 
     render() {
-        const { dataSource, height, isLoading } = this.state,
+        const { dataBlobs, dataSource, height, isLoading } = this.state,
             { match } = this.props;
         return (
             <div className='bg_grey_list_view'>
                 <ListView
                     ref={el => this.lv = el}
+                    contentContainerStyle={{ maxWidth: '100%' }}
                     dataSource={dataSource}
+                    renderFooter={() => isLoading ? '加载中...' : dataBlobs.length ? '我是有底线的' : '暂无结果'}
                     renderRow={(item, sectionID, index) => <div>
                         <div className={styles.message_time}>
                             <span>{formatDate(new Date(item.msgDate))}</span>
@@ -112,16 +125,16 @@ export default class message extends Component {
                     </div>}
                     style={{ height }}
                     onEndReached={this.onEndReached}
-                    onEndReachedThreshold={60}
-                    pullToRefresh={<PullToRefresh
-                        refreshing={isLoading}
-                        direction='down'
-                        distanceToRefresh={40}
-                        onRefresh={this.updateList}
-                    />}
+                // onEndReachedThreshold={60}
+                // pullToRefresh={<PullToRefresh
+                //     refreshing={isLoading}
+                //     direction='down'
+                //     distanceToRefresh={40}
+                //     onRefresh={this.updateList}
+                // />}
                 />
                 <Route path={match.path + '/detail'} component={Detail} />
             </div>
         );
     }
-}
+})

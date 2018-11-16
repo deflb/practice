@@ -9,18 +9,19 @@ export default class bar extends Component {
     }
     static propTypes = {
         detail: PropTypes.object,
-        onSend: PropTypes.func
+        onSend: PropTypes.func,
     }
     static defaultProps = {
-        detail: {},
-        onSend: function () { }
+        detail: {}, // 数量: {views, collects, likes, shares, comments} 查看 收藏 点赞 分享 评价
+        onSend: function () { },
     }
     hide = () => {
         this.setState({ visible: false })
     }
     render() {
-        const { visible } = this.state, { detail, onSend } = this.props,
-            { views, collects, likes, comments } = detail;
+        const { visible } = this.state,
+            { detail, onSend } = this.props,
+            { views, collects, likes, shares, comments } = detail;
         return (<div className={styles.wrapper}>
             <div className={styles.wrapper_left} onClick={e => { this.setState({ visible: true }) }}>
                 不写点什么吗？
@@ -34,10 +35,11 @@ export default class bar extends Component {
                 />
             </div>
             <ul className={styles.wrapper_right}>
-                <li><i className='iconfont icon-chakan' />{views}</li>
-                <li><i className='iconfont icon-collect' />{collects}</li>
-                <li><i className='iconfont icon-i-good' />{likes}</li>
-                <li><i className='iconfont icon-xiaoxi' />{comments}</li>
+                {views || views === 0 ? <li><i className='iconfont icon-chakan' />{views}</li> : null}
+                {collects || collects === 0 ? <li><i className='iconfont icon-collect' />{collects}</li> : null}
+                {likes || likes === 0 ? <li><i className='iconfont icon-i-good' />{likes}</li> : null}
+                {shares || shares === 0 ? <li><i className='iconfont icon-share' />{shares}</li> : null}
+                {comments || comments === 0 ? <li><i className='iconfont icon-xiaoxi' />{comments}</li> : null}
             </ul>
         </div>)
     }

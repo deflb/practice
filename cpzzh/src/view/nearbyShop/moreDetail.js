@@ -2,27 +2,26 @@ import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { getSelectionCase } from '../../store/action';
 import { connect } from 'react-redux';
-import { Carousel, List } from 'antd-mobile';
+import { List } from 'antd-mobile';
 import CustomWhiteSpace from '../../component/customWhiteSpace';
 import TextMaskImageBox from '../../component/textMaskImageBox';
 import TitleContent from '../../component/titleContent';
 import SelectionCaseLook from '../../component/selectionCaseLook';
-// import fullC from './common/fullC';
+import CustomCarousel from '../../component/customCarousel';
 import asyncC from '../../component/asyncC';
 import { request } from '../../request';
 import api from '../../request/api';
-import { imgAddress, crmFileAddress } from '../../request/baseURL';
 import styles from './moreDetail.less';
 const Counselor = asyncC(() => import('./counselor'));
 const Designer = asyncC(() => import('./designer'));
 const MeasureRoom = asyncC(() => import('./measureRoom'));
+const Detail = asyncC(() => import('../moreCase/caseComponent/detail'));
 
 export default connect(state => ({
     selectionCase: state.selectionCase
 }))(class nearbyShopDetail extends Component {
 
     state = {
-        docT: '',
         shopDetail: [],
         shopGuide: [],
         shopDesigner: [],
@@ -57,7 +56,6 @@ export default connect(state => ({
         const { location, dispatch } = this.props,
             { state = {} } = location,
             { fsname = '门店详情', fshopid } = state;
-        this.setState({ docT: fsname })
         document.title = fsname;
         this.getShopDetail(fshopid)
         this.getShopGuideList(fshopid)
@@ -65,40 +63,29 @@ export default connect(state => ({
         dispatch(getSelectionCase())
     }
 
-    componentWillReceiveProps() {
-        document.title = this.state.docT;
+    componentWillReceiveProps(nextProps) {
+        const { location, match } = nextProps,
+            { pathname, state } = location;
+        if (pathname === match.path)
+            document.title = state.fsname
+    }
+
+    updateCurrentItem = (field, index) => {
+        const { selectionCase } = this.props;
+        selectionCase[index][field]++;
     }
 
     render() {
         const { shopDetail, shopGuide, shopDesigner } = this.state,
-            shopImgList = shopDetail.shopImgList || [],
-            { location, match, selectionCase } = this.props,
-            { state = {} } = location,
-            { fshopid } = state;
+            { location, match, selectionCase, history } = this.props,
+            { state = {} } = location;
         return (
             <div className={styles.wrapper}>
                 <div className={styles.wrapper_container}>
-                    <Carousel
-                        autoplay={false}
-                        infinite
-                        className='carousel_common'
-                    >
-                        {shopImgList.map(item => (
-                            <span
-                                key={item.fid}
-                                className='carousel_common_item'
-                            >
-                                <img
-                                    src={crmFileAddress + api.crmFileUrl(item.fimgpath)}
-                                    alt=""
-                                    onLoad={() => {
-                                        // fire window resize event to change height
-                                        window.dispatchEvent(new Event('resize'));
-                                    }}
-                                />
-                            </span>
-                        ))}
-                    </Carousel>
+                    <CustomCarousel
+                        isCrm={true}
+                        source={shopDetail.shopImgList || []}
+                    />
                     <List>
                         <List.Item><div className='titleFontSizeC'>{shopDetail.fsname}</div></List.Item>
                         <List.Item thumb={<i className='iconfont icon-address redColor' />}><div className='normalFontSizeC shallowGreyColor'>{shopDetail.faddress}</div></List.Item>
@@ -111,13 +98,16 @@ export default connect(state => ({
                     <div className={styles.wrapper_container_personal}>
                         <div className={`${styles.wrapper_container_personal_header} titleFontSizeC`}>设计达人</div>
                         <div className={styles.wrapper_container_personal_body}>
-                            {shopDesigner.map((item, index) => <TextMaskImageBox
-                                key={index}
-                                style={{ margin: index % 3 === 1 ? '0 2%' : null }}
-                                className={styles.wrapper_container_personal_body_item}
-                                rowData={{ imgUrl: item.imgUrl, title: item.fsalesname }}
-                                onClick={this.jumpTo.bind(this, { pathname: match.path + '/designer', state: { ...item, fshopid } })}
-                            />)
+                            {shopDesigner.map((item, index) => {
+                                const { imgUrl, fsalesname, fsalesid, fusrid } = item;
+                                return <TextMaskImageBox
+                                    key={fsalesid}
+                                    style={{ margin: index % 3 === 1 ? '0 2%' : null }}
+                                    className={styles.wrapper_container_personal_body_item}
+                                    rowData={{ imgUrl, title: fsalesname }}
+                                    onClick={this.jumpTo.bind(this, { pathname: match.path + '/designer', state: { fsalesname, fsalesid, fusrid, ...state } })}
+                                />
+                            })
                             }
                         </div>
                     </div>
@@ -125,25 +115,42 @@ export default connect(state => ({
                     <div className={styles.wrapper_container_personal}>
                         <div className={`${styles.wrapper_container_personal_header} titleFontSizeC`}>资深家居顾问</div>
                         <div className={styles.wrapper_container_personal_body}>
-                            {shopGuide.map((item, index) => <TextMaskImageBox
-                                key={index}
-                                style={{ margin: index % 3 === 1 ? '0 2%' : null }}
-                                className={styles.wrapper_container_personal_body_item}
-                                rowData={{ imgUrl: item.imgUrl, title: item.fsalesname }}
-                                onClick={this.jumpTo.bind(this, { pathname: match.path + '/counselor', state: { ...item, fshopid } })}
-                            />)
+                            {shopGuide.map((item, index) => {
+                                const { imgUrl, fsalesname, fsalesid, fusrid } = item;
+                                return <TextMaskImageBox
+                                    key={fsalesid}
+                                    style={{ margin: index % 3 === 1 ? '0 2%' : null }}
+                                    className={styles.wrapper_container_personal_body_item}
+                                    rowData={{ imgUrl, title: fsalesname }}
+                                    onClick={this.jumpTo.bind(this, { pathname: match.path + '/counselor', state: { fsalesname, fsalesid, fusrid, ...state } })}
+                                />
+                            })
                             }
                         </div>
                     </div>
                     <CustomWhiteSpace />
                     <TitleContent title='精选方案'>
                         <div>
-                            {selectionCase.map(item => <SelectionCaseLook style={{ marginBottom: 10 }} key={item.id} data={{ ...item, imgUrl: imgAddress + item.surfacePlotUrl }} />)}
+                            {selectionCase.map((item, index) => {
+                                const { id, styleName, buildName, creator, views, createTime, surfacePlotUrl } = item;
+                                return <SelectionCaseLook
+                                    style={{ marginBottom: 10 }}
+                                    key={id}
+                                    rowClick={() => {
+                                        history.push({
+                                            pathname: match.path + '/caseDetail',
+                                            state: { id, index, ...state }
+                                        })
+                                    }}
+                                    data={{ styleName, buildName, creator, views, createTime, surfacePlotUrl }}
+                                />
+                            })}
                         </div>
                     </TitleContent>
                     <Route path={match.path + '/counselor'} component={Counselor} />
                     <Route path={match.path + '/designer'} component={Designer} />
                     <Route path={match.path + '/measureRoom'} component={MeasureRoom} />
+                    <Route path={match.path + '/caseDetail'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} />} />
                 </div>
             </div>
         );

@@ -47,6 +47,7 @@ const regExp = {
 const getDisplayName = WrappedComponent => WrappedComponent.displayName || WrappedComponent.name || 'Component';
 const isBoolean = val => Object.prototype.toString.call(val) === '[object Boolean]'
 const isString = val => Object.prototype.toString.call(val) === '[object String]'
+const isObject = val => Object.prototype.toString.call(val) === '[object Object]'
 
 export {
     setCookie,
@@ -56,5 +57,6 @@ export {
     regExp,
     getDisplayName,
     isBoolean,
-    isString
+    isString,
+    isObject
 }

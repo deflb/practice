@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { connect } from 'react-redux';
-import { Carousel, ListView, Toast } from 'antd-mobile';
+import { ListView } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import InfoList from '../../../component/infoList';
 import TitleContent from '../../../component/titleContent';
 import CasePdLook from '../../../component/casePdLook';
+import CustomCarousel from '../../../component/customCarousel';
+import asyncC from '../../../component/asyncC';
 import fullC from '../common/fullC';
-import MeasureRoom from '../measureRoom';
 import { request } from '../../../request';
 import api from '../../../request/api';
-import { imgAddress } from '../../../request/baseURL';
 import styles from './index.less';
+const MeasureRoom = asyncC(() => import('../measureRoom'));
+const Detail = asyncC(() => import('../../moreCase/caseComponent/detail'));
 
 export default connect(state => ({
     userInfo: state.userInfo
@@ -40,9 +42,16 @@ export default connect(state => ({
         this.getShopStaffDetail(fsalesid)
     }
 
+    componentWillReceiveProps(nextProps) {
+        const { location, match } = nextProps,
+            { pathname, state } = location;
+        if (pathname === match.path)
+            document.title = '设计师 ' + state.fsalesname;
+    }
+
     getShopStaffDetail = fsalesid => {
         request({ url: api.shopStaffDetail, data: { fsalesid } }).then(res => {
-            this.setState({ shopStaffDetail: res })
+            this.setState({ shopStaffDetail: res || {} })
         }).catch(err => { })
     }
 
@@ -59,7 +68,7 @@ export default connect(state => ({
                 { nextPage, rowCount } = pageTurn,
                 _dataBlobs = [...dataBlobs, ...list];
             this.setState({
-                height: !_dataBlobs.length ? 45 : _dataBlobs.length === 1 ? 140 : 300,
+                height: !_dataBlobs.length ? 45 : _dataBlobs.length === 1 ? 150 : 350,
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
                 pageNo: nextPage,
                 dataBlobs: _dataBlobs,
@@ -77,47 +86,28 @@ export default connect(state => ({
         this.getCaseList()
     }
 
-    onLikes = (rowData, index) => { // 点赞
-        request({ url: api.saveLikes, data: { id: rowData.id, status: 1 } }).then(res => {
-            Toast.success(res, 0.7)
-            const { dataBlobs, dataSource } = this.state,
-                _dataBlobs = [...dataBlobs],
-                currentRow = { ..._dataBlobs[index] };
-            currentRow.likes++;
-            _dataBlobs.splice(index, 1, currentRow)
-            this.setState({
-                dataBlobs: _dataBlobs,
-                dataSource: dataSource.cloneWithRows(_dataBlobs)
-            })
-        }).catch(err => { })
+    updateCurrentItem = (field, index) => { // views comments likes
+        if (!field) return;
+        const { dataBlobs, dataSource } = this.state,
+            _dataBlobs = [...dataBlobs],
+            currentRow = { ..._dataBlobs[index] };
+        currentRow[field]++;
+        _dataBlobs.splice(index, 1, currentRow)
+        this.setState({
+            dataBlobs: _dataBlobs,
+            dataSource: dataSource.cloneWithRows(_dataBlobs)
+        })
     }
 
     render() {
-        const { dataSource, height, shopStaffDetail } = this.state,
-            { match } = this.props;
+        const { dataBlobs, dataSource, height, isLoading, shopStaffDetail } = this.state,
+            { match, history, location } = this.props,
+            { state = {} } = location;
         return (
             <div className={styles.wrapper}>
-                <Carousel
-                    autoplay={false}
-                    infinite
-                    className='carousel_common'
-                >
-                    {[].map((val, index) => (
-                        <span
-                            key={index}
-                            className='carousel_common_item'
-                        >
-                            <img
-                                src={val}
-                                alt=""
-                                onLoad={() => {
-                                    // fire window resize event to change height
-                                    window.dispatchEvent(new Event('resize'));
-                                }}
-                            />
-                        </span>
-                    ))}
-                </Carousel>
+                <CustomCarousel
+                    source={[]}
+                />
                 <div className={styles.wrapper_info}>
                     <div className={styles.wrapper_info_avator}>
                         {/* <img src={pd_png} alt='' /> */}
@@ -146,26 +136,30 @@ export default connect(state => ({
                             ].map(item => <li className={styles.active} key={item.title}>{item.title}（{item.number}）</li>)}
                         </ul> */}
                         <ListView
-                            className='list_view_maybe_comon'
                             dataSource={dataSource}
+                            renderFooter={() => isLoading ? '加载中...' : dataBlobs.length ? '我是有底线的' : '暂无结果'}
                             renderRow={(rowData, sectionID, index) => {
-                                rowData.des = rowData.styleName;
-                                rowData.imgUrl = imgAddress + rowData.surfacePlotUrl;
+                                const { id, surfacePlotUrl, title, styleName, views, comments, likes } = rowData;
                                 return <CasePdLook
                                     style={{ marginBottom: 10 }}
-                                    rowData={rowData}
-                                    likeClick={this.onLikes.bind(this, rowData, index)}
+                                    rowClick={() => {
+                                        history.push({
+                                            pathname: match.path + '/caseDetail',
+                                            state: { id, index, ...state }
+                                        })
+                                    }}
+                                    rowData={{ index, id, surfacePlotUrl, title, styleName, views, comments, likes }}
+                                    updateCurrentItem={this.updateCurrentItem}
                                 />
                             }}
-                            style={{
-                                height,
-                            }}
+                            style={{ height }}
                             onEndReached={this.onEndReached}
-                            onEndReachedThreshold={30}
+                        // onEndReachedThreshold={30}
                         />
                     </div>
                 </TitleContent>
                 <Route path={match.path + '/measureRoom'} component={MeasureRoom} />
+                <Route path={match.path + '/caseDetail'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} />} />
             </div>
         );
     }

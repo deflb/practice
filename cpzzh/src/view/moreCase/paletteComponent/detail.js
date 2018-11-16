@@ -1,13 +1,12 @@
 import React, { Component } from 'react';
 import { Card } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
-import DetailCarousel from '../common/detailCarousel';
-import fullScreen from '../../../component/fullScreen';
+import CustomCarousel from '../../../component/customCarousel';
+import hasTransformFullScreen from '../../../component/fullScreen/hasTransformFullScreen';
 import { request } from '../../../request';
 import api from '../../../request/api';
-import { imgAddress } from '../../../request/baseURL';
 
-export default fullScreen(class paletteDetail extends Component {
+export default hasTransformFullScreen(class paletteDetail extends Component {
     state = {
         detail: {}
     }
@@ -19,15 +18,15 @@ export default fullScreen(class paletteDetail extends Component {
         if (id)
             request({ url: api.boardDetail, data: { id } }).then(res => {
                 this.setState({ detail: res })
-            }).catch(err => { console.log(err) })
+            }).catch(err => { })
     }
 
     render() {
         const { detail } = this.state,
-            { title, imgUrl, remark, details } = detail;
+            { title, imgUrl = '', remark, details } = detail;
         return <div>
-            <DetailCarousel
-                source={[imgAddress + imgUrl]}
+            <CustomCarousel
+                source={[imgUrl]}
             />
             <Card full>
                 <Card.Header

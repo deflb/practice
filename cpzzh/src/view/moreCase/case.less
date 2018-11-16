@@ -4,13 +4,15 @@
     overflow: hidden;
 }
 .filter_wrapper{
-    &>li:first-child{
+    &_title{
         padding: 8px 10px;
+        .fontSize(normal);
         background-color: @bgGrey;
     }
-    &>li:last-child{
+    &_content{
         padding: 10px 0 10px 10px;
         .filter_item_wrapper{
+            .fontSize(text);
             &>li{
                 display: inline-block;
                 vertical-align: top;
