@@ -2,31 +2,34 @@
 .wrapper{
     display: flex;
     align-items: center;
-    padding: 10px 15px;
+    padding: 10px 0 10px 15px;
     .fontSize(normal);
-    .xReal1px(before);
+    .real1px(x, top);
     background-color: @bgGrey;
     &_left{
         flex: 1;
-        padding: 4px 20px 4px 10px;
+        padding: 4px 10px;
         background-color: @white;
-        color: @shallowGrey;
+        color: @grey;
         .oneRowOverflowOmit();
     }
     &_right{
         flex: 1;
         display: flex;
-        color: @shallowGrey;
+        color: @grey;
         text-align: center;
         &>li{
             flex: 1;
-            padding: 0 10px;
+            padding: 0 7px;
             &>i{
                 margin-right: 2px;
             }
         }
         &>li:not(:last-child){
-            .yReal1px(after);
+            .real1px(y, right);
+        }
+        .active{
+            color: @orange;
         }
     }
 }

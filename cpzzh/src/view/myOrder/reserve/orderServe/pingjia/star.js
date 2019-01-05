@@ -4,7 +4,6 @@ import React, {Component} from 'react';
 export default class Star extends Component {
     constructor(props) {
         super(props)
-        console.log(this.props.name)
         this.state={
              //接到页面传过来的值    
             //因为当前页面显示五颗星，而分数是十分所以要去平均值，
@@ -32,7 +31,12 @@ export default class Star extends Component {
                     this.state.arr.map((ele,index)=>{
                         return(
                             <span key={index}>
-                                <span onClick={this.starChange.bind(this,index)}>{ele>this.state.num?<span style={{color:"#c1c1c1",fontSize:"32px"}}>☆</span>:<span style={{color:"#e93536",fontSize:"32px"}}>★</span>}</span>
+                                <span onClick={this.starChange.bind(this,index)}>{ele>this.state.num?
+                                <span style={{color:"#c1c1c1",fontSize:"32px"}}>
+                                 <i className='iconfont icon-collect greyColor' />
+                                </span>:<span style={{color:"#e93536",fontSize:"32px"}}>
+                                <i className='iconfont icon-star-fill redColor' />
+                                </span>}</span>
                             </span>
                         )
                     })

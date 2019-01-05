@@ -11,6 +11,8 @@ const MyAfterSale = asyncC(() => import('../view/myAfterSale')); // 我的售后
 const MoreCase = asyncC(() => import('../view/moreCase')); // 万套案例
 const CheckTrue = asyncC(() => import('../view/checkTrue')); // 产品验证
 const ShowHome = asyncC(() => import('../view/showHome')); // 晒家有礼
+const Activity = asyncC(() => import('../view/activity')); // 活动
+const ReportBusiness = asyncC(() => import('../view/reportBusiness')); // 报备商机
 
 export default () => <Switch>
     <Route path={routerBase + '/personalCenter'} component={PersonalCenter} />
@@ -21,5 +23,7 @@ export default () => <Switch>
     <Route path={routerBase + '/moreCase'} component={MoreCase} />
     <Route path={routerBase + '/checkTrue'} component={CheckTrue} />
     <Route path={routerBase + '/showHome'} component={ShowHome} />
+    <Route path={routerBase + '/activity'} component={Activity} />
+    <Route path={routerBase + '/reportBusiness'} component={ReportBusiness} />
     <Route component={Page404} />
 </Switch>

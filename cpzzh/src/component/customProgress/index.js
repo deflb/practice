@@ -7,26 +7,26 @@ export default connect(state => ({
 }))(class customProgress extends Component {
     render() {
         const { userLevelInfo } = this.props,
-            { userValue = 0, levelList = [] } = userLevelInfo,
+            { userValue = 0 } = userLevelInfo,
+            levelList = userLevelInfo.levelList || [],
             length = levelList.length,
-            total = length ? levelList[length - 1].levelValue : 0,
+            total = length ? levelList[length - 1].levelValue : userValue * 2,
             rate = userValue / total * 100 + '%';
         return (
             <div className={styles.wrapper}>
                 <div className={styles.container}>
-                    <div style={{ width: rate }} className={styles.progress}></div>
+                    <div style={{ width: rate }} className={styles.progress} />
                     <div className={styles.tip} style={{ left: rate }}>
-                        <div className='textFontSizeC'><span className='shallowGreyColor'>当前成长值：</span><span className='redColor'>{userValue}</span></div>
-                        <i />
+                        当前成长值 {userValue}
                     </div>
                 </div>
                 <div className={styles.step}>
                     {levelList.map(item => {
                         const pos = item.levelValue / total;
-                        return <div key={item.levelValue} style={{ left: pos * 100 + '%', transform: `translateX(${pos === 0 ? '-25%' : pos === 1 ? '-75%' : '-50%'})` }}>
-                            <div><span className='shallowGreyColor textFontSizeC'>{item.levelName}</span></div>
-                            <div><span className='redColor textFontSizeC'>{item.levelValue}</span></div>
-                        </div>
+                        return <ul key={item.levelValue} className={styles.step_item} style={{ left: pos * 100 + '%', transform: `translateX(${pos === 0 ? '-25%' : pos === 1 ? '-75%' : '-50%'})` }}>
+                            <li className={styles.step_item_name}>{item.levelName}</li>
+                            <li className={styles.step_item_value}>{item.levelValue}</li>
+                        </ul>
                     })}
                 </div>
             </div>

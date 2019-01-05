@@ -1,23 +1,25 @@
 import React, { Component } from 'react';
-import {Icon ,List,ActivityIndicator} from 'antd-mobile';
+import {Icon ,List} from 'antd-mobile';
 import styles  from './index.less';
 import { request } from '../../../../request';
 import api from '../../../../request/api';
+import nothingImg from '../../../../assets/icon/no_data@3x.png'
+import addIcon from '../../../../assets/icon/add@3x.png'
 export default class myAfterSale extends Component {
     state = {
         historyList:[],
         orderId:'',
         orderNo:''
     }
-    componentDidMount(){
+    componentWillMount(){
         this.init();
     }
-    init(){
+    init=()=>{
         //获取售后列表 
         this.setState({
             isLoading:true
         })
-        request({ url: api.getStoreList, data: { pageNo: 1, pageSize: 10 } }).then(res => {
+        request({ url: api.getStoreList, data: { pageNo: 1, pageSize: 1000000 } }).then(res => {
             const { list } = res;
             this.setState({ historyList: list||[],isLoading:false })
         }).catch(err => { console.log(err)
@@ -44,6 +46,7 @@ export default class myAfterSale extends Component {
                 orderNo,
                 orderId
             })
+            this.toDetail({orderId,orderNo})
     }
     toAdd=()=>{
         const { history, match } = this.props;
@@ -55,9 +58,8 @@ export default class myAfterSale extends Component {
             }
         })
     }
-    toDetail=()=>{
+    toDetail=({orderId,orderNo})=>{
         const { history, match } = this.props;
-        let {orderId,orderNo} = this.state;
         if(!orderId){
             return
         }
@@ -66,31 +68,33 @@ export default class myAfterSale extends Component {
             state: {orderId,orderNo}
         })
     }
+   
     render() {
-        let {isLoading=true,historyList} =this.state;
-        return (
-            <div className={styles.myAfterSale}>  
-                {historyList.length===0&&!isLoading?
+        let {historyList} =this.state;
+        return (<div className={styles.myAfterSale}>  
+                {historyList.length===0?
                
-                    <div className ={styles.nothing}>暂无售后记录</div>
+                    <div className ={styles.nothing}>
+                    <img src={nothingImg} alt="" width="150"/></div>
              
                :
-                 <div className={styles.historyList}>
+                 <div className={styles.historyList} >
                     <List.Item className={styles.mb_8+' '+styles.historyTop}>
                     全部售后单 
                       <Icon className={styles.fr +" "+styles.icon} type="up" theme="outlined" size ="lg" onClick={this.toDetail} />
                     </List.Item>
+                    <div className={styles.body} >
                     {this.state.historyList.map((item,index)=>{
-                        return <div className={styles.hisItem} key ={item.fclaimno +index}
+                        return <div className={styles.hisItem} key ={item.fclaimno+'idx' +index}
                          onClick={(e)=>{
                             e.stopPropagation();
                              this.choose(item)}}>售后单 :{item.fclaimno} <div className={styles.fr +" "+styles.checkIcon}>{item.checked?<Icon type="check-circle" size="md" />:''}</div></div>
                     })}
+                    </div>  
                 </div>
                 } 
-                <ActivityIndicator animating={isLoading} size="large" toast/>
 
-                <div className={styles.plusBtn}><Icon type="plus" onClick={this.toAdd}/></div>
+                <div onClick={this.toAdd} className={styles.plusBtn+' highFontSizeC'}><img src={addIcon} width="100%" alt=""/></div>
             </div>
         );
     }

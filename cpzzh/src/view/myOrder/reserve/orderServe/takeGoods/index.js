@@ -1,93 +1,43 @@
 import React, {Component} from 'react';
 import {List,WhiteSpace,Card,Grid} from 'antd-mobile'
 import Tel from '../../../../../component/tel'
-import { crmFileAddress } from '../../../../../request/baseURL';
 import styles from '../index.less'
 import { request } from '../../../../../request';
 import api from '../../../../../request/api';
+import whichImgLink from '../../../../../utlis/whichImgLink';
 export default class SendGoods extends Component {
     constructor(props) {
         super(props)
         this.state={
-           data:{}
         }
     }
     componentDidMount(){
-        // let data= {
-        //     customerId: 34448,
-        //     installInfo: {
-        //         completeTime: 85106,
-        //         customerConfirmPhotos: [
-        //                 "string1",
-        //                 "string2",
-        //                 "string3",
-        //                 "string4",
-        //                 "string5"
-        //             ],
-        //             customerRecordings: [
-        //                 "string1",
-        //                 "string2",
-        //                 "string3",
-        //                 "string4",
-        //                 "string5"
-        //             ],
-        //             installedPhotos: [
-        //                 "string1",
-        //                 "string2",
-        //                 "string3",
-        //                 "string4",
-        //                 "string5"
-        //             ],
-        //             installingPhotos: [
-        //                 "string1",
-        //                 "string2",
-        //                 "string3",
-        //                 "string4",
-        //                 "string5"
-        //             ],
-        //             staffName: "刘全有",
-        //             staffPhone: "1646644584",
-        //             uninstallPhotos: [
-        //                 "string1",
-        //                 "string2",
-        //                 "string3",
-        //                 "string4",
-        //                 "string5"
-        //             ]
-        //         },
-        //         taskNo: 2699,
-        //         taskProgress: {
-        //             "index": 0,
-        //             "mainProcess": "A08",
-        //             "processType": "AssignOrderProcess",
-        //             "status": 1,
-        //             "subProcess": "A0803"
-        //         },
-        //         taskType: "mark"
-        //     }
-        // this.setState({data})
+       
         this.init()
     }
     init=()=>{
-        let {taskNo,orderNo,taskType} =this.props.state;
-        request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType}}).then(res => {
+        let {taskNo,orderNo} =this.props.state;
+        request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType:'install'}}).then(res => {
             this.setState({
-                data:res
+                installInfo:res.installInfo||{}
             })
         })
     }
     getPhoto =(ImgList=[])=>{
+        if(!Array.isArray(ImgList)||!ImgList){
+            ImgList=[]
+        }
         return Array.from(ImgList).map((_val, i) => ({
-            icon: crmFileAddress + api.crmFileUrl(_val),
+            icon: whichImgLink(_val),
           }));  
     }
     render(){
-        let {data} = this.state,{installInfo={}}=data,{state} =this.props;
+        let {installInfo={}} = this.state,{state} =this.props;
         return(
-            <div className={styles.serveDetail} >
+            <div className={styles.serveDetails} >
               <List>
                 <List.Item className={styles.historyTop}>
-                    安装信息{data.sss}
+                    安装信息
                 </List.Item>
 
               </List>
@@ -121,7 +71,7 @@ export default class SendGoods extends Component {
                      <Grid columnNum={3}
                           itemStyle={{margin:'8px 8px  0 0',height:'75px'}}
                           renderItem={(el,index)=>{
-                              return <img  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
+                              return <img  alt="" className={styles.iconImg}  key={index+'iconImg3'} src={el.icon}/>
                           }} 
                           hasLine={false}
                          data={this.getPhoto(installInfo.uninstallPhotos)}/>

@@ -2,12 +2,10 @@ import { request_form } from '../request';
 import api from '../request/api';
 
 const _requestInfo = ({ wx, reslove, reject, url, jsApiList }) => {
-    request_form.post(api.getWxConfig, { url }, {
-        baseURL: 'http://192.168.5.12:9999'
-    }).then(data => {
+    request_form.post(api.getWxConfig, { url }).then(data => {
         const { appId, timestamp, nonceStr, signature } = data;
         wx.config({
-            debug: true, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
+            debug: false, // 开启调试模式,调用的所有api的返回值会在客户端alert出来，若要查看传入的参数，可以在pc端打开，参数信息会通过log打出，仅在pc端时才会打印。
             appId, // 必填，公众号的唯一标识
             timestamp: Number(timestamp), // 必填，生成签名的时间戳
             nonceStr, // 必填，生成签名的随机串
@@ -35,8 +33,7 @@ const _requestInfo = ({ wx, reslove, reject, url, jsApiList }) => {
 }
 
 const wxConfig = ({ wx = {}, jsApiList = [] } = {}) => new Promise((reslove, reject) => {
-    const { href } = window.location,
-        url = href.replace(/#.*/, '');
+    let url = sessionStorage.getItem('signatureUrl').replace(/#.*/, '');
     _requestInfo({ wx, reslove, reject, url, jsApiList })
 })
 

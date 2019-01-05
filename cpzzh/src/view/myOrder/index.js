@@ -9,11 +9,12 @@ const serve = asyncC(() => import('./reserve/orderServe'));
 const serveDetail = asyncC(() => import('./reserve/orderServe/detail'));
 const pingjia = asyncC(() => import('./reserve/orderServe/pingjia'));
 const pingjiaResult = asyncC(() => import('./reserve/orderServe/pingjia/result'));
-export default class myOrder extends Component {
+export default  class myOrder extends Component {
+    componentDidMount() {
+      }
     render() {
         const { match } = this.props;
         return (
-            <div>
                 <Switch>
                     <Route exact path={match.path} component={reserve} />
                     <Route exact path={match.path + '/detail'} component={detail} />
@@ -24,7 +25,6 @@ export default class myOrder extends Component {
                     <Route exact path={match.path + '/detail/serve/serveDetail'} component={serveDetail} />
                     <Route component={Page404} />
                 </Switch>
-            </div>
         );
     }
 }

@@ -1,0 +1,62 @@
+@import '../../../style/mixin.less';
+.wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .report_btn{
+        padding: 15px;
+    }
+    .report_record_title{
+        display: flex;
+        padding: 0 15px 7px;
+        color: @colorGrey;
+        .fontSize(normal);
+        &>li:first-child{
+            flex: 1;
+        }
+    }
+    .report_record_list{
+        flex: 1;
+        &_item{
+            padding: 7px;
+            .real1px(x, top);
+            &_header{
+                display: flex;
+                align-items: center;
+                padding: 0 15px;
+                .fontSize(normal);
+                &_info{
+                    flex: 1;
+                    margin-left: 7px;
+                }
+            }
+            &_content{
+                padding-left: 40px;
+                :global(.am-list-line){
+                    &:after{
+                        display: none !important;
+                    }
+                }
+                &_box{
+                    .fontSize(normal);
+                    &_money{
+                        color: @red;
+                    }
+                    &_date{
+                        color: @grey;
+                    }
+                }
+            }
+            &_footer{
+                padding: 4px 8px;
+                border-radius: 8px;
+                color: @red;
+                background-color: @bgGrey;
+                margin-left: 36px;
+                &_text{
+                    white-space: normal;
+                }
+            }
+        }
+    }
+}

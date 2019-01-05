@@ -1,13 +1,13 @@
 import React, { Component } from 'react';
-import {Icon ,List,WhiteSpace,ListView,Accordion,
-    ActivityIndicator,Card,Steps, Button} from 'antd-mobile';
+import {Icon,Toast ,List,WhiteSpace,ListView,Accordion,Card,Steps, Button} from 'antd-mobile';
 import styles  from './index.less';
 import { request } from '../../../request';
 import api from '../../../request/api';
-import { crmFileAddress} from '../../../request/baseURL';
 import Tel from '../../../component/tel'
+import { formatDate } from '../../../utlis';
+import whichImgLink from '../../../utlis/whichImgLink';
 const Step =  Steps.Step;
-export default class reserve extends Component {
+export default class reserveDetail extends Component {
     state = {
         data:{},
         current:1,
@@ -21,13 +21,14 @@ export default class reserve extends Component {
     }
     componentDidMount(){
         this.init();
-        this.initSteps();
+       
     }
     init(){
         let {location={}} = this.props,{state={}}=location;
         this.setState({
             orderNo:state.id,
-            orderId:state.orderId
+            orderId:state.orderId,
+            isLoading:true
         })
         if(!state.offical){
              request({method : 'get', url: api.getOrderDetail+state.id, data: {} }).then(res => {
@@ -36,10 +37,12 @@ export default class reserve extends Component {
                 res.intentionProducts.forEach(item=>{
                         num+=item.quantity
                 })
-              
+                if(res&&res.fordid){
+                    this.initSteps(res.fordid);
+                }
                 this.setState({
-                    data: res ,isLoading:false,goodsNumber:num})
-            }).catch(err => { console.log(err)
+                    data: res||{} ,isLoading:false,goodsNumber:num})
+            }).catch(err => { 
                 this.setState({
                     isLoading:false
                 })
@@ -56,12 +59,17 @@ export default class reserve extends Component {
                         })
                   
                     });
-                    console.log(res)
+                    if(res&&res.fordid){
+                        this.initSteps(res.fordid);
+                    }
+                    
                     this.setState({
-                        data: res ,
+                        data: res ||{},
                         isLoading:false,
                         goodsNumber:num,
                         offical:true})
+                }else{
+                    Toast.fail("不是正确的销货单号")
                 }
 
             }).catch(err => { 
@@ -74,9 +82,12 @@ export default class reserve extends Component {
         
       
     }
-    initSteps=()=>{
-        let {location={}} = this.props,{state={}}=location;
-        let data ={orderId:state.orderId}
+    initSteps=(orderId)=>{
+        let data ={orderId:orderId}
+        this.setState({
+            isLoading:true,
+            orderId
+        })
         request({ url: api.getOrderProgress, data }).then(res => {
             let steps =[];
             let{nodeList} = res;
@@ -86,10 +97,11 @@ export default class reserve extends Component {
                 let obj = {};
                 obj.title = "";
                 obj.description = item.nodeName;
+                obj.status = item.status;
                 obj.desc =<div className={styles.desc}>
                 { item.items.map(item=>{
                     return <div key={item.key}>{item.key} : <span className={item.phone?styles.people:''}>{`${this.getDate(item.value)||''} ${item.phone||""}`}
-                        <span style={{display:item.phone?null:'none'}}><Tel /></span></span>
+                        <span style={{display:item.phone?null:'none'}}><Tel  tel={item.phone}/></span></span>
                         <WhiteSpace size="xs"/>
                     </div>
                 })}
@@ -99,18 +111,32 @@ export default class reserve extends Component {
             
             this.setState({
                 steps:steps,
-                current
+                current,
+                isLoading:false
             })
-        }).catch(err => { console.log(err) })
+        }).catch(err => { console.log(err)
+        this.setState({
+            isLoading:false
+        })
+        })
     }
+    getIcon=(s)=>{
+        return s.status?( <i className='iconfont icon-check-circle greenColor' />):<i className='iconfont icon-time uncheckedIcon ' style={{width:'20px',height:'20px'}}/>
+     }
+    
     getSteps=()=>{
-        return this.state.steps.map((s, i) => <Step key={i} title={s.title} description={s.description} />);
+      
+        return this.state.steps.map((s, i) => <Step key={i} status={"wait"} title={s.title} description={s.description}  icon={this.getIcon(s)} />);
        }
   
    
    toViewStep =()=>{//跳到进度
     const { history, match } = this.props;
     let {data} = this.state;
+    if(!data.fordid){
+        Toast.fail('没有订单id')
+        return 
+    }
     history.push({
         pathname: match.path + '/step',
         state: {id:data.fordid}
@@ -126,16 +152,19 @@ export default class reserve extends Component {
     wantPro =()=>{
         let {data} = this.state,{intentionProducts,batches} = data;
         if(intentionProducts){
-            return intentionProducts.map((item,index)=><div style={{overflow:'hidden',borderTop:index>=1?'1px dashed #999':null,padding:"8px 0px"}} key={item.goodsCode}>
-                    <div  className={"fl"} style={{width:'80px'}}>
-                        <img src={crmFileAddress + api.crmFileUrl(item.thumbnail)} alt="" width="80" border="1" />
+            return intentionProducts.map((item,index)=><div style={{overflow:'hidden',borderTop:index>=1?'1px dashed #999':null,padding:"8px 0px"}}  key={item.goodsCode}>
+                    <div  className={"fl "} style={{width:'20%',minHeight:'100px'}}>
+                    <div className={styles.imgBox}>
+                        <img src={whichImgLink(item.thumbnail)} alt=""  border="1" />
+                        
                     </div>
-                    <div  className={`fl ml-8`}>
-                        <h3>{item.goodsName}</h3>
-                        <div>规格 : {item.sizeDesc?item.sizeDesc+'mm':''}</div>
+                    </div>
+                    <div  className={`fl ml-8 normalFontSizeC`} style={{width:'68%'}}>
+                        <div className="titleFontSizeC">{item.goodsName}</div>
+                        <div className="greyColor">规格 :<span className="ml-8">{item.sizeDesc?item.sizeDesc:''}</span></div>
                         <div className={styles.redC}>{`￥${item.unitPrice}/${item.unit}`}</div>
                     </div>
-                    <div  className="fr">
+                    <div  className="fr greyColor normalFontSizeC" style={{width:'8%'}}>
                         x{item.quantity}
                     </div>
                 </div>)
@@ -149,7 +178,7 @@ export default class reserve extends Component {
                                 return <div key={index+''+item.code}>
                                     <div style={{overflow:'hidden',borderTop:index>=1?'1px dashed #999':null,padding:"8px 0px"}} key={item.code}>
                                         <div  className={"fl"} style={{width:'80px'}}>
-                                        <img src={crmFileAddress + api.crmFileUrl(item.thumbnail)} alt="" width="80" border="1" />
+                                        <img src={whichImgLink(item.thumbnail)} alt="" width="80" border="1" />
                                         </div>
                                         <div  className={`fl ml-8`}>
                                             <h3>{item.name}</h3>
@@ -174,16 +203,24 @@ export default class reserve extends Component {
     toServe=()=>{
         const { history, match } = this.props;
         let {orderId,orderNo} = this.state;
+        if(!orderId){
+            Toast.fail('没有订单id')
+            return 
+        }
         history.push({
             pathname: match.path + '/serve',
             state: {orderId,orderNo}
         })
     }
     toApply=()=>{
-        const { history } = this.props;
+        const { history,match } = this.props;
         let {orderId,orderNo} = this.state;
+        if(!orderId){
+            Toast.fail('没有订单id')
+            return 
+        }
         history.push({
-            pathname:'/wx/myAfterSale/apply',
+            pathname:match.path.slice(0,-15)+'/myAfterSale/apply',
             state: {orderId,orderNo}
         })
     }
@@ -191,23 +228,26 @@ export default class reserve extends Component {
         if(!date){
             return ""
         }
+        if(typeof date==="string"){
+            return date
+        }
         if(Number(date)<15000000){
             return date
         }
-        return new Date(date).toLocaleString().replace(/\//g,'-').slice(0,-10)
+        return formatDate(new Date(date),"YYYY-MM-DD hh:mm")
     }
     footer=(data)=>{
         let {offical} =this.state;
         if(!offical){
-            return <div>
+            return <span className="fr">
                 <Button size="small" className={`fl mr-8`} type="primary" onClick={()=>{
                     window.location.href ="tel://"+data.guidePhone;
                 }}>联系顾问</Button>
                 <Button size="small" className={`fl mr-8`} type="warning" onClick={this.toServe}>订单服务</Button>
-            </div>
+            </span>
         }
    
-        return <div>
+        return <span className="fr">
                 <Button size="small" className={`fl mr-8`} type="primary" onClick={()=>{
                     window.location.href ="tel://"+data.guidePhone;
                 }}>联系设计师</Button>   
@@ -216,7 +256,7 @@ export default class reserve extends Component {
                 }}>联系顾问</Button>
                 <Button size="small" className={`fl mr-8`} type="warning" onClick={this.toApply}>申请售后</Button>
                 <Button size="small" className={`fl mr-8`} type="warning" onClick={this.toServe}>订单服务</Button>
-        </div>
+        </span>
     }
     getFunds =(funds=[])=>{
         return funds.map(item=>{
@@ -226,32 +266,47 @@ export default class reserve extends Component {
                     </div>
         })
     }
+    statusIcon =(text)=>{
+        if(text){
+            return <span className={` ${styles.statusIcon}`}>{text}</span>
+        }
+        return<span className={` ${styles.statusIcon} ${styles.orange}`}>待处理</span>
+        
+     
+    }
     render() {
-        let {data={},isLoading=true,orderNo,current,goodsNumber,offical} = this.state;
+        let {data={},orderNo,current,goodsNumber,offical} = this.state;
        
         return (
          
-            <div className={styles.reserve}>  
+            <div className={styles.reserve}>   
             
              <div className={styles.header}>
                 <List.Item className={styles.historyTop}>
-                 <div >
-                     <span className="greenColor mr-8">{data.recerveStatusDesc||(<span className="origanColor">未接收</span>)}
-                     </span>当前订单 : {data.orderNo||orderNo} <Icon className={"fr "+styles.icon} type="down" theme="outlined" size ="lg"  onClick={this.back} />
+                 <div className="normalFontSizeC" style={{display:'flex'}}>
+                       <span>{this.statusIcon(data.recerveStatusDesc)}</span> 
+                    
+                     <div className={"normalFontSizeC"} style={{display:'flex',flex:'1',width:'80%'}}>
+                     <div className="oneRowOverflowOmit mr-8" style={{flex:'1'}}>
+                        当前订单 : {data.orderNo||orderNo} 
+                     </div>
+                     <Icon className={styles.icon} type="down" theme="outlined" size ="lg"  onClick={this.back} />
+                     </div>
                      </div></List.Item>
-             </div>
+                 </div>
              <div className="mb-8"></div>
-             {data?
+             <div className={styles.flexItem} >
+             {!data?(<div className={styles.nothing}>暂无详情</div>):
                    
             <div style={{paddingBottom:'52px'}}>
             <Card full>
             <Card.Header
-                title="订单进度"
+                title={(<span className="normalFontSizeC">订单进度</span>)}
                 thumb=""
                 extra={<span><Icon className={"fr "+styles.icon} type="right" theme="outlined" onClick={this.toViewStep}/></span>}
             />
             <Card.Body >
-                <div style={{right:0,position:'relative'}} >
+                <div style={{right:0,position:'relative',overflowY:'auto',paddingTop:'4px'}} >
                     <Steps  current={current} direction="horizontal" size="small" >
                         {this.getSteps()}
                     </Steps>
@@ -270,9 +325,9 @@ export default class reserve extends Component {
             <div className="mb-8"></div>
             <Card full>
             <Card.Header
-                title={offical?"产品信息":"意向产品"}
+                title={(<span className="normalFontSizeC">{offical?"产品信息":"意向产品"}</span>)}
                 thumb=""
-                extra={<div><span className={`fl normalFontSize`}>共<span className={`${styles.redC}`}> {goodsNumber} </span>件产品</span><span className="blueColor">展开</span></div>}
+                extra={<div><span className={`fl normalFontSizeC`}>共<span className={`${styles.redC}`}> {goodsNumber} </span>件产品</span><span className="blueColor normalFontSizeC">展开</span></div>}
             />
             <Card.Body style={{paddingTop:'0'}}>
              {this.wantPro(data.intentionProducts)}
@@ -284,7 +339,7 @@ export default class reserve extends Component {
             
             <Card full style={{display:offical?null:'none'}}>
                 <Card.Header
-                    title="费用信息"
+                    title={(<span className={`fl normalFontSizeC`}>费用信息</span>)}
                     thumb=""
                     extra={null}
                 />
@@ -314,7 +369,7 @@ export default class reserve extends Component {
             <div className="mb-8"></div>
             <Card full>
             <Card.Header
-                title="收货地址"
+                title={(<span className="normalFontSizeC">收货地址</span>)}
                 thumb=""
                 extra={null}
             />
@@ -324,7 +379,7 @@ export default class reserve extends Component {
                     <span className="mr-8">{data.customerName||''}
                     </span>
                     <span>{data.customerPhone||''}</span>
-                    <span className="mr-8" style={{display:data.customerPhone?null:'none'}}></span><Tel />
+                    <span className="mr-8" style={{display:data.customerPhone?null:'none'}}><Tel tel={data.customerPhone} /></span>
                     </span>
                 </div>
                 <div>
@@ -339,9 +394,9 @@ export default class reserve extends Component {
             <div className="mb-8"></div>
             <Card full>
             <Card.Header
-                title="订单信息"
+                title={(<span className="normalFontSizeC">订单信息</span>)}
                 thumb=""
-                extra={<span className="blueColor">合同附件</span>}
+                extra={<span className="blueColor normalFontSizeC">  <i className='iconfont icon-link blueColor ' /> 合同附件</span>}
             />
             <Card.Body>
                 <div className={`${styles.desc} pl-8`}>
@@ -359,7 +414,7 @@ export default class reserve extends Component {
             <div className="mb-8"></div>
             <Card full>
             <Card.Header
-                title="备注"
+                title={(<span className="normalFontSizeC">备注</span>)}
                 thumb=""
                 extra={null}
             />
@@ -368,14 +423,14 @@ export default class reserve extends Component {
             </Card.Body>
             </Card>
             </div>
-                    :<div style={{textAlign:'center',background:'#fff'}}>没有数据哦...</div>
+                    
         }
-                <div className={styles.footer}>
-                    {this.footer(data)}
-                       
-                </div>
-                <ActivityIndicator animating={isLoading} size="large" toast/>
+        </div>
+            <div className={styles.footer}>
+                {this.footer(data)}
+                    
             </div>
+    </div>
         );
     }
 }

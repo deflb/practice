@@ -1,3 +1,4 @@
+import routerBase from '../router/routerBase';
 const setCookie = (name, value, time = 0) => {
     let cookie = [`${name}=${encodeURIComponent(value)}`, 'path=/']
     if (time !== 0) {
@@ -20,6 +21,9 @@ const delCookie = (name) => {
 }
 
 const formatDate = (date, fmt = 'YYYY-MM-DD') => {
+    if (isString(date)) return date;
+    if (isNumber(date) || date === null)
+        date = new Date(date);
     let o = {
         "M+": date.getMonth() + 1, //月份
         "D+": date.getDate(), //日
@@ -45,9 +49,14 @@ const regExp = {
 }
 
 const getDisplayName = WrappedComponent => WrappedComponent.displayName || WrappedComponent.name || 'Component';
-const isBoolean = val => Object.prototype.toString.call(val) === '[object Boolean]'
-const isString = val => Object.prototype.toString.call(val) === '[object String]'
-const isObject = val => Object.prototype.toString.call(val) === '[object Object]'
+const isBoolean = val => Object.prototype.toString.call(val) === '[object Boolean]';
+const isString = val => Object.prototype.toString.call(val) === '[object String]';
+const isNumber = val => Object.prototype.toString.call(val) === '[object Number]';
+const isObject = val => Object.prototype.toString.call(val) === '[object Object]';
+
+const isIOS = () => /iPhone|iPod|iPad/i.test(window.navigator.userAgent);
+
+const pageUrlRegFn = (path) => new RegExp(`${routerBase}${path}($|/.*)`)
 
 export {
     setCookie,
@@ -58,5 +67,8 @@ export {
     getDisplayName,
     isBoolean,
     isString,
-    isObject
+    isNumber,
+    isObject,
+    isIOS,
+    pageUrlRegFn,
 }

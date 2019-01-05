@@ -5,50 +5,64 @@
 @maxWidth: 1024px; // ipad pro
 
 // 字体
-@font-size-base-sm: 12 * @hd;
-@font-size-base-md: 14 * @hd;
-@font-size-base-lg: 16 * @hd;
+@font-size-xs: 12 * @hd;
+@font-size-sm: 14 * @hd;
+@font-size-md: 16 * @hd;
+@font-size-lg: 18 * @hd;
+@font-size-xl: 20 * @hd;
 
 @font-size-text-sm: 12 * @hd;
 @font-size-text-md: 13 * @hd;
 @font-size-text-lg: 15 * @hd;
+@font-size-text-hg: 17 * @hd;
 @font-size-normal-sm: 14 * @hd;
 @font-size-normal-md: 15 * @hd;
 @font-size-normal-lg: 17 * @hd;
+@font-size-normal-hg: 19 * @hd;
 @font-size-title-sm: 16 * @hd;
 @font-size-title-md: 17 * @hd;
 @font-size-title-lg: 19 * @hd;
+@font-size-title-hg: 21 * @hd;
 @font-size-high-sm: 18 * @hd;
 @font-size-high-md: 19 * @hd;
 @font-size-high-lg: 20 * @hd;
+@font-size-high-hg: 22 * @hd;
 
-@black: #000;
-@red: #FF0000;
-@shallowRed: #FF4463;
+// 主题类 -- 黑 白 红 灰
+@black: #434343;
+@blobBlack: #1e1e1e;
 @white: #FFF;
-@normalGrey: #DDD;
-@bgGrey: #F7F7F7;
-@shallowGrey: #AEAEAE;
-@blobGrey: #DFDFDF;
-@lightGrey: #797979;
+@red: #FF5656;
+@grey: #afafaf;
+@colorGrey: #999;
+@shallowGrey: #dadada;
+@bgGrey: #F5F5F5;
+@borderGrey: #F1F1F1;
+// 特殊类
+@pink: #FCC;
 @blue: #34A5EA;
 @blobBlue: #0066CC;
 @green: #2FCE31;
 @blodGreen: #26C392;
 @yellow: #FFCC33;
+@orange: #FF953C;
 
 .fontSize(@which: text){ // text normal title high
     @var-sm: "font-size-@{which}-sm";
     @var-md: "font-size-@{which}-md";
     @var-lg: "font-size-@{which}-lg";
-    @media screen and (max-width: 321px){ /*小*/
+    @var-hg: "font-size-@{which}-hg";
+    @media screen and (max-width: 320px){ /*小*/
         font-size: @@var-sm
     }
     @media screen and (min-width: 321px) and (max-width: 400px){ /*中*/
         font-size: @@var-md
     }
-    @media screen and (min-width: 400px){ /*大*/
+    @media screen and (min-width: 401px) and (max-width: 767px){ /*大*/
         font-size: @@var-lg
+    }
+    @media screen and (min-width: 768px){ /*超大 ipad*/
+        font-size: @@var-hg
     }
 }
 
@@ -66,70 +80,63 @@
     -webkit-line-clamp: @row;
 }
 
-.real1px(@bg, @flag, @which, @type){
+/**
+@beforeDirection: x|y|unset
+@beforePos: top|right|bottom|left|unset(不渲染before)
+@afterDirection: x|y|unset
+@afterPos: top|right|bottom|left|unset(不渲染after)
+@type: solid|dashed|dotted
+@color: any
+**/
+.real1px(@beforeDirection: x, @beforePos: unset, @afterDirection: y, @afterPos: unset, @type: solid, @bgColor: @borderGrey){
     position: relative;
-    &::before,&::after{
+    &:before,&:after{
         content: '';
         position: absolute;
-        display: block;
         z-index: 1;
-        & when (@flag = x){
+    }
+    .whichStyle(@direction, @position){
+        & when (@direction = x){
+            left: 0;
+            right: 0;
             width: 100%;
-            border-top: 1px @type @bg;
-            left: 0;
-            right: 0;
+            height: 1px;
+            background-color: @bgColor;
         }
-        & when (@flag = y){
-            border-left: 1px @type @bg;
+        & when (@direction = y){
+            top: 0;
+            bottom: 0;
+            width: 1px;
             height: 100%;
-            top: 0;
-            bottom: 0;
+            background-color: @bgColor;
         }
-    }
-    &::before{
-        & when (@which = after){
+        @{position}: 0;
+        & when (@position = unset){
             display: none;
         }
-        & when (@flag = x){
-            top: 0;
+        @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
+            & when (@direction = x){
+                transform: scaleY(0.5)
+            }
+            & when (@direction = y){
+                transform: scaleX(0.5)
+            }
         }
-        & when (@flag = y){
-            left: 0;
-        }
-    }
-    &::after{
-        & when (@which = before){
-            display: none;
-        }
-        & when (@flag = x){
-            bottom: 0;
-        }
-        & when (@flag = y){
-            right: 0;
-        }
-    }
-    @media (-webkit-min-device-pixel-ratio: 2), (min-resolution: 2dppx){
-        & when (@flag = x){
-            &::before,&::after{transform: scaleY(0.5)}
-        }
-        & when (@flag = y){
-            &::before,&::after{transform: scaleX(0.5)}
+        @media (-webkit-min-device-pixel-ratio: 3), (min-resolution: 3dppx){
+            & when (@direction = x){
+                transform: scaleY(0.33)
+            }
+            & when (@direction = y){
+                transform: scaleX(0.33)
+            }
         }
     }
-    @media (-webkit-min-device-pixel-ratio: 2) and (-webkit-min-device-pixel-ratio: 3), (min-resolution: 2dppx) and (min-resolution: 3dppx){
-        & when (@flag = x){
-            &::before,&::after{transform: scaleY(0.33)}
-        }
-        & when (@flag = y){
-            &::before,&::after{transform: scaleX(0.33)}
-        }
+    &:before{
+        .whichStyle(@beforeDirection, @beforePos);
     }
-}
-.xReal1px(@which: both, @type: solid, @bg: @normalGrey){ // 横轴
-    .real1px(@bg, x, @which, @type);
-}
-.yReal1px(@which: both, @type: solid, @bg: @normalGrey) { // 纵轴
-    .real1px(@bg, y, @which, @type);
+    &:after{
+        .whichStyle(@afterDirection, @afterPos);
+    }
 }
 
 // 清除浮动

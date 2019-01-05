@@ -1,0 +1,35 @@
+@import '../../style/mixin.less';
+.wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    &_content{
+        flex: 1;
+        position: relative;
+        overflow: auto;
+        -webkit-overflow-scrolling: touch;
+        &_text{
+            position: absolute;
+            width: 100%;
+            padding: 4px 15px;
+        }
+        .activity_time{
+            position: absolute;
+            top: 25px;
+            left: 10%;
+            right: 10%;
+            padding: 7px;
+            box-shadow: 0 0 4px inset @blobBlack;
+            background-color: @white;
+            .oneRowOverflowOmit();
+        }
+    }
+    &_footer{
+        padding: 20px 15px;
+        &_form{
+            height: 176px;
+            margin-bottom: 20px;
+            .real1px(y, left, y, right);
+        }
+    }
+}

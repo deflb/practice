@@ -2,53 +2,26 @@ import React, {Component} from 'react';
 import {List,WhiteSpace,Card,WingBlank,Grid,Badge, Button,Toast} from 'antd-mobile'
 import Tel from '../../../../../component/tel'
 import styles from '../index.less';
-import { crmFileAddress } from '../../../../../request/baseURL';
 import { request } from '../../../../../request';
 import api from '../../../../../request/api';
+import { formatDate } from '../../../../../utlis';
+import whichImgLink from '../../../../../utlis/whichImgLink';
 export default class Design extends Component {
     constructor(props) {
         super(props)
         this.state={
-           data:{}
+            designInfo:{}
         }
     }
     componentDidMount(){
-        // let data ={
-        //     customerId: 75456,
-        //     designInfo: {
-        //         designTime: 1540288768130,
-        //         projectList: [
-        //                 {
-        //                     name: "旗舰店全景效果专修图v1.1",
-        //                     number: "19568819",
-        //                     overallView: "",
-        //                     renders: [
-        //                         "https://3vj-render.3vjia.com/UpFile_Render/C00002433/DesignSchemeRenderFile/201810/31/19568819/f52ba8f35ea5410d9c1e16c4379c7af1.jpg",
-        //                         "https://3vj-render.3vjia.com/UpFile_Render/C00002433/DesignSchemeRenderFile/201810/23/19568819/552db20a78a148018faab6829f475fdc.jpg"
-        //                     ]
-        //                 }
-        //             ],
-        //             status: "客户已确图"
-        //         },
-        //         taskNo: 897151604,
-        //         taskProgress: {
-        //             "index": 1,
-        //             "mainProcess": 1,
-        //             "processType": 1,
-        //             "status": 1,
-        //             "subProcess": 1
-        //         },
-        //         taskType: "design"
-        //     }
-
-        //     this.setState({data})
+       
         this.init()
     }
     init=()=>{
-        let {taskNo,orderNo,taskType} =this.props.state;
-        request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType}}).then(res => {
+        let {taskNo,orderNo} =this.props.state;
+        request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType:'design'}}).then(res => {
             this.setState({
-                data:res
+                designInfo:res.designInfo||{}
             })
         })
     }
@@ -59,11 +32,14 @@ export default class Design extends Component {
         if(isLong){
             return new Date(date).toLocaleString().replace(/\//g,'-') 
         }
-        return new Date(date).toLocaleString().replace(/\//g,'-').slice(0,-10)
+        return formatDate(new Date(date),"YYYY-MM-DD hh:mm")
     }
     getPhoto =(ImgList=[])=>{
+        if(!Array.isArray(ImgList)||!ImgList){
+            ImgList=[]
+        }
         return Array.from(ImgList).map((_val, i) => ({
-            icon: crmFileAddress + api.crmFileUrl(_val),
+            icon: whichImgLink(_val),
           }));  
     }
     toOverall=(url)=>{
@@ -84,13 +60,13 @@ export default class Design extends Component {
         }
     }
     render(){
-        let {data} = this.state,{designInfo={}}=data,{projectList=[]}=designInfo;
+        let {designInfo={}} = this.state,{projectList=[]}=designInfo;
         let{state} = this.props;
         return(
-            <div className={styles.serveDetail}>
+            <div className={styles.serveDetails}>
               <List>
                 <List.Item className={styles.historyTop}>
-                    设计信息
+                    方案信息
                 </List.Item>
 
               </List>
@@ -110,7 +86,11 @@ export default class Design extends Component {
                     <div><span className="mr-8">{"完成时间"} :</span> {this.getDate(state.finishDate)}</div>
                     </div>
                 </div>
-               
+                {projectList.length===0?(<div className="greyColor tc mt-16">
+                    <WhiteSpace />
+                     还没有做好的方案~
+                
+                </div>):null}
                 {projectList.map((item,index)=>{
                     return <WingBlank key={item.number} className={styles.mt_16}>
                     <Card full  >
@@ -131,7 +111,7 @@ export default class Design extends Component {
                           columnNum={3}
                           itemStyle={{margin:'8px 8px  0 0',height:'75px'}}
                           renderItem={(el,index)=>{
-                              return <img  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
+                              return <img width="100%"  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
                           }} 
                           hasLine={false}/>
                            <WhiteSpace/>
@@ -140,8 +120,8 @@ export default class Design extends Component {
                      <div className={"fl "+styles.overallView} onClick={this.toOverall.bind(this,item.overallView)} >
                          前往查看720°全景图
                       </div>
-                      <div className=" fl textFontSize" style={{width:'36%',padding:'0 8px'}}>
-                       <Button type="ghost" size="small" onClick={this.toShare.bind(this,item.overallView)}>分享效果图</Button></div>
+                      <div className=" fl textFontSize" style={{width:'36%',padding:'0 8px'}}> 
+                       <Button type="ghost" size="small" onClick={this.toShare.bind(this,item.overallView)}><i className='iconfont icon-share' />分享效果图</Button></div>
                      
                    </div>
                   </Card.Body>

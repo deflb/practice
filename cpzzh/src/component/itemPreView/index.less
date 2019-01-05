@@ -1,0 +1,66 @@
+@import '../../style/mixin.less';
+.wrapper{
+    .real1px(x, top, x, bottom);
+    &_image{
+        position: relative;
+        height: 4.5rem;
+        max-height: 500px;
+        .real1px(y, left, y, right);
+        img{
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+        &_extra{
+            position: absolute;
+            top: 0;
+            right: 0;
+            padding: 4px 8px;
+            color: @white;
+            .fontSize(normal);
+        }
+    }
+    &_content{
+        line-height: 1;
+        background-color: @white;
+        padding: 0 8px;
+        .real1px(x, top);
+        .fontSize(text);
+        &_title{
+            padding: 8px 0 6px;
+            .fontSize(normal);
+            .oneRowOverflowOmit();
+        }
+        &_warn{
+            padding-bottom: 8px;
+            color: @blue;
+        }
+        &_des{
+            padding-bottom: 8px;
+            color: @grey;
+            .whichRowsOverflowOmit(2);
+        }
+        &_footer{
+            line-height: 1.5;
+            display: flex;
+            color: @grey;
+            padding: 8px 0;
+            .real1px(x, top);
+            &>li{
+                flex: 1;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                &>i{
+                    margin-right: 4px;
+                }
+            }
+            &>li:nth-child(2){
+                .real1px(y, left, y, right);
+            }
+            .active{
+                color: @yellow;
+            }
+        }
+    }
+}

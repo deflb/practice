@@ -3,133 +3,56 @@ import {List,WhiteSpace,Card,WingBlank,Grid,Pagination,Icon} from 'antd-mobile'
 import Tel from '../../../../../component/tel'
 import Title from '../gauge/title'
 import Col from './col'
-import { crmFileAddress } from '../../../../../request/baseURL';
 import styles from '../index.less'
 import { request } from '../../../../../request';
 import api from '../../../../../request/api';
+import whichImgLink from '../../../../../utlis/whichImgLink';
 export default class PutSample extends Component {
     constructor(props) {
         super(props)
         this.state={
            data:{},
            current:1,
+           markInfos:[{}]
         }
     }
     componentDidMount(){
-        // let data ={
-        //     customerId: 72416,
-        //     markInfos: [
-        //             {
-        //                 markDrawing: [
-        //                     {
-        //                         img: "https://beta.3vjia.net//UpFile_ConstructionImage/C00002433/201810/6f28acfae1244eb1bfb0c2cd1d76bd1a.png",
-        //                         name: "房间-111B墙面"
-        //                     }
-        //                 ],
-        //                 rooms: [
-        //                     {
-        //                         components: [
-        //                             {
-        //                                 actDeep: 0,
-        //                                 actHeight: 0,
-        //                                 actWidth: 0,
-        //                                 actmeasureno: "11B0101",
-        //                                 deep: 390,
-        //                                 height: 2400,
-        //                                 name: "GQG-ZG-007-316140013",
-        //                                 objId: "138025",
-        //                                 remark: "",
-        //                                 width: 1000
-        //                             }
-        //                         ],
-        //                         photos: [],
-        //                         isMark: "0",
-        //                         needMark: "1",
-        //                         proxyNumber: "11B",
-        //                         roomCode: "11",
-        //                         roomName: "房间-1",
-        //                         wallCode: "01B",
-        //                         wallName: "11B墙面"
-        //                     }
-        //                 ],
-        //                 unitName: "4"
-        //             },
-        //             {
-        //                 markDrawing: [
-        //                     {
-        //                         img: "https://beta.3vjia.net//UpFile_ConstructionImage/C00002433/201810/6f28acfae1244eb1bfb0c2cd1d76bd1a.png",
-        //                         name: "66666666"
-        //                     }
-        //                 ],
-        //                 rooms: [
-        //                     {
-        //                         components: [
-        //                             {
-        //                                 actDeep: 0,
-        //                                 actHeight: 0,
-        //                                 actWidth: 0,
-        //                                 actmeasureno: "11B0101",
-        //                                 deep: 390,
-        //                                 height: 2400,
-        //                                 name: "GQG-ZG-007-316140013",
-        //                                 objId: "138025",
-        //                                 remark: "",
-        //                                 width: 1000
-        //                             }
-        //                         ],
-        //                         photos: [1,122,34],
-        //                         isMark: "0",
-        //                         needMark: "1",
-        //                         proxyNumber: "11B",
-        //                         roomCode: "11",
-        //                         roomName: "房间-1",
-        //                         wallCode: "01B",
-        //                         wallName: "11B墙面"
-        //                     }
-        //                 ],
-        //                 unitName: "4"
-        //             }
-        //         ],
-        //         taskNo: 2699,
-        //         taskProgress: {
-        //             "index": 0,
-        //             "mainProcess": "A08",
-        //             "processType": "AssignOrderProcess",
-        //             "status": 1,
-        //             "subProcess": "A0803"
-        //         },
-        //         taskType: "mark"
-        //     }
-        // this.setState({data})
+       
         this.init()
     }
     init=()=>{
-        let {taskNo,orderNo,taskType} =this.props;
-        request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType}}).then(res => {
+        let {taskNo,orderNo} =this.props.state;
+        request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType:'mark'}}).then(res => {
             this.setState({
-                data:res
+                markInfos:res.markInfos||[{}]
             })
         })
     }
     getPhoto =(ImgList=[])=>{
+        if(!Array.isArray(ImgList)||!ImgList){
+            ImgList=[]
+        }
         return Array.from(ImgList).map((_val, i) => ({
-            icon: crmFileAddress + api.crmFileUrl(_val.img),
+            icon: whichImgLink(_val.img),
             name:_val.name
           }));  
     }
     getRoomPhotos =(ImgList=[])=>{
+        if(!Array.isArray(ImgList)||!ImgList){
+            ImgList=[]
+        }
         return Array.from(ImgList).map((_val, i) => ({
-            icon: crmFileAddress + api.crmFileUrl(_val),
+            icon: whichImgLink(_val),
           }));  
     }
     render(){
-        let {data={},current} = this.state,{markInfos=[]}=data;
+        let {markInfos=[{}],current} = this.state;
         let info = markInfos[current-1] ||{};
         let {rooms=[]} = info;
         let{state} = this.props;
         
         return(
-            <div className={styles.serveDetail}>
+            <div className={styles.serveDetails}>
               <List>
                 <List.Item className={styles.historyTop}>
                     放样信息
@@ -208,6 +131,7 @@ export default class PutSample extends Component {
                 </Card.Body>
                 </Card>
                 </WingBlank>
+                <div style={{display:markInfos.length<2?'none':null}}>
                 <Pagination total={markInfos.length}
                     className={styles.pagination}
                     simple={true}
@@ -220,6 +144,7 @@ export default class PutSample extends Component {
                         nextText: (<span  className="arrow-align"><Icon type="right" /></span>),
                     }}
                     />
+                    </div>
             </div>
     )
     }

@@ -1,12 +1,12 @@
 import React, { Component } from 'react';
 import { TextareaItem ,Toast
-    ,Picker,ActivityIndicator, List,DatePicker, Button } from 'antd-mobile';
+    ,Picker, List,DatePicker, Button } from 'antd-mobile';
 import styles  from './apply.less';
-import CustomImageUpload from '../../../component/customImageUpload';
+import CustomUpload from '../../../component/customUpload';
 import { connect } from 'react-redux';
 import { request } from '../../../request';
 import api from '../../../request/api';
-// const FormTaskApply = Form.create()(taskApply);
+import { formatDate } from '../../../utlis';
 export default connect(state => ({
     userInfo: state.userInfo
 }))(class apply extends Component {
@@ -17,31 +17,28 @@ export default connect(state => ({
         PickerValue:'',
         orderId:'',
         textareaValue:'',
-        orderNoList:[]
+        orderNoList:[],
     }
     componentDidMount(){
         this.initOrderNoList()
         this.init();
-        
+      
     }
     initOrderNoList=()=>{
         let {location={}} = this.props,{state={}}=location;
         const {userInfo} =this.props;
-        request({ url: api.getOrderList, data: { pageNo: 1, pageSize: 10,fcstid:userInfo.customerId } }).then(res => {
+        request({ url: api.getOrderList, data: { pageNo: 1, pageSize: 10,fcstid:userInfo.customerId,fordtype:1 } }).then(res => {
                 const { list=[] } = res;
                 let arr =[];
                 list.forEach(item=>{
-                    // if(item.recerveStatusDesc!=="未接收")
-                    arr.push( arr.push({
+                     arr.push({
                         label:item.orderNo,
                         value:item.orderId
-                    }))
+                    })
                 })
-                console.log(state)
                 this.setState({
                      orderNoList: arr,
                     orderId:state.orderId,
-                    // orderNo:state.orderNo,
                     isLoading:false})
             }).catch(err => { 
                 this.setState({
@@ -75,6 +72,7 @@ export default connect(state => ({
         this.setState({PickerValue:val})
       }
       orderOk =(val)=>{
+         
         this.setState({orderId:val})
       }
       commit =()=>{
@@ -84,11 +82,14 @@ export default connect(state => ({
         files.forEach(item=>{
             imgList.push(item.fileUrl)
         })
+        if(Array.isArray(orderId)){
+            orderId =orderId[0].toString()
+        }
          let data={
                 custproblem:textareaValue,
                 fasksettledate:this.getDate(datePickerValue),
                 fclmtypeid:PickerValue[0],
-                fordid:Number(orderId),
+                fordid:orderId,
                 imgList:imgList
             };
         request({url,data}).then(res=>{
@@ -98,54 +99,54 @@ export default connect(state => ({
         })
       }
       toStart=()=>{
-        const { history } = this.props;
-        history.push({
-            pathname: '/myAfterSale',
-            state: {}
-        })
+        this.props.history.goBack()
     }
       getDate=(datePickerValue)=>{
         if(!datePickerValue||datePickerValue<1500000){
             return datePickerValue
         }
-       return datePickerValue.toLocaleString().replace(/\//g,'-').slice(0,-10)
+        return formatDate(new Date(datePickerValue),"YYYY-MM-DD")
       }
+      getHeight=()=>{
+        return document.documentElement.clientHeight-150
+    }
     render() {
-        let {files,orderId,datePickerValue,textareaValue,isLoading=true,orderNoList=[]} = this.state;
-        return (
-            <div className={styles.apply}>   
-                <div className={styles.item}>
+        let {files,orderId,datePickerValue,textareaValue,orderNoList=[]} = this.state;
+        return (<div className={styles.apply}>   
+                <div className={styles.item+" "+styles.header}>
                 <Picker data={orderNoList}
                  onOk={this.orderOk}
                  cols ={1} 
                  value={orderId} >
                     <List.Item arrow="horizontal">
-                        订单号
+                    {(<span className="normalFontSizeC">订单号</span>)}
                     </List.Item>
                 </Picker>
                 </div>
-                <div className={styles.item}>
+                <div className={styles.body}  >
+                <div className={styles.item+" normalFontSizeC"}>
                         <Picker data={this.state.BaseDataList} 
                         value = {this.state.PickerValue}
                         onOk={this.sqOk}
                         cols ={1} >
                             <List.Item arrow="horizontal">
-                                诉求
+                            {(<span className="normalFontSizeC">诉求</span>)}
                             </List.Item>
                         </Picker>
                     </div>
-                <div className={styles.item +" "+styles.mb8}>
+                <div className={styles.item +" normalFontSizeC"+styles.mb8}>
                         <DatePicker data={this.state.BaseDataList} 
                         value={datePickerValue}
+                        mode="date"
                         onChange={(e)=>{
                             this.setState({datePickerValue:e})
                         }}>
                             <List.Item arrow="horizontal">
-                                要求完成日期
+                            {(<span className="normalFontSizeC">要求完成日期</span>)}
                             </List.Item>
                         </DatePicker></div>
-                <div className={styles.item}>
-                    <List.Item >问题描述
+                <div className={styles.item+" normalFontSizeC"}>
+                    <List.Item >{(<span className="normalFontSizeC">问题描述</span>)}
                     <TextareaItem
                         placeholder="请输入问题描述"
                         data-seed="logId"
@@ -154,29 +155,32 @@ export default connect(state => ({
                             this.setState({textareaValue:e})
                         }}
                         ref={el => this.autoFocusInst = el}
-                        autoHeight
+                        rows={4}
                     />
                     </List.Item>
                 </div>
-                <div className={styles.item}>
+                <div className={styles.item+" normalFontSizeC"}>
                 <List.Item >
-                拍照上传<span>({files.length}/10)</span>
+                <span className="normalFontSizeC">拍照上传<span className="greyColor">({files.length}/10)</span></span>
                 
-                    <CustomImageUpload
+                    <CustomUpload
+                            useCrmUpload={true}
                             maxLength={10}
-                            changeHandle={(val) => {
+                            onChange={(val) => {
                                 this.setState({
                                     files: val
                                 })
                             }}
-                            selectable={files.length < 10}
-                            files={files}
+                            accept="image/*"
+                            getLength={length => { this.setState({ length }) }}
+                            value={files}
                         />
 
                     </List.Item>
                 </div>
+                </div>
                 <div className={styles.paddingbox}><Button type="primary" onClick={this.commit}>提交</Button></div>
-                <ActivityIndicator animating={isLoading} size="large" toast/>
+                {/* <div className={"normalFontSizeC "+styles.nameless}><Checkbox defaultChecked className="mr-8"/>匿名提交</div> */}
             </div>
         );
     }

@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
-import { Card, Toast, ActivityIndicator } from 'antd-mobile';
+import ReactDOM from 'react-dom';
+import { Card, Toast } from 'antd-mobile';
 import InfoList from '../../../component/infoList';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import CustomCarousel from '../../../component/customCarousel';
@@ -10,7 +11,6 @@ import EvaluateBar from '../../../component/evaluate/bar';
 import { request } from '../../../request';
 import api from '../../../request/api';
 import styles from './detail.less';
-import { formatDate } from '../../../utlis';
 
 export default hasTransformFullScreen(class caseDetail extends Component {
     state = {
@@ -20,9 +20,11 @@ export default hasTransformFullScreen(class caseDetail extends Component {
 
     static propTypes = {
         updateCurrentItem: PropTypes.func,
+        collectBack: PropTypes.func,
     }
     static defaultProps = {
-        updateCurrentItem: function () { }
+        updateCurrentItem: function () { },
+        collectBack: function () { },
     }
 
     getDetail = () => { // 获取案例详情
@@ -42,19 +44,18 @@ export default hasTransformFullScreen(class caseDetail extends Component {
     }
 
     componentDidMount() {
-        this.getDetail()
         document.title = '案例详情'
+        this.getDetail()
     }
 
     onCollect = () => { // 收藏|取消收藏
-        const { location } = this.props,
+        const { location, collectBack } = this.props,
             { state = {} } = location,
             { detail } = this.state,
             { flagLike } = detail,
-            status = flagLike === 0 ? 1 : 0;
+            status = flagLike ? 0 : 1;
         request({ url: api.saveCollects, data: { id: state.id, status } }).then(res => {
-            Toast.success(res, 0.7)
-            const { detail } = this.state;
+            Toast.success(res, 0.7);
             if (status === 1) {
                 ++detail.collects;
                 detail.flagLike = 1;
@@ -62,25 +63,25 @@ export default hasTransformFullScreen(class caseDetail extends Component {
                 detail.collects--;
                 detail.flagLike = 0;
             }
+            collectBack();
             this.setState({ detail: { ...detail } })
         }).catch(err => { })
     }
 
-    // onLike = () => { // 点赞
-    //     const { detail } = this.state,
-    //         { location, updateCurrentItem } = this.props,
-    //         { state = {} } = location;
-    //     request({ url: api.saveLikes, data: { id: state.id, status: 1 } }).then(res => {
-    //         Toast.success(res, 0.7);
-    //         detail.likes++;
-    //         this.setState({ detail: { ...detail } })
-    //         // 更新列表点赞数
-    //         updateCurrentItem('likes', state.index)
-    //     }).catch(err => { })
-    // }
+    onLike = () => { // 点赞
+        const { detail } = this.state,
+            { location, updateCurrentItem } = this.props,
+            { state = {} } = location;
+        request({ url: api.saveLikes, data: { id: state.id, status: 1 } }).then(res => {
+            Toast.success(res, 0.7);
+            detail.likes++;
+            this.setState({ detail: { ...detail } })
+            // 更新列表点赞数
+            updateCurrentItem('likes', state.index)
+        }).catch(err => { })
+    }
 
     onSave = () => { // 评价保存后
-        this.evaluateBar.hide();
         const { detail } = this.state,
             { location, updateCurrentItem } = this.props,
             { state } = location;
@@ -94,79 +95,67 @@ export default hasTransformFullScreen(class caseDetail extends Component {
         this.evaluate.saveComment(info)
     }
 
+    onComment = () => {
+        ReactDOM.findDOMNode(this.evaluate).scrollIntoView()
+    }
+
     render() {
-        const { detail, isLoading } = this.state,
+        const { detail } = this.state,
             { location } = this.props,
             { state = {} } = location,
-            { title, effectImageUrlList = [], remark, creator, createTime, content,
+            { title, effectImageUrlList = [], remark, content,
                 areaName, houseName, priceName, spaceName, styleName,
                 collects, comments, flagLike, likes, views,
                 // intents
             } = detail;
         return <div className={styles.wrapper}>
             <div className={styles.wrapper_container}>
-                <div className={styles.wrapper_container_body}>
-                    <CustomCarousel
-                        source={effectImageUrlList}
+                <CustomCarousel
+                    source={effectImageUrlList}
+                />
+                <Card full>
+                    <Card.Header title={<div className={styles.wrapper_title}>{title}</div>} />
+                    <Card.Body>
+                        <div className={styles.wrapper_info}>
+                            <p className={styles.wrapper_info_des}>{remark}</p>
+                            <InfoList data={[
+                                { label: '面积', value: areaName, span: 12 },
+                                { label: '户型', value: houseName, span: 12 },
+                                { label: '价位', value: priceName, span: 12 },
+                                { label: '空间名称', value: spaceName, span: 12 },
+                                { label: '风格', value: styleName, span: 12 },
+                                // { label: '楼盘', value: <span>成都天语小区 <a href='/x'>同楼盘方案</a></span>, },
+                            ]} />
+                        </div>
+                    </Card.Body>
+                </Card>
+                <CustomWhiteSpace />
+                <Card full>
+                    <Card.Header
+                        title="详情"
                     />
-                    <Card full>
-                        <Card.Header
-                            title={<div className={styles.wrapper_container_body_title}>
-                                <div>{title}</div>
-                                <div onClick={this.onCollect} style={{ color: flagLike ? '#FFCC33' : null }}>
-                                    <i className='iconfont icon-collect' />
-                                    <div>{flagLike ? '取消收藏' : '收藏'}</div>
-                                </div>
-                            </div>}
-                        />
-                        <Card.Body>
-                            <div className={styles.wrapper_container_body_info}>
-                                <div className={styles.wrapper_container_body_info_des}>
-                                    <ul>
-                                        <li>{creator}</li>
-                                        <li>{createTime ? formatDate(new Date(createTime), 'YY-MM-DD') : null}</li>
-                                    </ul>
-                                    <div>{remark}</div>
-                                </div>
-                                <InfoList data={[
-                                    { label: '面积', value: areaName, span: 12 },
-                                    { label: '户型', value: houseName, span: 12 },
-                                    { label: '价位', value: priceName, span: 12 },
-                                    { label: '空间名称', value: spaceName, span: 12 },
-                                    { label: '风格', value: styleName, span: 12 },
-                                    // { label: '楼盘', value: <span>成都天语小区 <a href='/x'>同楼盘方案</a></span>, },
-                                ]} />
-                            </div>
-                        </Card.Body>
-                    </Card>
-                    <CustomWhiteSpace />
-                    <Card full>
-                        <Card.Header
-                            title="详情"
-                        />
-                        <Card.Body>
-                            <div dangerouslySetInnerHTML={{ __html: content }} style={{ overflow: 'auto' }} />
-                        </Card.Body>
-                    </Card>
-                    <CustomWhiteSpace />
-                    <Evaluate
-                        ref={instance => this.evaluate = instance}
-                        listApi={api.pageCommentList}
-                        replyApi={api.saveCommentReply}
-                        commentApi={api.saveComment}
-                        id={state.id}
-                        field='caseId'
-                        onSave={this.onSave}
-                    />
-                </div>
-                <EvaluateBar
-                    ref={instance => this.evaluateBar = instance}
-                    detail={{ collects, comments, likes, views }}
-                    // onLike={this.onLike}
-                    onSend={this.onSend}
+                    <Card.Body>
+                        <div dangerouslySetInnerHTML={{ __html: content }} className='rich_text_global' />
+                    </Card.Body>
+                </Card>
+                <CustomWhiteSpace />
+                <Evaluate
+                    ref={instance => this.evaluate = instance}
+                    listApi={api.pageCommentList}
+                    replyApi={api.saveCommentReply}
+                    commentApi={api.saveComment}
+                    id={state.id}
+                    field='caseId'
+                    onSave={this.onSave}
                 />
             </div>
-            <ActivityIndicator toast={isLoading} className={styles.wrapper_loading} />
+            <EvaluateBar
+                detail={{ collects, comments, likes, views, collected: flagLike }}
+                onLike={this.onLike}
+                onSend={this.onSend}
+                onCollect={this.onCollect}
+                onComment={this.onComment}
+            />
         </div>
     }
 })

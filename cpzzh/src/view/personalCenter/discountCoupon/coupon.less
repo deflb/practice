@@ -1,73 +1,70 @@
 @import '../../../style/mixin.less';
-.coupon{
-    display: flex;
-    background-color: @white;
-    margin-bottom: 15px;
-    &_left{
-        flex-basis: 30%;
+.wrapper{
+    position: relative;
+    height: 90px;
+    padding-right: 105px;
+    color: @white;
+    margin-bottom: 24px;
+    .left{
+        width: 100%;
+        height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        align-items: center;
-        padding: 15px 0;
-        .yReal1px(after,dashed);
-        &_top{
-            .fontSize(title);
+        padding-left: 15px;
+        background-color: #4DE17E;
+        border-radius: 8px 0 0 8px;
+        font-size: 0;
+        &_name,&_type,&_date{
+            line-height: 1;
+            .oneRowOverflowOmit();
+        }
+        &_name{
+            font-size: @font-size-md;
             font-weight: bold;
         }
-        &_bottom{
-            .fontSize(normal);
-            color: @lightGrey;
+        &_type{
+            font-size: @font-size-sm;
+            margin: 12px 0;
+        }
+        &_date{
+            font-size: @font-size-xs;
         }
     }
-    &_right{
-        flex: 1;
-        position: relative;
-        overflow: hidden;
-        padding: 15px 20px 30px 15px;
-        &_top{
-            .fontSize(normal);
-            color: @lightGrey;
+    .right{
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 105px;
+        height: 100%;
+        &>img{
+            width: 30px;
+            height: 100%;
+            vertical-align: top;
         }
-        &_center{
-            .fontSize(text);
-            color: @shallowGrey;
-            margin: 5px 0;
-        }
-        &_bottom{
-            position: absolute;
-            bottom: 4px;
-            right: 6px;
-            font-size: 0;
-            &_btn{
-                display: inline-block;
-                padding: 6px 10px;
-                line-height: 1;
-                border: 1px solid @lightGrey;
-                border-radius: 16px;
-                color: @lightGrey;
-                .fontSize(text);
+        &>div{
+            display: inline-block;
+            width: 75px;
+            height: 100%;
+            line-height: 90px;
+            font-size: @font-size-sm;
+            background-color: #4DE17E;
+            text-align: center;
+            border-radius: 0 8px 8px 0;
+            span{
+                font-size: @font-size-lg;
+                font-weight: bold;
             }
         }
-        &_tip{
-            position: absolute;
-            top: -40px;
-            right: -40px;
-            width: 80px;
-            height: 80px;
-            background-color: @yellow;
-            transform-origin: center;
-            transform: rotate(45deg);
-            &_text{
-                position: absolute;
-                left: 0;
-                right: 0;
-                bottom: 2px;
-                width: 100%;
-                .fontSize(text);
-                color: @white;
-                text-align: center;
-            }
-        }
+    }
+    .disabled{
+        background-color: #E5E5E5 !important;
+    }
+    .extra{
+        position: absolute;
+        top: 0;
+        right: 0;
+        width: 50px;
+        height: 50px;
     }
 }

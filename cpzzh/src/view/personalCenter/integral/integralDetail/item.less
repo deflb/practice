@@ -1,0 +1,21 @@
+@import '../../../../style/mixin.less';
+.wrapper{
+    display: flex;
+    align-items: center;
+    padding: 10px 15px;
+    .real1px(x, bottom);
+    &_left{
+        flex: 1;
+        &_title{
+            .fontSize(title);
+        }
+        &_time{
+            .fontSize(text);
+            color: @grey;
+        }
+    }
+    &_right{
+        color: @orange;
+        .fontSize(normal);
+    }
+}

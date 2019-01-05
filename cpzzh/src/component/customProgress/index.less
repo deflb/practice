@@ -1,45 +1,53 @@
 @import '../../style/mixin.less';
 .wrapper{
-    margin-top: 60px;
+    margin-top: 40px;
     text-align: left;
     white-space: nowrap;
     .container{
         position: relative;
-        height: 10px;
-        background-color: #F2F2F2;
+        height: 6px;
+        background-color: @bgGrey;
         border-radius: 6px;
         .progress{
+            position: relative;
             display: inline-block;
             vertical-align: top;
-        }
-        .progress{
             height: 100%;
-            background-color: #FFCC33;
+            background-color: @yellow;
             border-radius: 6px;
+            &:after{
+                position: absolute;
+                top: -5px;
+                right: -5px;
+                content: '';
+                width: 10px;
+                height: 10px;
+                background-color: @white;
+                border: 3px solid @yellow;
+                border-radius: 50%;
+            }
         }
         .tip{
             position: absolute;
-            top: 0;
+            top: -5px;
             text-align: center;
+            font-size: @font-size-sm;
+            color: @red;
             transform: translate(-50%,-100%);
-            &>i{
-                display: inline-block;
-                width: 0;
-                height: 0;
-                border: 8px solid #FFCC33;
-                border-bottom: none;
-                border-right-color: transparent;
-                border-left-color: transparent;
-            }
         }
     }
     .step{
         position: relative;
-        min-height: 50px;
-        &>div{
+        height: 47px;
+        font-size: @font-size-sm;
+        color: @grey;
+        &_item{
             position: absolute;
-            top: 0;
+            top: 5px;
             text-align: center;
+            &_name{
+                font-size: @font-size-xs;
+            }
         }
     }
 }

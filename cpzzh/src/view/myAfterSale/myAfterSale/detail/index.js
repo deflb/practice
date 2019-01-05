@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
-import {Icon ,Tabs,Grid,List,ActivityIndicator,WhiteSpace} from 'antd-mobile';
+import {Icon ,Tabs,Grid,List,WhiteSpace,TextareaItem,Toast} from 'antd-mobile';
 import styles  from './detail.less';
 import { request } from '../../../../request';
-import { imgAddress } from '../../../../request/baseURL';
 import api from '../../../../request/api';
+import { formatDate } from '../../../../utlis';
+import  whichImgLink  from '../../../../utlis/whichImgLink';
+import double_arrowSrc from '../../../../assets/icon/double_arrow_rigth@3x.png'
+import addIcon from '../../../../assets/icon/add@3x.png'
 export default class myAfterSale extends Component {
     state = {
       Handle:'已处理',
@@ -16,6 +19,7 @@ export default class myAfterSale extends Component {
     init(){
         let {location={}}=this.props,{state={}} =location;
         let fclaimid = state.orderId;
+        if(fclaimid)
         request({ url: api.getStoreDetail, data: { fclaimid} }).then(res => {
             this.setState({ data: res,isLoading:false })
          
@@ -32,11 +36,12 @@ export default class myAfterSale extends Component {
     back=()=>{
         this.props.history.goBack()
     }
-    toAdd=()=>{
-        const { history } = this.props;
+    toAdd=(e)=>{
+        e.stopPropagation();
+        const { history,match } = this.props;
         let {data} = this.state;
         history.push({
-            pathname:'/wx/myAfterSale/apply',
+            pathname:match.path.slice(0,-7)+'/apply',
             state: {orderId:data.fclaimid,orderNo:data.fclaimno}
         })
     }
@@ -47,22 +52,45 @@ export default class myAfterSale extends Component {
         if(Number(date)<15000000){
             return date
         }
-        return new Date(date).toLocaleString().replace(/\//g,'-').slice(0,-10)
+        return formatDate(new Date(date),"YYYY-MM-DD")
+    }
+    toOrdDetail=(ord)=>{
+        const { history, match } = this.props;
+       if(!ord){
+           Toast.fail("没有销货单")
+           return
+       }
+        history.push({
+            pathname: match.path.slice(0,-19) + '/myOrder/detail',
+            state: {id:ord,offical:true}
+        })
+    }
+    statusIcon =(text)=>{
+        if(text){
+            return <span className={` ${styles.statusIcon}`}>已处理</span>
+        }else{
+            return<span className={` ${styles.statusIcon} ${styles.orange}`}>待处理</span>
+        }
+     
+    }
+    getHeight=()=>{
+        return document.documentElement.clientHeight-100
     }
     render() {
-        let {data,isLoading=true} = this.state,{beforeImgList=[],afterImgList=[]}=data;
+        let {data} = this.state,{beforeImgList=[],afterImgList=[]}=data;
         const photoData  = Array.from(beforeImgList).map((_val, i) => ({
-            icon:imgAddress+ _val.fimgpath,
+            icon:whichImgLink(_val.fimgpath),
           }));
           const photoData2  = Array.from(afterImgList).map((_val, i) => ({
-            icon: imgAddress+ _val.fimgpath,
+            icon: whichImgLink(_val.fimgpath),
           }));  
         return (
             <div className={styles.myAfterSaleDetail}>   
-                {/* <div className ={styles.nothing}>暂无售后记录</div> */}
+               
                 <div className={styles.historyList}>
                     <List.Item className={styles.mb_8+' '+styles.historyTop}> 
-                    <div><span className={`greenColor ${styles.mr_8}`}>{data.factclmtypedesc||<span className="origanColor">未处理</span>}</span>
+                    <div className="normalFontSizeC">
+                    {this.statusIcon(data.factclmtypedesc)}
                     当前售后单 : {data.fclaimno} 
                     <Icon size ="lg" className={"fr "+styles.icon}
                     type="down" theme="outlined" 
@@ -77,40 +105,42 @@ export default class myAfterSale extends Component {
                         tabBarTextStyle={{ color: '#6b6b6b' }}
                         tabBarActiveTextColor='#3399ff'
                         tabBarUnderlineStyle={{ borderColor: '#3399ff',width:'30%',margin:'0 10%'}}
+                        destroyInactiveTab={false}
                     >
-                        <div className={styles.tabBody}>
+                        <div className={styles.tabBody} style={{maxHeight:this.getHeight()+'px'}}>
                             <div className={styles.item}> 
                             <List.Item >
-                            <label>销货单号</label><span>{data.fordno}</span>
+                            <label className="normalFontSizeC fl">销货单号</label>
+                            <div className={"normalFontSizeC fl"} style={{display:'flex',width:'65%'}}>
+                                <div className="oneRowOverflowOmit fl mr-8" style={{flex:'1'}}>{data.fordno}</div>
+                                <div className="blueColor fl" onClick={this.toOrdDetail.bind(this,data.fordno)}>查看详情<img src={double_arrowSrc} className="ml-8" style={{height:'8px'}} alt=""/></div>
+                            </div>
                             </List.Item>
                             </div>
                             <div className={styles.item}>
                             <List.Item >
-                            <label>诉求</label><span>{data.fclmtypedesc}</span>
+                            <label className="normalFontSizeC">诉求</label><span className="normalFontSizeC">{data.fclmtypedesc}</span>
                             </List.Item>
                             </div>
                             <div className={styles.item}>
                             <List.Item >
-                            <label>受理日期</label><span>{this.getDate(data.facceptdate)}</span>
+                            <label className="normalFontSizeC">受理日期</label><span className="normalFontSizeC ">{this.getDate(data.facceptdate)}</span>
                             </List.Item></div>
                             <div className={styles.item}>
                             <List.Item >
-                            <label>要求完成</label><span>{this.getDate(data.fasksettledate)}</span><br/>
-                            <label>日期</label>
-                            
+                            <label className="normalFontSizeC">要求完成日期</label><span className="normalFontSizeC">{this.getDate(data.fasksettledate)}</span>
                             </List.Item></div>
                             <div className={styles.item}>
                             <List.Item >
-                                <div className={styles.fl}>
-                                <label>问题描述</label>
-                                </div>
-                                <div className={styles.fl} style={{whiteSpace:'normal'}}>
-                                    <span>{data.fcustproblem}</span>
+                                
+                                <label className="normalFontSizeC nomargin">问题描述</label>
+                                <div className={styles.descItem}>
+                                    <TextareaItem disabled value={data.fcustproblem||''}  autoHeight/>
                                 </div>
                             </List.Item></div>
                             <div className={styles.item}>
                             <List.Item >
-                                <label>照片</label>
+                                <label className="normalFontSizeC">照片</label>
                                 <div className={styles.before}>
                                     <Grid columnNum={3} data={photoData} itemStyle={{marginRight:'8px'}} renderItem={(el,index)=>{
                                         return <img className={styles.iconImg} key={index+'iconImg'} src={el.icon} alt=""/>
@@ -120,38 +150,42 @@ export default class myAfterSale extends Component {
                             </div>
 
                         </div>
-                        <div className={styles.tabBody}>
+                        <div className={styles.tabBody} style={{maxHeight:this.getHeight()+'px'}}>
                             <div className={styles.item}>
                             <List.Item>
-                                <label>处理方式</label>
-                                <span>{data.factclmtypedesc||<span className="origanColor">未处理</span>}</span>
+                                <label className="normalFontSizeC">处理方式</label>
+                                <span className="normalFontSizeC ">{data.factclmtypedesc}</span>
                                 </List.Item></div>
                             <div className={styles.item}>
                             <List.Item>
-                                <label>处理说明</label>
-                                <span>{data.fdealdesc||'无'}</span>
+                                <label className="normalFontSizeC nomargin">处理说明</label>
+                                {/* <span className="normalFontSizeC">{data.fdealdesc||'无'}</span> */}
+                                <div className={styles.descItem}>
+                                    <TextareaItem disabled value={data.fdealdesc||''}  rows={data.fdealdesc?(Math.floor(data.fdealdesc.length/13)+1):1}/>
+                                </div>
                                 </List.Item></div>
                             <div className={styles.item}><List.Item>
-                                <label>客户满意度</label>
-                                <span>{data.fstsdegreedesc||'无'}</span>
+                                <label className="normalFontSizeC">客户满意度</label>
+                                <span className="normalFontSizeC">{data.fstsdegreedesc||''}</span>
                                 </List.Item></div>
                             <div className={styles.item}>
                             <List.Item>
                                 <div style={{minHeight:'100px'}}>
-                                    <label>现场照片</label>
+                                    <label className="normalFontSizeC">现场照片</label>
                                     <br/>
                                     <div className={`${styles.before} ${styles.border}`}>
                                     <div><span>处理前</span></div>
                                     <WhiteSpace/>
                                     <Grid data={photoData} columnNum={3}
-                                    itemStyle={{marginRight:'8px'}} renderItem={(el,index)=>{
+                                    itemStyle={{marginRight:'12px',height:'72px'}} renderItem={(el,index)=>{
                                         return <img className={styles.iconImg} alt="" key={index+'iconImg2'} src={el.icon}/>
                                     }}  hasLine={false}/>
                                     </div>
+                                    
                                     <div className={styles.before}>
                                     <div><span>处理后</span></div>
                                     <WhiteSpace/>
-                                    <Grid data={photoData2} columnNum={3} itemStyle={{marginRight:'8px'}}
+                                    <Grid data={photoData2} columnNum={3} itemStyle={{marginRight:'12px',height:'72px'}}
                                         renderItem={(el,index)=>{
                                             return <img  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
                                         }} 
@@ -162,8 +196,7 @@ export default class myAfterSale extends Component {
                         </div>
                     </Tabs>
                 </div>
-                <ActivityIndicator animating={isLoading} size="large" toast/>
-                <div className={styles.plusBtn}><Icon type="plus" onClick={this.toAdd}/></div>
+                <div className={styles.plusBtn+' highFontSizeC'} onClick={this.toAdd}><img src={addIcon} width="100%" alt=""/></div>
             </div>
         );
     }

@@ -3,13 +3,13 @@
     height: 100%;
     :global(#map){
         height: 60%;
-        .xReal1px(after)
+        .real1px(unset, unset, x, bottom);
     }
     &_list{
         height: 40%;
         &_item{
             padding: 10px 15px;
-            .xReal1px(after);
+            .real1px(unset, unset, x, bottom);
             &_title{
                 display: flex;
                 .fontSize(title);
@@ -24,7 +24,7 @@
             }
             &_address{
                 .fontSize(text);
-                color: @shallowGrey;
+                color: @grey;
                 .whichRowsOverflowOmit();
             }
         }

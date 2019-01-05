@@ -1,8 +1,8 @@
 import React, {Component} from 'react';
 import styles from './css.less'
 import{Accordion,Grid} from 'antd-mobile'
-import api from '../../../../../request/api';
-import { crmFileAddress } from '../../../../../request/baseURL';
+// import api from '../../../../../request/api';
+import whichImgLink from '../../../../../utlis/whichImgLink';
 export default class Row extends Component {
     constructor(props) {
         super(props)
@@ -11,30 +11,34 @@ export default class Row extends Component {
         }
     }
     getPhoto =(ImgList=[])=>{
+        if(!Array.isArray(ImgList)||!ImgList){
+            ImgList=[]
+        }
         return Array.from(ImgList).map((_val, i) => ({
-            icon: crmFileAddress + api.crmFileUrl(_val)
+            icon: whichImgLink(_val)
           }));  
     }
     render(){
         let {prop,name,components=[],fixPictures=[],livePictures=[]} = this.props.state;
+        let  targetProp = prop||{}
         return(
-          <Accordion className={styles.row}>
+          <Accordion className={styles.row} key={name}>
           <Accordion.Panel className={styles.row} header={ 
-               <div className={' normalFontSize'}>
+               (<div className={' normalFontSize'}>
                 <div className={styles.left}>
                     {name}
                 </div>
                 <div className={styles.right}>
                     { 
-                        Object.keys(prop).map(key=>{
-                            return <span className="ml-8"> {`${key} ${prop[key]}mm`}</span>
+                        Object.keys(targetProp).map(key=>{
+                            return <span key={key} className="ml-8"> {`${key} ${prop[key]}mm`}</span>
                         })
                     }
                    
                 </div>
-                </div>} >
+               </div>)} >
                
-                        { 
+                        { !components?null:
                            components.map((child,idx)=>{
                                return  <div key={child.name+''+idx} className={styles.floatBox+' normalFontSize xBottom1pxd'}>
                                             <div className={styles.left}>
@@ -42,9 +46,9 @@ export default class Row extends Component {
                                             </div>
                                             <div className={styles.right+' mt-8'}>
                                             { 
-                                                Object.keys(child.sizes).map(key=>{
-                                                    return <span className="ml-8 mb-8"> {`${key} ${child.sizes[key]}mm`}</span>
-                                                })
+                                                 Object.keys(child.sizes).map(key=>{
+                                                    return <span key={key} className="ml-8 mb-8"> {`${key} ${child.sizes[key]}mm`}</span>
+                                                 })
                                             }
                                             </div>
                                     </div>
@@ -65,7 +69,7 @@ export default class Row extends Component {
                                 hasLine={false}/>
                             </div>
                         </div>
-                        <div  className={styles.floatBox+' normalFontSize xBottom1pxd'}>
+                        <div  className={styles.floatBox+' normalFontSize '}>
                             <div className={styles.left}>
                                 <label>整改照片</label>
                             </div>

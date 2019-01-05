@@ -322,7 +322,14 @@ module.exports = {
               {
                 loader: require.resolve('less-loader'),
                 options: {
-                  modifyVars: { "@fill-body": "#FFF" },
+                  modifyVars: {
+                    "@fill-body": "#FFF",
+                    "@brand-primary": "#FF5656",
+                    "@brand-primary-tap": "#FF4463",
+                    "@warning-button-fill": "#FF5656",
+                    "@warning-button-fill-tap": "#FF4463",
+                    "@border-color-base": "#F1F1F1",
+                  },
                 },
               }
             )

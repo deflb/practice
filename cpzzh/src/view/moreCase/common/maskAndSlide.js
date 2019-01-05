@@ -1,6 +1,7 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
+import EnabledIosScrollView from '../../../component/enabledIosScrollView';
 import styles from './maskAndSlide.less';
 
 export default class customModal extends Component {
@@ -38,7 +39,7 @@ export default class customModal extends Component {
                     className={styles.mask}
                     onClick={e => { if (maskClose) onCancel() }}
                     style={{ display: visible ? null : 'none' }}
-                />
+                ><EnabledIosScrollView /></div>
                 <div
                     className={styles.dialog_content}
                     ref={distance => this.dialog = distance}

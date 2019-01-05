@@ -1,9 +1,13 @@
 import { LOCATION_CHANGE, SELECTION_CASE, USER_INFO, USER_LEVEL_INFO, GLOBAL_LOADING } from './type';
+import { isIOS } from '../utlis';
 
 const routeState = (state = '/', action) => { // 路由状态
-    if (action.type === LOCATION_CHANGE)
+    if (action.type === LOCATION_CHANGE) {
+        let signatureUrl = sessionStorage.getItem('signatureUrl');
+        if (!signatureUrl || (signatureUrl && !isIOS()))
+            sessionStorage.setItem('signatureUrl', window.location.href)
         return action.payload
-    else
+    } else
         return state
 }
 

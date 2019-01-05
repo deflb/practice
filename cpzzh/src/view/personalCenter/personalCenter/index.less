@@ -1,131 +1,178 @@
 @import '../../../style/mixin.less';
-.had_verify{
-    &_avator{
-        width: 50px;
-        height: 50px;
-        margin-right: 5px;
-        border-radius: 50%;
-        background-color: @bgGrey;
-        &>img{
-            width: 100%;
-            height: 100%;
-            border-radius: 50%;
-        }
-    }
-    &_title{
-        flex: 1;
-        &_header{
-            display: flex;
-            .fontSize(high);
-            &_info{
-                flex: 1;
-                &_level{
-                    .fontSize(text);
-                    padding: 2px;
-                    border-radius: 4px;
-                    background-color: @red;
-                    color: @white;
-                }
-            }
-            :global(.iconfont){
-                position: relative;
-                &::after{
-                    content: '';
-                    position: absolute;
-                    top: 2px;
-                    right: -2px;
-                    width: 4px;
-                    height: 4px;
-                    border-radius: 50%;
-                    background-color: @red;
-                }
-            }
-        }
-        &_footer{
-            .fontSize(text);
-            &_tip{
-                color: @red;
-            }
-        }
-    }
-    &_options{
-        display: flex;
-        align-items: center;
-        &_item{
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            &_title{
-                .fontSize(text);
-                color: @shallowGrey;
-            }
-            &_text{
-                .fontSize(title);
-            }
-            .growth_value{
-                color: @red;
-            }
-        }
-        &_item:nth-child(2){
-            .yReal1px(both);
-        }
-    }
-}
-.no_verify{
-    &_info{
-        position: relative;
-        padding: 20px 15px;
-        text-align: center;
-        .fontSize(high);
-        :global(.iconfont){
-            position: absolute;
-            top: 10px;
-            right: 15px;
-            &::after{
-                content: '';
-                position: absolute;
-                top: 2px;
-                right: -2px;
-                width: 4px;
-                height: 4px;
-                border-radius: 50%;
-                background-color: @red;
-            }
-        }
-        &_avator{
-            display: inline-block;
-            width: 80px;
-            height: 80px;
-            background-color: @bgGrey;
-            border-radius: 50%;
-            &>img{
-                width: 100%;
-                height: 100%;
-                border-radius: 50%;
-            }
-        }
-    }
-}
-.operate{
-    &_item{
-        img{
-            width: 24px;
-            height: 24px;
-        }
-        .list_item_extra{
-            display: inline-block;
-            width: 24px;
-            height: 24px;
-            line-height: 24px;
-            text-align: center;
-            color: @white;
-            .fontSize(text);
+.wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    .message{
+        position: absolute;
+        top: 14px;
+        right: 14px;
+        width: 16px;
+        height: 16px;
+        background-image: url('../../../assets/icon/news_icon@3x.png');
+        background-size: 100% 100%;
+        background-repeat: no-repeat;
+        text-align: right;
+        &::after{
+            content: '';
+            float: right;
+            width: 5px;
+            height: 5px;
             border-radius: 50%;
             background-color: @red;
         }
-        &_text{
-            .fontSize(title);
+    }
+    .had_verify{
+        &_header{
+            position: relative;
+            height: 126px;
+            padding: 33px 30px 33px 18px;
+            background-image: url('../../../assets/image/bg_img@3x.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            .content{
+                display: flex;
+                &_avator{
+                    width: 60px;
+                    height: 60px;
+                    margin-right: 16px;
+                    border: 2px solid @white;
+                    border-radius: 50%;
+                    &>img{
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 50%;
+                    }
+                }
+                &_info{
+                    flex: 1;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: center;
+                    color: @white;
+                    font-size: 0;
+                    &_top,&_bottom{
+                        line-height: 1;
+                    }
+                    &_top{
+                        margin-bottom: 14px;
+                        &_name{
+                            font-size: @font-size-lg;
+                            font-weight: bold;
+                        }
+                        &_level{
+                            height: 16px;
+                            line-height: 16px;
+                            font-size: @font-size-xs;
+                            border-radius: 4px;
+                            background-color: @red;
+                            padding: 0 4px;
+                            margin-left: 12px;
+                        }
+                    }
+                    &_bottom{
+                        color: @grey;
+                        font-size: @font-size-xs;
+                        .oneRowOverflowOmit();
+                    }
+                }
+            }
+        }
+        &_options{
+            height: 60px;
+            display: flex;
+            align-items: center;
+            .real1px(x, top);
+            &_item{
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                &_title{
+                    font-size: @font-size-md;
+                    font-weight: bold;
+                }
+                &_text{
+                    font-size: @font-size-sm;
+                    color: @grey;
+                }
+                .growth_value{
+                    color: @red;
+                }
+            }
+            &_item:nth-child(n+2){
+                .real1px(y, left);
+            }
+        }
+    }
+    .no_verify{
+        &_info{
+            position: relative;
+            height: 126px;
+            padding: 20px 30px 0;
+            background-image: url('../../../assets/image/bg_img@3x.png');
+            background-size: 100% 100%;
+            background-repeat: no-repeat;
+            text-align: center;
+            color: @white;
+            font-size: @font-size-md;
+            &_avator{
+                display: inline-block;
+                width: 60px;
+                height: 60px;
+                border: 2px solid @white;
+                border-radius: 50%;
+                &>img{
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 50%;
+                }
+            }
+        }
+        &_operate{
+            height: 50px;
+            display: flex;
+            align-items: center;
+            font-size: @font-size-md;
+            padding: 0 18px;
+            &_text{
+                flex: 1;
+                margin-right: 18px;
+                .whichRowsOverflowOmit(1);
+            }
+            &_btn{
+                padding: 4px 8px;
+                color: @white;
+                background-color: @red;
+            }
+        }
+    }
+    .operate{
+        padding: 0 18px;
+        &_item{
+            height: 50px;
+            display: flex;
+            align-items: center;
+            .real1px(unset, unset, x, bottom);
+            img{
+                width: 16px;
+                height: 16px;
+            }
+            &_text{
+                font-size: @font-size-md;
+                margin: 0 10px 0 16px;
+            }
+            &_extra{
+                display: inline-block;
+                width: 20px;
+                height: 20px;
+                line-height: 20px;
+                text-align: center;
+                color: @white;
+                font-size: @font-size-xs;
+                border-radius: 50%;
+                background-color: @red;
+            }
         }
     }
 }

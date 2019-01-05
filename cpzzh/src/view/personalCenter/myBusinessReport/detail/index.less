@@ -1,0 +1,127 @@
+@import '../../../../style/mixin.less';
+.wrapper{
+    .fontSize(normal);
+    .header,.title,.guide,.custom{
+        padding: 7px 15px;
+    }
+    .header{
+        &_date{
+            display: flex;
+            li:first-child{
+                flex: 1;
+            }
+            li:last-child{
+                flex-basis: 20%;
+                color: @colorGrey;
+                text-align: right;
+            }
+        }
+        &_record{
+            color: @red;
+            &_text{
+                margin-left: 7px;
+                color: @colorGrey;
+            }
+        }
+    }
+    .detail{
+        text-align: center;
+        padding: 0 15px;
+        &_valid{
+            border-radius: 8px 8px 0 0;
+        }
+        &_void{
+            background-color: @bgGrey;
+            border-radius: 0 0 8px 8px;
+            border: 1px solid #ddd;
+            overflow: hidden;
+            &_title{
+                color: @colorGrey;
+                padding: 7px 0;
+            }
+            &_content{
+                padding: 7px 0;
+                .real1px(x, top);
+            }
+        }
+        &_date{
+            color: @colorGrey;
+            margin: 7px 0;
+        }
+    }
+    .title{
+        .fontSize(title);
+        color: @colorGrey;
+        background-color: @bgGrey;
+    }
+    .info{
+        color: @black;
+        &_header{
+            display: flex;
+            align-items: center;
+            &_title{
+                flex: 1;
+                &_text{
+                    color: @colorGrey;
+                }
+                &_icon{
+                    color: @colorGrey;
+                    margin-right: 7px;
+                }
+                &_des{
+                    background-color: @bgGrey;
+                    color: @colorGrey;
+                    margin-left: 7px;
+                    padding: 0 7px;
+                }
+            }
+            &_extra{
+                display: flex;
+                align-items: center;
+                &_thumb{
+                    display: inline-block;
+                    width: 35px;
+                    height: 35px;
+                    border-radius: 50%;
+                    background-color: @bgGrey;
+                    margin-right: 15px;
+                    img{
+                        display: block;
+                        width: 100%;
+                        height: 100%;
+                    }
+                }
+            }
+        }
+        &_content{
+            padding-left: 25px;
+        }
+    }
+    .custom{
+        .info{
+            margin-bottom: 7px;
+        }
+    }
+}
+.record_list{
+    &>ul{
+        display: flex;
+        &>li{
+            flex: 1;
+        }
+        &>li:last-child{
+            text-align: right;
+        }
+    }
+    &_header{
+        color: @colorGrey;
+        background-color: @bgGrey;
+        margin-bottom: 7px;
+    }
+    &_tip{
+        margin-top: 15px;
+        padding: 7px 0;
+        color: @red;
+        .real1px(x, top);
+    }
+}

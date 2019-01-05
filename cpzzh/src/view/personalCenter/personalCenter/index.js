@@ -1,10 +1,16 @@
 import React, { Component } from 'react';
 import { connect } from 'react-redux';
-import { Card, List } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
-import GoToVerify from './goToVerify';
-import list_thumb_png from '../../../assets/image/list_thumb.png';
+import EnabledIosScrollView from '../../../component/enabledIosScrollView';
+import CustomModal from '../../../component/customModal';
+import order_icon from '../../../assets/icon/order_icon@3x.png';
+import after_sale_icon from '../../../assets/icon/after_sale_icon@3x.png';
+import business_opportunity_icon from '../../../assets/icon/business_opportunity_icon@3x.png';
+import sun_home_icon from '../../../assets/icon/sun_home_icon@3x.png';
+import collect_icon from '../../../assets/icon/collect_icon@3x.png';
+import opinion_icon from '../../../assets/icon/opinion_icon@3x.png';
 import routerBase from '../../../router/routerBase';
+import whichImgLink from '../../../utlis/whichImgLink';
 import styles from './index.less';
 
 export default connect(state => ({
@@ -19,101 +25,94 @@ export default connect(state => ({
         })
     }
 
+    goToVerify = () => {
+        let { dispatch, userInfo } = this.props;
+        CustomModal.verify({ dispatch, userInfo })
+    }
+
+    componentWillUnmount() {
+        CustomModal.unmountFnDialog();
+    }
+
     render() {
-        const { match, userInfo } = this.props,
+        const { match, userInfo, dispatch } = this.props,
             { path } = match,
             { avatar, name, userLevel, growthValue, needValue, nextLevel, couponCount, score, isAuth, orderCount, claimCount } = userInfo;
-        return (
-            <div>
-                {isAuth === 1 ? <Card full className={styles.had_verify}>
-                    <Card.Header
-                        thumb={<div className={styles.had_verify_avator}>
-                            {avatar ? <img src={avatar} alt='' /> : null}
-                        </div>}
-                        title={<div className={styles.had_verify_title}>
-                            <div className={styles.had_verify_title_header}>
-                                <div className={styles.had_verify_title_header_info}>{name} {userLevel ? <span className={styles.had_verify_title_header_info_level}>{userLevel}</span> : null}</div>
-                                <i className='iconfont icon-message' onClick={this.jumpTo.bind(this, { pathname: path + '/message' })} />
+        return (<div className={styles.wrapper}>
+            {isAuth === 1 ? <div>
+                <div className={styles.had_verify_header}>
+                    <ul className={styles.content}>
+                        <li className={styles.content_avator}>
+                            {avatar ? <img src={whichImgLink(avatar)} alt='' /> : null}
+                        </li>
+                        <li className={styles.content_info}>
+                            <div className={styles.content_info_top}>
+                                <span className={styles.content_info_top_name}>{name}</span>{userLevel ? <span className={styles.content_info_top_level}>{userLevel}</span> : null}
                             </div>
-                            <div className={styles.had_verify_title_footer}>再有<span className={styles.had_verify_title_footer_tip}>{needValue}</span>成长值即可升级为{nextLevel}</div>
-                        </div>}
-                    />
-                    <Card.Body>
-                        <div className={styles.had_verify_options}>
-                            <div className={styles.had_verify_options_item} onClick={this.jumpTo.bind(this, { pathname: path + '/grade', state: { avatar, name, userLevel } })}>
-                                <div className={`${styles.had_verify_options_item_text} ${styles.growth_value}`}>{growthValue}</div>
-                                <div className={styles.had_verify_options_item_title}>成长值</div>
-                            </div>
-                            <div className={styles.had_verify_options_item}
-                                onClick={this.jumpTo.bind(this, { pathname: path + '/discountCoupon' })}
-                            >
-                                <div className={styles.had_verify_options_item_text}>{couponCount}</div>
-                                <div className={styles.had_verify_options_item_title}>优惠券</div>
-                            </div>
-                            <div
-                                className={styles.had_verify_options_item}
-                            // onClick={this.jumpTo.bind(this, { pathname: path + '/integral' })}
-                            >
-                                <div className={styles.had_verify_options_item_text}>{score}</div>
-                                <div className={styles.had_verify_options_item_title}>积分</div>
-                            </div>
-                        </div>
-                    </Card.Body>
-                </Card>
-                    :
-                    <div className={styles.no_verify}>
-                        <div className={styles.no_verify_info}>
-                            <i className='iconfont icon-message' onClick={this.jumpTo.bind(this, { pathname: path + '/message' })} />
-                            <div className={styles.no_verify_info_avator}>
-                                {avatar ? <img src={avatar} alt='' /> : null}
-                            </div>
-                            <p>{name}</p>
-                        </div>
-                        <CustomWhiteSpace />
-                        <GoToVerify />
-                    </div>
-                }
-                {isAuth === 1 ? <CustomWhiteSpace /> : null}
-                {isAuth === 1 ? <List className={styles.operate}>
-                    <List.Item
-                        className={styles.operate_item}
-                        arrow="horizontal"
-                        thumb={list_thumb_png}
-                        extra={<span className={styles.list_item_extra}>{orderCount}</span>}
-                        onClick={this.jumpTo.bind(this, { pathname: routerBase + '/myOrder' })}
-                    >
-                        <span className={styles.operate_item_text}>我的订单</span>
-                    </List.Item>
-                    <List.Item
-                        className={styles.operate_item}
-                        arrow="horizontal"
-                        thumb={list_thumb_png}
-                        extra={<span className={styles.list_item_extra}>{claimCount}</span>}
-                        onClick={this.jumpTo.bind(this, { pathname: routerBase + '/myAfterSale' })}
-                    >
-                        <span className={styles.operate_item_text}>我的售后</span>
-                    </List.Item>
-                </List> : null}
-                <CustomWhiteSpace />
-                <List>
-                    <List.Item
-                        className={styles.operate_item}
-                        arrow="horizontal"
-                        thumb={list_thumb_png}
-                        onClick={this.jumpTo.bind(this, { pathname: path + '/collect' })}
-                    >
-                        <span className={styles.operate_item_text}>我的收藏</span>
-                    </List.Item>
-                    <List.Item
-                        className={styles.operate_item}
-                        arrow="horizontal"
-                        thumb={list_thumb_png}
-                        onClick={this.jumpTo.bind(this, { pathname: path + '/suggestionFeedback' })}
-                    >
-                        <span className={styles.operate_item_text}>意见反馈</span>
-                    </List.Item>
-                </List>
+                            {!needValue || !nextLevel
+                                ? <div className={styles.content_info_bottom}>再有3200成长值即可升级为银牌会员</div>
+                                : <div className={styles.content_info_bottom}>再有{needValue}成长值即可升级为{nextLevel}</div>}
+                        </li>
+                    </ul>
+                    <i className={styles.message} onClick={this.jumpTo.bind(this, { pathname: path + '/message' })} />
+                </div>
+                <ul className={styles.had_verify_options}>
+                    {[
+                        { router: '/grade', text: '成长值', value: <span className={styles.growth_value}>{growthValue}</span>, state: { avatar, name, userLevel } },
+                        { router: '/bounty', text: '奖励金', value: 1300, state: {} },
+                        { router: '/discountCoupon', text: '优惠券', value: couponCount, state: {} },
+                        { router: '/integral', text: '积分', value: score, state: { score } },
+                    ].map(item => (<li key={item.router} className={styles.had_verify_options_item} onClick={this.jumpTo.bind(this, { pathname: path + item.router, state: item.state })}>
+                        <div className={styles.had_verify_options_item_title}>{item.value}</div>
+                        <div className={styles.had_verify_options_item_text}>{item.text}</div>
+                    </li>))}
+                </ul>
             </div>
-        );
+                :
+                <div className={styles.no_verify}>
+                    <div className={styles.no_verify_info}>
+                        <i className={styles.message} onClick={this.jumpTo.bind(this, { pathname: path + '/message' })} />
+                        <div className={styles.no_verify_info_avator}>
+                            {avatar ? <img src={whichImgLink(avatar)} alt='' /> : null}
+                        </div>
+                        <p>{name}</p>
+                    </div>
+                    <CustomWhiteSpace />
+                    <ul className={styles.no_verify_operate}>
+                        <li className={styles.no_verify_operate_text}>验证成功后，订单信息一手掌握</li>
+                        <li className={styles.no_verify_operate_btn} onClick={this.goToVerify}>去验证</li>
+                    </ul>
+                </div>
+            }
+            <CustomWhiteSpace />
+            <EnabledIosScrollView>
+                <ul className={styles.operate}>
+                    {[
+                        { text: '我的订单', router: '/myOrder', extra: <span className={styles.operate_item_extra}>{orderCount}</span>, icon: <img src={order_icon} alt='' /> },
+                        { text: '我的售后', router: '/myAfterSale', extra: <span className={styles.operate_item_extra}>{claimCount}</span>, icon: <img src={after_sale_icon} alt='' /> }
+                    ].map(item => <li key={item.router} className={styles.operate_item} onClick={() => {
+                        if (CustomModal.verify({ dispatch, userInfo }))
+                            this.jumpTo({ pathname: routerBase + item.router })
+                    }}>
+                        {item.icon}
+                        <span className={styles.operate_item_text}>{item.text}</span>
+                        {isAuth === 1 ? item.extra : null}
+                    </li>)}
+                </ul>
+                <CustomWhiteSpace />
+                <ul className={styles.operate}>
+                    {[
+                        { text: '我的商机报备', router: '/myBusinessReport', icon: <img src={business_opportunity_icon} alt='' /> },
+                        { text: '我的晒家', router: '/myShowHome', icon: <img src={sun_home_icon} alt='' /> },
+                        { text: '我的收藏', router: '/collect', icon: <img src={collect_icon} alt='' /> },
+                        { text: '意见反馈', router: '/suggestionFeedback', icon: <img src={opinion_icon} alt='' /> }
+                    ].map(item => <li key={item.router} className={styles.operate_item} onClick={this.jumpTo.bind(this, { pathname: path + item.router })}>
+                        {item.icon}
+                        <span className={styles.operate_item_text}>{item.text}</span>
+                        {item.extra}
+                    </li>)}
+                </ul>
+            </EnabledIosScrollView>
+        </div>);
     }
 })

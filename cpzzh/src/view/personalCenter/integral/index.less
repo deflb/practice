@@ -1,0 +1,64 @@
+@import '../../../style//mixin.less';
+.wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    &_header{
+        display: flex;
+        text-align: center;
+        padding: 17px 0;
+        .fontSize(normal);
+        &>li{
+            flex: 1;
+            img{
+                width: 30px;
+                height: 30px;
+            }
+        }
+    }
+    &_product{
+        display: inline-block;
+        width: 50%;
+        padding: 15px;
+        .real1px(x, bottom, y, right);
+        &_title{
+            .fontSize(title);
+            .oneRowOverflowOmit();
+        }
+        &_des{
+            .fontSize(text);
+            color: @grey;
+            .oneRowOverflowOmit();
+        }
+        &_img{
+            height: 3rem;
+            padding: 7px 0;
+            img{
+                display: block;
+                width: 100%;
+                height: 100%;
+            }
+        }
+        &_operate{
+            display: flex;
+            align-items: center;
+            &_left{
+                flex: 1;
+                display: flex;
+                align-items: center;
+                .fontSize(title);
+                color: @orange;
+                img{
+                    width: 25px;
+                    height: 25px;
+                }
+            }
+            &_right{
+                border: 1px solid @borderGrey;
+                border-radius: 4px;
+                .fontSize(text);
+                padding: 2px 6px;
+            }
+        }
+    }
+}

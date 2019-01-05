@@ -2,21 +2,30 @@
 
 .nothing{
     text-align: center;
-    padding-top: 30%;
+    padding-top: 40%;
     color:#999;
     font-size: 24px;
     background: #fff;
+    height: 100%;
 }
 .myAfterSale{
     background: #f2f2f2;
     overflow: hidden;
+    height: 100%;
 }
 .historyList{
-  
+   display: flex;
+   flex-direction: column;
+   height: 100%;
+   .body{
+    overflow-y: auto;
+    flex:1;
+   }
    .hisItem{
        background-color: #fff;
        padding: 8px 16px;
        margin-bottom: 1px;
+       padding-left: 30px;
    }
    .fr{
        float: right;
@@ -32,12 +41,13 @@
 }
 .historyTop{
     background: #fff;
-
-     .icon{
-         color: #999;
-         font-weight: normal;
-         margin-top: -8px;
-     }
+    padding-left: 30px;
+    .icon{
+        color: #dadada;
+        font-weight: normal;
+        margin-top: -8px;
+        font-size: @font-size-md;
+    }
 }
 .mt_8{
     margin-top: 8px;
@@ -47,15 +57,13 @@
 }
 .plusBtn{
     position: absolute;
-    top: 75%;
+    top: 85%;
     right: 10%;
-    width: 48px;
-    height:48px;
-    background:#21bc8a;
+    width: 50px;
+    height:50px;
+    background:@red; 
     color: #fff;
     text-align: center;
-    line-height: 2.5;
-    font-size: 20px;
     font-weight:bold;
     border-radius: 50%;
 }

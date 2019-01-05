@@ -5,9 +5,9 @@ import Title from '../gauge/title'
 import Row from '../gauge/row'
 import styles from '../index.less'
 import { request } from '../../../../../request';
-import { crmFileAddress } from '../../../../../request/baseURL';
+import  whichImgLink from '../../../../../utlis/whichImgLink';
 import api from '../../../../../request/api';
-export default class Gauge extends Component {
+export default class secondGauge extends Component {
     constructor(props) {
         super(props)
         this.state={
@@ -17,88 +17,26 @@ export default class Gauge extends Component {
     }
     componentDidMount(){
         this.init()
-        // let data = {
-        //     customerId: 25298,
-        //     measureInfo: [
-        //             {
-        //                 rooms: [
-        //                     {
-        //                         prop: {
-        //                             "层高": "2800",
-        //                             "脚踢线": "100"
-        //                         },
-        //                         walls: [
-        //                             {
-        //                                 components: [
-        //                                     {
-        //                                         sizes: {
-        //                                             "厚": "240",
-        //                                             "右沿边距": "2235",
-        //                                             "宽": "880",
-        //                                             "左沿边距": "1355",
-        //                                             "距地": "0",
-        //                                             "高": "2050"
-        //                                         },
-        //                                         name: "1-入户门"
-        //                                     }
-        //                                 ],
-        //                                 fixPictures: [
-        //                                     "string1",
-        //                                     "string2",
-        //                                     "string3",
-        //                                     "string4",
-        //                                     "string5"
-        //                                 ],
-        //                                 livePictures: [
-        //                                     "string1",
-        //                                     "string2",
-        //                                     "string3",
-        //                                     "string4",
-        //                                     "string5"
-        //                                 ],
-        //                                 prop: {
-        //                                     "墙长": "3536"
-        //                                 },
-        //                                 name: "01A墙面"
-        //                             }
-        //                         ],
-        //                         name: "房间-1"
-        //                     }
-        //                 ],
-        //                 unitName: "908",
-        //                 unitsPicture: "http://192.168.5.77/group2/M00/00/15/wKgFTVsXjI6ABBkUAARmpA-syYI881.png"
-        //             }
-        //         ],
-        //         taskNo: 2697,
-        //         taskProgress: {
-        //             index: 0,
-        //             mainProcess: "A02",
-        //             processType: "AssignOrderProcess",
-        //             status: 1,
-        //             subProcess: "A0204"
-        //         },
-        //         taskType: "measure"
-        //     }
-        // this.setState({data})
-       
+      
     }
     init=()=>{
-        let {taskNo,orderNo,taskType} =this.props.state;
-        request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType}}).then(res => {
+        let {taskNo,orderNo} =this.props.state;
+        
+        request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType:'remeasure'}}).then(res => {
             this.setState({
-                data:res
+                measureInfo:res.measureInfo||[{}]
             })
         })
     }
    
     render(){
-        let {data={},current} = this.state,{measureInfo=[{}]}=data;
+        let {measureInfo=[{}],current} = this.state;
         let {state} = this.props;
         let info = measureInfo[current-1] ||{};
         let {rooms=[]} = info; 
        
         return(
-            <div className={styles.serveDetail}>
+            <div className={styles.serveDetails}>
               <List>
                 <List.Item className={styles.historyTop}>
                     复尺信息
@@ -132,7 +70,7 @@ export default class Gauge extends Component {
                 <Card.Body style={{padding:'8px'}}>
                      <div style={{minHeight:'200px'}}>
                     <div className="tc">{info.unitName}</div>
-                         <img src={crmFileAddress + api.crmFileUrl(info.unitsPicture)} width="100%" alt=""/>
+                         <img src={whichImgLink(info.unitsPicture)} width="100%" alt=""/>
                     </div>
                 </Card.Body>
                 </Card>
@@ -167,6 +105,7 @@ export default class Gauge extends Component {
                 </Card.Body>
                 </Card>
                 </WingBlank>
+                <div style={{display:measureInfo.length<2?'none':null}}>
                 <Pagination total={measureInfo.length}
                     className={styles.pagination}
                     simple={true}
@@ -179,6 +118,7 @@ export default class Gauge extends Component {
                         nextText: (<span  className="arrow-align"><Icon type="right" /></span>),
                     }}
                     />
+                    </div>
             </div>
     )
     }

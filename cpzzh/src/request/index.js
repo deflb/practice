@@ -1,13 +1,14 @@
 import axios from 'axios';
 import jsencrypt from 'jsencrypt';
 import { encode } from 'querystring';
-import { address } from './baseURL';
+import { address, crmFileAddress } from './baseURL';
 import api from './api';
 import { setCookie, delCookie } from '../utlis';
+import { globalLoadingToggle } from '../store/action';
 import { Toast } from 'antd-mobile';
 
-let Authorization = '';
-const timeout = 5000;
+let Authorization = '', dispatch = function () { };
+const timeout = 15000;
 const X_Requested_Key = '2,';
 
 // 基础
@@ -26,19 +27,23 @@ const request = ({ method = 'post', url, data = {}, config = {} }) => { // confi
     })
 }
 axios.interceptors.request.use(function (config) {
+    dispatch(globalLoadingToggle(true));
     return config;
 }, function (error) {
     return Promise.reject(error);
 })
 axios.interceptors.response.use(function (response) {
     const { msgcode, data } = response.data;
+    dispatch(globalLoadingToggle(false));
     if (msgcode === 0)
         return data;
     // 其他状态 提示 错误信息
     Toast.fail(data, 1);
     return Promise.reject({ msgcode, data });
 }, function (error) {
-    Toast.fail('网络错误', 1);
+    dispatch(globalLoadingToggle(false));
+    let msg = new RegExp('timeout').test(error) ? '请求超时' : '网络错误';
+    Toast.fail(msg, 1);
     return Promise.reject(error);
 })
 
@@ -51,19 +56,49 @@ const request_form = axios.create({
     }]
 })
 request_form.interceptors.request.use(function (config) {
+    dispatch(globalLoadingToggle(true));
     return config;
 }, function (error) {
     return Promise.reject(error);
 })
 request_form.interceptors.response.use(function (response) {
     const { msgcode, data } = response.data;
+    dispatch(globalLoadingToggle(false));
     if (msgcode === 0)
         return data;
     // 其他状态 提示 错误信息
     Toast.fail(data, 1);
     return Promise.reject({ msgcode, data });
 }, function (error) {
-    Toast.fail('网络错误', 1);
+    dispatch(globalLoadingToggle(false));
+    let msg = new RegExp('timeout').test(error) ? '请求超时' : '网络错误';
+    Toast.fail(msg, 1);
+    return Promise.reject(error);
+})
+
+// crm3.0文件上传接口
+const crm3_upload = axios.create({
+    timeout,
+    baseURL: crmFileAddress
+})
+crm3_upload.interceptors.request.use(function (config) {
+    dispatch(globalLoadingToggle(true));
+    return config;
+}, function (error) {
+    return Promise.reject(error);
+})
+crm3_upload.interceptors.response.use(function (response) {
+    const { error, message, filepath, title } = response.data;
+    dispatch(globalLoadingToggle(false));
+    if (error === 0)
+        return { url: filepath, fileName: title };
+    // 其他状态 提示 错误信息
+    Toast.fail(message, 1);
+    return Promise.reject({ error, message });
+}, function (error) {
+    dispatch(globalLoadingToggle(false));
+    let msg = new RegExp('timeout').test(error) ? '请求超时' : '网络错误';
+    Toast.fail(msg, 1);
     return Promise.reject(error);
 })
 
@@ -107,13 +142,20 @@ request.setAuthorization = uuid => {
     Authorization = 'Bearer ' + uuid;
 }
 
-// 内网(模拟外网环境)测试配置(发起授权 获取uuid)
+request.setDispatch = fn => { dispatch = fn }
+
 request.getAuthUrl = async () => {
-    const uuid = await request.login({ merchantCode: 'mt', userName: 'leibo_wxtest', password: '123456' });
-    window.location.href = window.location.href.split('?')[0] + '?uuid=' + uuid;
+    if (process.env.NODE_ENV === "production") { // 上线
+        window.location.href = address + api.getAuthUrl + `?redirectUrl=${encodeURIComponent(window.location.href)}`;
+    } else { // 内网(模拟外网环境)测试配置(发起授权 获取uuid)
+        const uuid = await request.login({ merchantCode: 'mt', userName: 'leibo_wxtest', password: '123456' }),
+            { href, search } = window.location;
+        window.location.href = search ? href + '&uuid=' + uuid : href + '?uuid=' + uuid;
+    }
 }
 
 export {
     request,
-    request_form
+    request_form,
+    crm3_upload
 }

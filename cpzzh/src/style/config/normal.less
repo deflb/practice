@@ -12,19 +12,23 @@
     .whichRowsOverflowOmit(3)
 }
 
-:global(.bg_grey_list_view){ // 灰背景 listView 公用样式
-    padding: 10px 8px 0;
-    background-color: @bgGrey;
-    :global(.am-list-view-scrollview){
-        height: 100%;
-        :global(.am-list-body){
-            background-color: @bgGrey;
-        }
-    }
-}
-
 :global(.am-list-footer){ // listView footer 默认居中
     text-align: center;
+}
+:global(.am-list-view-scrollview-content){ // listView 滚动部分 最大宽度
+    max-width: 100%;
+}
+:global(.am-tabs-horizontal .am-tabs-pane-wrap-active){
+    height: 100% !important;
+}
+
+:global(.rich_text_global){ // 富文本展示
+    word-break: break-all;
+    overflow-x: auto;
+    img{
+        width: 100%;
+        height: auto;
+    }
 }
 
 :global(.pl-8){
@@ -62,4 +66,12 @@
 }
 :global(.tc){
     text-align: center;
+}
+:global(.icon-check-circle) {
+    font-size: 24px !important;
+    }
+:global(.uncheckedIcon){
+    font-size: 28px !important;
+    color: #f90;
+    background: #fff;
 }

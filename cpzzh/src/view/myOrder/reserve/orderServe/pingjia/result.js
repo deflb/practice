@@ -2,10 +2,10 @@ import React, { Component } from 'react';
 import {  Toast ,WhiteSpace, WingBlank, Grid} from 'antd-mobile';
 import { request } from '../../../../../request';
 import api from '../../../../../request/api';
-import { crmFileAddress } from '../../../../../request/baseURL';
 import Star from "./star"
 import styles from '../index.less';
-
+import { formatDate } from '../../../../../utlis';
+import  whichImgLink  from '../../../../../utlis/whichImgLink';
 export default class PingjiaResult extends Component {
     state = {
         imgList: [],
@@ -26,20 +26,23 @@ export default class PingjiaResult extends Component {
         if(!date||date<150000000){
             return date
         }
-        return new Date(date).toLocaleString().replace(/\//g,'-')
+        return formatDate(new Date(date),"YYYY-MM-DD hh:mm")
     }
     getPhoto =(ImgList=[])=>{
+        if(!Array.isArray(ImgList)||!ImgList){
+            ImgList=[]
+        }
         return Array.from(ImgList).map((_val, i) => ({
-            icon: crmFileAddress + api.crmFileUrl(_val.attachUrl),
+            icon: whichImgLink(_val.attachUrl),
           }));  
     }
-    
+   
     render() {
             const { data={}} = this.state;
            
-            let allhighappraiseresult = ['',"好评",'中评','差评']
+            let allhighappraiseresult = ['默认好评',"好评",'中评','差评']
         return (
-            <div>
+            <div style={{height:'100%',overflowY:'auto'}}>
             <WingBlank className="greyColor">
                 <WhiteSpace/>
                 <div className={styles.labels}>
@@ -76,9 +79,9 @@ export default class PingjiaResult extends Component {
                 </div>
                 <div className="pl-16">
                          <Grid data={this.getPhoto(data.attachDtos)} 
-                          itemStyle={{margin:'8px 8px  0 0',height:'75px'}}
+                          itemStyle={{margin:'8px 8px  0 0',minHeight:'75px'}}
                           renderItem={(el,index)=>{
-                              return <img  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
+                              return <img  alt="failload" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
                           }} 
                           hasLine={false}/>
                 </div>

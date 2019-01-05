@@ -1,18 +1,13 @@
 import React, { Component } from 'react';
-import ReactDOM from 'react-dom';
-import {
-    Tabs,
-    ListView,
-    // PullToRefresh
-} from 'antd-mobile';
+import { Tabs } from 'antd-mobile';
 import { Route } from 'react-router';
-import { globalLoadingToggle } from '../../store/action';
 import asyncC from '../../component/asyncC';
+import CustomListView from '../../component/customListView';
 import SearchBar from './common/searchBar';
 import Filter from './common/filter';
 import { request } from '../../request';
 import api from '../../request/api';
-import { imgAddress } from '../../request/baseURL';
+import whichImgLink from '../../utlis/whichImgLink';
 import styles from './mountings.less';
 const Detail = asyncC(() => import('./mountingsComponent/detail'));
 
@@ -23,11 +18,8 @@ export default class mountings extends Component {
         pageSize: 10,
         hasMore: true,
         dataBlobs: [],
-        dataSource: new ListView.DataSource({
-            rowHasChanged: (row1, row2) => row1 !== row2
-        }),
-        isLoading: false,
-        height: 0,
+        loading: false,
+        refreshing: false,
         pid: '',
         brandname: '',
         keyword: '',
@@ -49,42 +41,36 @@ export default class mountings extends Component {
     getBrandList = () => {
         request({ url: api.brandList }).then(res => {
             this.setState({ brandList: res })
-        }).catch(err => { console.log(err) })
+        }).catch(err => { })
     }
 
     getMountingsClassify = () => {
         request({ url: api.partSortList, data: { pid: 0 } }).then(res => {
             this.setState({ classifyList: res })
-        }).catch(err => { console.log(err) })
+        }).catch(err => { })
     }
 
     getMountingsList = ({ pageNo = this.state.pageNo, keyword = this.state.keyword, dataBlobs = this.state.dataBlobs } = {}) => {
-        const { pageSize, pid, brandname, dataSource } = this.state,
-            { dispatch } = this.props;
-        dispatch(globalLoadingToggle(true));
-        this.setState({ isLoading: true, keyword })
+        const { pageSize, pid, brandname } = this.state;
+        this.setState({ loading: true, keyword })
         request({ url: api.partDetailList, data: { pageNo, pageSize, status: 1, pid, brandname, keyword } }).then(res => {
             const { list, pageTurn } = res,
                 { nextPage, rowCount } = pageTurn,
                 _dataBlobs = [...dataBlobs, ...list];
-            dispatch(globalLoadingToggle(false));
             this.setState({
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
                 pageNo: nextPage,
                 dataBlobs: _dataBlobs,
-                dataSource: dataSource.cloneWithRows(_dataBlobs),
-                isLoading: false,
-            })
-            pageNo === 1 && this.lv.scrollTo(0, 0)
+                loading: false,
+                refreshing: false,
+            });
+            pageNo === 1 && this.listView.scrollTo(0, 0);
         }).catch(err => {
-            this.setState({ isLoading: false });
-            dispatch(globalLoadingToggle(false));
+            this.setState({ loading: false, refreshing: false });
         })
     }
 
     componentDidMount() {
-        const hei = document.documentElement.clientHeight - ReactDOM.findDOMNode(this.lv).getBoundingClientRect().top;
-        this.setState({ height: hei })
         this.getBrandList()
         this.getMountingsClassify()
         this.getMountingsList()
@@ -107,25 +93,16 @@ export default class mountings extends Component {
     }
 
     onEndReached = (event) => {
-        const { isLoading, hasMore } = this.state;
-        if (isLoading || !hasMore)
+        const { loading, hasMore } = this.state;
+        if (loading || !hasMore)
             return;
         this.getMountingsList()
     }
 
-    // updateList = () => { // 更新list (下拉刷新)
-    //     const { dataBlobs, dataSource, pid, brandname, keyword } = this.state,
-    //         len = dataBlobs.length;
-    //     request({ url: api.partDetailList, data: { pageNo: 1, pageSize: len, status: 1, pid, brandname, keyword } }).then(res => {
-    //         const { list, pageTurn } = res,
-    //             { rowCount } = pageTurn;
-    //         this.setState({
-    //             hasMore: list.length >= rowCount ? false : true,
-    //             dataBlobs: list,
-    //             dataSource: dataSource.cloneWithRows(list),
-    //         })
-    //     }).catch(error => { })
-    // }
+    onRefresh = () => {
+        this.setState({ refreshing: true });
+        this.getMountingsList({ pageNo: 1, dataBlobs: [] })
+    }
 
     onSearch = keyword => {
         if (keyword !== this.state.keyword)
@@ -140,13 +117,12 @@ export default class mountings extends Component {
         const {
             classifyList,
             dataBlobs,
-            dataSource,
-            height,
-            isLoading,
+            loading,
+            refreshing
         } = this.state,
             { match } = this.props;
         return (
-            <div>
+            <div className={styles.wrapper}>
                 <SearchBar
                     placeholder='请输入配件名称'
                     extra={<Filter
@@ -172,29 +148,22 @@ export default class mountings extends Component {
                     </Filter>}
                     onSearch={this.onSearch}
                 />
-                <div className='bg_grey_list_view'>
-                    <ListView
-                        ref={el => this.lv = el}
-                        dataSource={dataSource}
-                        renderFooter={() => isLoading ? '加载中...' : dataBlobs.length ? '我是有底线的' : '暂无结果'}
-                        renderRow={(rowData, sectionID, rowID) => <div onClick={this.goToDetail.bind(this, rowData)} key={rowID} style={{ marginRight: rowID % 2 === 0 ? '2%' : null }} className={styles.list_row_wrapper}>
-                            <div className='xBottom1px'>
-                                <img src={imgAddress + rowData.surfacePlotUrl} alt={rowData.name} />
-                            </div>
-                            <div>{rowData.name}</div>
-                        </div>}
-                        style={{
-                            height
-                        }}
-                        onEndReached={this.onEndReached}
-                    // onEndReachedThreshold={60}
-                    // pullToRefresh={<PullToRefresh
-                    //     direction='down'
-                    //     distanceToRefresh={40}
-                    //     onRefresh={this.updateList}
-                    // />}
-                    />
-                </div>
+                <CustomListView
+                    style={{ flex: 1 }}
+                    getListViewInstance={instance => this.listView = instance}
+                    sectionBodyClassName={styles.list_wrapper}
+                    loading={loading}
+                    data={dataBlobs}
+                    onEndReached={this.onEndReached}
+                    refreshing={refreshing}
+                    onRefresh={this.onRefresh}
+                    renderRow={(rowData, sectionID, index) => (<div onClick={this.goToDetail.bind(this, rowData)} key={index} style={{ marginRight: index % 2 === 0 ? '2%' : null }} className={styles.list_row_wrapper}>
+                        <div>
+                            {rowData.surfacePlotUrl ? <img src={whichImgLink(rowData.surfacePlotUrl)} alt={rowData.name} /> : null}
+                        </div>
+                        <div>{rowData.name}</div>
+                    </div>)}
+                />
                 <Route path={match.path + '/mountings'} component={Detail} />
             </div>
         );

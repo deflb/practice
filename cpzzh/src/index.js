@@ -1,6 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import App from './App';
+import Root from './root';
 import * as serviceWorker from './serviceWorker';
 import { Provider } from 'react-redux';
 import reducers from './store/reducer';
@@ -9,6 +9,8 @@ import { routerReducer, ConnectedRouter, routerMiddleware } from 'react-router-r
 import createBrowserHistory from 'history/createBrowserHistory';
 import thunk from 'redux-thunk';
 import 'babel-polyfill';
+import FastClick from 'fastclick';
+FastClick.attach(document.body);
 
 const history = createBrowserHistory()
 const middleWare = routerMiddleware(history)
@@ -22,7 +24,7 @@ const store = createStore(
 
 ReactDOM.render(<Provider store={store}>
     <ConnectedRouter history={history}>
-        <App />
+        <Root />
     </ConnectedRouter>
 </Provider>, document.getElementById('root'));
 

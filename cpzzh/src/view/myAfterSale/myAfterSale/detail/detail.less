@@ -7,17 +7,20 @@
 
 .historyTop{
     background: #fff;
+    padding-left: 30px;
     .icon{
-            color: #999;
+            color: #dadada;
             font-weight: normal;
             margin-top: -8px;
+            font-size: @font-size-md;
         }
 }
- 
+
 .tabBody{
     background: #f2f2f2;
     overflow: hidden;
     padding-top: 8px;
+    overflow-y: auto;
     :global(.am-grid-icon){
         width:100% !important;
     }
@@ -25,12 +28,23 @@
         margin-bottom: 2px;
         background: #fff;
         padding:8px 16px;
-        
+        .descItem{
+            width: 70%;
+            display: inline-block;
+        }
         :global(label){
             margin-right: 16px;
             width: 25%;
             display: inline-block;
             color:rgb(51, 51, 51);
+            &:global(.nomargin){
+                margin-right: 0px; 
+              
+            }
+        }
+        :global(.am-textarea-control) :global(textarea){
+            font-size: @font-size-text-lg;
+            color: #999;
         }
         :global(span){
             color:#999;
@@ -46,6 +60,7 @@
             }
         }
     }
+   
 } 
 .mt8{
     margin-top: 8px;
@@ -58,15 +73,13 @@
 }
 .plusBtn{
     position: absolute;
-    top: 75%;
+    top: 85%;
     right: 10%;
-    width: 48px;
-    height:48px;
-    background:#21bc8a;
+    width: 50px;
+    height:50px;
+    background:@red;
     color: #fff;
     text-align: center;
-    line-height: 2.5;
-    font-size: 20px;
     font-weight:bold;
     border-radius: 50%;
 }
@@ -80,4 +93,16 @@
     border: 1px solid #ccc;
     padding: 4px;
     overflow: hidden;
+}
+.statusIcon{
+    display: inline-block;
+    padding: 2px 8px;
+    background: @green;
+    border-radius: 5px;
+    color:#fff;
+    font-size: @font-size-xs;
+    margin-right: 8px;
+    &.orange{
+        background: @orange;
+    }
 }

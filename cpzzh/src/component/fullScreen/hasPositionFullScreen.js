@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { getDisplayName } from '../../utlis';
+import { getDisplayName, isIOS } from '../../utlis';
 import styles from './hasPositionFullScreen.less';
 
 export default WrappedComponent => class extends Component { // 全屏 父级已设置定位时使用
@@ -8,7 +8,9 @@ export default WrappedComponent => class extends Component { // 全屏 父级已
 
     render() {
         return (<div className={styles.wrapper}>
-            <WrappedComponent {...this.props} />
+            {isIOS() ?
+                <div style={{ height: 'calc(100% + 1px)' }}><WrappedComponent {...this.props} /></div>
+                : <WrappedComponent {...this.props} />}
         </div>)
     }
 }

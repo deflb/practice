@@ -1,45 +1,46 @@
 @import '../../style/mixin.less';
-.item_header{
-    &_title{
-        &>li:first-child{
-            .fontSize(normal);
-        }
-        &>li:last-child{
-            .fontSize(text);
-            color: @shallowGrey;
-        }
-    }
-    &_avatar{
-        width: 40px;
-        height: 40px;
-        margin-right: 10px;
-        border-radius: 50%;
-        background-color: @bgGrey;
-        &>img{
-            width: 100%;
-            height: 100%;
+.item{
+    padding: 7px 15px;
+    &_header{
+        display: flex;
+        align-items: center;
+        &_avatar{
+            width: 40px;
+            height: 40px;
+            margin-right: 10px;
             border-radius: 50%;
-        }
-    }
-    &_reply{
-        padding: 6px 12px;
-        background-color: @bgGrey;
-        .fontSize(normal);
-    }
-}
-.item_body{
-    &_box{
-        .fontSize(normal);
-        &_text{
-            word-break: break-all;
-        }
-        &>:last-child{
-            margin-top: 15px;
-            padding-top: 10px;
-            .xReal1px(before);
-            .tip{
-                color: @blue;
+            background-color: @bgGrey;
+            &>img{
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
             }
+        }
+        &_title{
+            flex: 1;
+            &>li:first-child{
+                .fontSize(normal);
+            }
+            &>li:last-child{
+                .fontSize(text);
+                color: @grey;
+            }
+        }
+        &_reply{
+            padding: 6px 12px;
+            .fontSize(normal);
+            color: @grey;
+            background-color: @bgGrey;
+        }
+    }
+    &_body{
+        word-break: break-all;
+        &_content,&_replyList{
+            padding: 10px 0;
+            .real1px(unset, unset, x, bottom);
+        }
+        .tip{
+            color: @blue;
         }
     }
 }

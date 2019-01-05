@@ -1,55 +1,56 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router';
-import { ListView } from 'antd-mobile';
-import { connect } from 'react-redux';
-import { globalLoadingToggle } from '../../../store/action';
+// import { Route } from 'react-router';
 import Coupon from './coupon';
-import asyncC from '../../../component/asyncC';
+// import asyncC from '../../../component/asyncC';
+import CustomListView from '../../../component/customListView';
 import { request } from '../../../request';
 import api from '../../../request/api';
 import styles from './index.less';
-const GetCoupon = asyncC(() => import('./getCoupon'));
+// const GetCoupon = asyncC(() => import('./getCoupon'));
 
-export default connect()(class discountCoupon extends Component {
+export default class discountCoupon extends Component {
     state = {
         pageNo: 1,
         pageSize: 10,
         hasMore: true,
         dataBlobs: [],
-        dataSource: new ListView.DataSource({
-            rowHasChanged: (row1, row2) => row1 !== row2
-        }),
-        isLoading: false,
+        loading: false,
+        refreshing: false,
     }
 
     getList = ({
         pageNo = this.state.pageNo,
+        dataBlobs = this.state.dataBlobs,
     } = {}) => {
-        this.props.dispatch(globalLoadingToggle(true))
-        const { pageSize, dataSource, dataBlobs } = this.state;
+        const { pageSize } = this.state;
+        this.setState({ loading: true });
         request({ url: api.myCoupon, data: { pageNo, pageSize } }).then(res => {
             const { list, pageTurn } = res,
                 { nextPage, rowCount } = pageTurn,
                 _dataBlobs = [...dataBlobs, ...list];
-            this.props.dispatch(globalLoadingToggle(false))
             this.setState({
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
                 pageNo: nextPage,
                 dataBlobs: _dataBlobs,
-                dataSource: dataSource.cloneWithRows([..._dataBlobs]),
-                isLoading: false,
+                loading: false,
+                refreshing: false
             })
-        }).catch(err => { this.setState({ isLoading: false }) })
+        }).catch(err => { this.setState({ loading: false, refreshing: false }) })
     }
     componentDidMount() {
         this.getList()
     }
 
     onEndReached = (event) => {
-        const { isLoading, hasMore } = this.state;
-        if (isLoading || !hasMore)
+        const { loading, hasMore } = this.state;
+        if (loading || !hasMore)
             return;
         this.getList()
+    }
+
+    onRefresh = () => {
+        this.setState({ refreshing: true })
+        this.getList({ pageNo: 1, dataBlobs: [] })
     }
 
     goToGetCoupon = () => {
@@ -58,25 +59,25 @@ export default connect()(class discountCoupon extends Component {
     }
 
     render() {
-        const { dataSource, dataBlobs, isLoading } = this.state,
-            { match } = this.props;
+        const { dataBlobs, loading, refreshing } = this.state;
+        // { match } = this.props;
         return (
-            <ul className={styles.wrapper}>
-                <li className='bg_grey_list_view'>
-                    <ListView
-                        ref={el => this.lv = el}
-                        dataSource={dataSource}
-                        renderFooter={() => isLoading ? '加载中...' : dataBlobs.length ? '我是有底线的' : '暂无结果'}
-                        renderRow={(rowData, sectionID, index) => <Coupon rowData={rowData} />}
-                        onEndReached={this.onEndReached}
-                    // onEndReachedThreshold={80}
-                    />
-                </li>
-                <li className={styles.wrapper_bottom} onClick={this.goToGetCoupon}>
+            <div className={styles.wrapper}>
+                <CustomListView
+                    style={{ flex: 1 }}
+                    sectionBodyClassName={styles.wrapper_main}
+                    loading={loading}
+                    data={dataBlobs}
+                    onEndReached={this.onEndReached}
+                    refreshing={refreshing}
+                    onRefresh={this.onRefresh}
+                    renderRow={(rowData, sectionID, index) => (<Coupon key={rowData.id} rowData={rowData} />)}
+                />
+                {/* <div className={styles.wrapper_bottom} onClick={this.goToGetCoupon}>
                     去领券>>
-                </li>
-                <Route path={match.path + '/getCoupon'} component={GetCoupon} />
-            </ul>
+                </div>
+                <Route path={match.path + '/getCoupon'} component={GetCoupon} /> */}
+            </div>
         );
     }
-})
+}

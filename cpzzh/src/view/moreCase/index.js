@@ -4,6 +4,7 @@ import { Tabs } from 'antd-mobile';
 import Case from './case';
 import Mountings from './mountings';
 import Palette from './palette';
+import { isIOS } from '../../utlis';
 
 export default connect(state => ({
     routeState: state.routeState
@@ -16,14 +17,17 @@ export default connect(state => ({
     componentWillMount() {
         const { routeState } = this.props,
             { pathname } = routeState,
-            key = pathname.split('/')[2];
+            arr = pathname.split('/'),
+            key = arr[arr.length - 1];
         if (key)
             this.setState({ page: key })
     }
 
     render() {
-        const { page } = this.state, { history, match, dispatch } = this.props;
+        const { page } = this.state, { history, match } = this.props;
         return <Tabs
+            swipeable={false}
+            destroyInactiveTab={isIOS() ? true : false}
             tabs={[
                 { key: 'case', title: '设计案例' },
                 { key: 'palette', title: '色板库' },
@@ -36,9 +40,9 @@ export default connect(state => ({
             page={page}
             onChange={({ ...props }) => { this.setState({ page: props.key }) }}
         >
-            <Case key='case' history={history} match={match} dispatch={dispatch} />
-            <Palette key='palette' history={history} match={match} dispatch={dispatch} />
-            <Mountings key='mountings' history={history} match={match} dispatch={dispatch} />
+            <Case key='case' history={history} match={match} />
+            <Palette key='palette' history={history} match={match} />
+            <Mountings key='mountings' history={history} match={match} />
         </Tabs>
     }
 })

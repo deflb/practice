@@ -3,6 +3,7 @@ import { Card } from 'antd-mobile';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import CustomCarousel from '../../../component/customCarousel';
 import hasTransformFullScreen from '../../../component/fullScreen/hasTransformFullScreen';
+import EnabledIosScrollView from '../../../component/enabledIosScrollView/simple';
 import { request } from '../../../request';
 import api from '../../../request/api';
 
@@ -24,7 +25,7 @@ export default hasTransformFullScreen(class paletteDetail extends Component {
     render() {
         const { detail } = this.state,
             { title, imgUrl = '', remark, details } = detail;
-        return <div>
+        return <EnabledIosScrollView>
             <CustomCarousel
                 source={[imgUrl]}
             />
@@ -42,9 +43,9 @@ export default hasTransformFullScreen(class paletteDetail extends Component {
                     title="详情"
                 />
                 <Card.Body>
-                    <div dangerouslySetInnerHTML={{ __html: details }} style={{ overflow: 'auto' }} />
+                    <div dangerouslySetInnerHTML={{ __html: details }} className='rich_text_global' />
                 </Card.Body>
             </Card>
-        </div>
+        </EnabledIosScrollView>
     }
 })

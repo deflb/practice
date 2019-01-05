@@ -1,0 +1,29 @@
+@import '../../../../style/mixin.less';
+.overview{
+    .fontSize(normal);
+    text-align: center;
+    color: #ccc;
+    background-color: #868686;
+    padding-bottom: 7px;
+    &_title{
+        margin: 7px 0;
+    }
+    &_content{
+        display: flex;
+        &_item{
+            flex: 1;
+            &_top{
+                color: @white;
+                &_number{
+                    .fontSize(high);
+                }
+            }
+            &_footer{
+                line-height: 1;
+            }
+        }
+        &_item:nth-child(2){
+            .real1px(y, left, y, right);
+        }
+    }
+}

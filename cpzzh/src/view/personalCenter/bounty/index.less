@@ -1,0 +1,51 @@
+@import '../../../style/mixin.less';
+.wrapper{
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+    .overview{
+        display: flex;
+        align-items: center;
+        .fontSize(normal);
+        padding: 7px 15px;
+        &_info{
+            flex: 1;
+            &_top{
+                color: @red;
+                &_money{
+                    .fontSize(high);
+                }
+            }
+            &_bottom{
+                color: @colorGrey;
+            }
+        }
+        &_btn{
+            padding: 5px 15px;
+            color: @white;
+            background-color: @red;
+            border-radius: 12px;
+        }
+    }
+    .list{
+        flex: 1;
+        &_item{
+            padding: 7px 15px;
+            .real1px(x, top);
+            &_top{
+                display: flex;
+                .fontSize(normal);
+                li{
+                    flex: 1;
+                }
+                li:last-child{
+                    text-align: right;
+                }
+            }
+            &_bottom{
+                color: @colorGrey;
+            }
+        }
+    }
+}

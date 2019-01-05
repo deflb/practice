@@ -4,6 +4,7 @@ import styles  from './index.less';
 import { request } from '../../../../request';
 import Tel from '../../../../component/tel'
 import api from '../../../../request/api';
+import { formatDate } from '../../../../utlis';
 // import NoResult from '../../../../component/noResult';
 const Step = Steps.Step;
 export default class reserve extends Component {
@@ -18,10 +19,13 @@ export default class reserve extends Component {
         if(!date){
             return ""
         }
-        if(Number(date)<15000000){
+        if(typeof date==="string"){
             return date
         }
-        return new Date(date).toLocaleString().replace(/\//g,'-').slice(0,-10)
+        if(Number(date)<15000000){
+            return date
+        } 
+        return formatDate(new Date(date),"YYYY-MM-DD hh:mm")
     }
     init(){
         //获取进度
@@ -35,18 +39,24 @@ export default class reserve extends Component {
             nodeList.forEach(item => {
                 current +=Number(item.status);
                 let obj = {};
-                obj.title = item.nodeName;
+                obj.title = <span className="normalFontSizeC">{item.nodeName}</span>;
+                obj.status = item.status;
                 obj.description = <div className={styles.desc}>
                                     { item.items.map(item=>{
                                         return  <div key={item.key}>
                                         {item.key} : <span className={item.phone?styles.people:''}>{`${this.getDate(item.value)} ${item.phone||""}`}<span style={{display:item.phone?null:'none'}}><Tel tel={item.phone}/></span> </span>
                                         <WhiteSpace size="xs"/>
+                                        
                                         </div>
                                     })}
-                                    </div>
-                steps.push(obj)
+                                    </div>;
+               
+                    steps.push(obj)
+                         
+               
             });
             
+         
             this.setState({
                 steps:steps,
                 current
@@ -54,14 +64,20 @@ export default class reserve extends Component {
         }).catch(err => { console.log(err) })
       
     }
+    getIcon=(s)=>{
+        return s.status?(<i className='iconfont icon-check-circle greenColor' />):<i className='iconfont icon-time uncheckedIcon ' />
+     }
+    
     getSteps=()=>{
-        return this.state.steps.map((s, i) => <Step key={i} title={s.title} description={s.description} />);
+      
+        return this.state.steps.map((s, i) => <Step key={i} status={"wait"} title={s.title} description={s.description}  icon={this.getIcon(s)} />);
        }
+     
     render() {
-        let {current} = this.state;
+     
         return (
-            <div className={styles.schedule}>  
-                <Steps current={current} >
+            <div className={styles.schedule} >  
+                <Steps >
                      {this.getSteps()}
                 </Steps>
             </div>

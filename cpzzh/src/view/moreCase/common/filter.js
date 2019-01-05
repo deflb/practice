@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import PropTypes from 'prop-types';
+import EnabledIosScrollView from '../../../component/enabledIosScrollView';
 import MaskAndSlide from './maskAndSlide';
 import styles from './filter.less';
 
@@ -27,10 +28,10 @@ export default class filter extends Component {
                     onCancel={this.onCancel}
                 >
                     <div className={styles.wrapper}>
-                        <div>
+                        <EnabledIosScrollView>
                             {children}
-                        </div>
-                        <div className='xBoth1px'>
+                        </EnabledIosScrollView>
+                        <div>
                             <span onClick={onRest}>重置</span>
                             <span onClick={() => {
                                 onOk()

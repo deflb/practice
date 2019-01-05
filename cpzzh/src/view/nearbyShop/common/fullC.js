@@ -1,31 +1,28 @@
 import React, { Component } from 'react';
-import { Button, Toast } from 'antd-mobile';
+import fullScreen from '../../../component/fullScreen';
+import EnabledIosScrollView from '../../../component/enabledIosScrollView';
 import { getDisplayName } from '../../../utlis';
 import styles from './fullC.less';
 
-export default flag => WrappedComponent => class extends Component {
+export default flag => WrappedComponent => fullScreen(class extends Component {
 
     static displayName = `HOC${getDisplayName(WrappedComponent)}`;
 
     goToAppointment = () => {
         const { match, history, location, userInfo } = this.props,
-            { customerId } = userInfo,
             { state = {} } = location;
-        if (customerId)
-            history.push({
-                pathname: match.path + '/measureRoom',
-                state: { ...state, flag, customerId }
-            })
-        else
-            Toast.info('请前往个人中心进行验证后再进行操作!')
+        history.push({
+            pathname: match.path + '/measureRoom',
+            state: { ...state, flag, customerId: userInfo.customerId, userName: userInfo.name, isAuth: userInfo.isAuth }
+        })
     }
 
     render() {
         return <div className={styles.wrapper}>
-            <WrappedComponent {...this.props} />
-            <div className={styles.wrapper_footer}>
-                <Button type='warning' onClick={this.goToAppointment}>预约量房</Button>
-            </div>
+            <EnabledIosScrollView>
+                <WrappedComponent {...this.props} />
+            </EnabledIosScrollView>
+            <div className={styles.wrapper_btn} onClick={this.goToAppointment}>预约量房</div>
         </div>
     }
-}
+})

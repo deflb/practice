@@ -11,6 +11,7 @@ import fullC from '../common/fullC';
 import MeasureRoom from '../measureRoom';
 import { request } from '../../../request';
 import api from '../../../request/api';
+import whichImgLink from '../../../utlis/whichImgLink';
 import styles from './index.less';
 const Detail = asyncC(() => import('../../moreCase/caseComponent/detail'));
 
@@ -25,16 +26,16 @@ export default connect(state => ({
     componentDidMount() {
         const { location } = this.props,
             { state = {} } = location,
-            { fsalesname = '顾问详情', fsalesid } = state;
-        document.title = '家居顾问 ' + fsalesname;
+            { fsalesid } = state;
         this.getShopStaffDetail(fsalesid)
     }
 
     componentWillReceiveProps(nextProps) {
         const { location, match } = nextProps,
             { pathname, state } = location;
-        if (pathname === match.path)
+        if (pathname === match.path && document.title !== '家居顾问 ' + state.fsalesname) {
             document.title = '家居顾问 ' + state.fsalesname;
+        }
     }
 
     getShopStaffDetail = fsalesid => {
@@ -50,31 +51,33 @@ export default connect(state => ({
 
     render() {
         const { shopStaffDetail } = this.state,
+            { fheadpic, fsalesname, fmobile, fsnname } = shopStaffDetail,
             { selectionCase, match, location, history } = this.props,
             { state = {} } = location;
         return (
-            <div className={styles.wrapper}>
+            <div>
                 <CustomCarousel
-                    source={[]}
+                    source={state.shopImgList || []}
                 />
                 <List renderHeader={() => <ul className={styles.wrapper_info}>
                     <li>
                         <div>
-                            {/* <img src={pd_png} alt='' /> */}
+                            {fheadpic ? <img src={whichImgLink(fheadpic)} alt='' /> : null}
                         </div>
-                        {shopStaffDetail.fsalesname}
+                        {fsalesname}
                     </li>
                     <li>
-                        {/* <i className='iconfont icon-phone' />
-                            13597456698 */}
-                        <i className='iconfont icon-code' />
+                        {fmobile ? <a href={`tel:${fmobile}`} className='shallowGreyColor'><i className='iconfont icon-phone greenColor' />{fmobile}</a> : null}
+                        {/* <i className='iconfont icon-code' /> */}
                     </li>
                 </ul>}>
-                    {/* <List.Item className={styles.wrapper_extra} thumb={<i className='iconfont icon-store redColor' />} arrow='horizontal'><div>东莞南城金隅小区</div></List.Item> */}
+                    <List.Item onClick={e => { history.goBack() }} className={styles.wrapper_extra} thumb={<i className='iconfont icon-store redColor' />} arrow='horizontal'>
+                        {fsnname}
+                    </List.Item>
                 </List>
                 <CustomWhiteSpace />
                 <TitleContent title='精选方案'>
-                    <div>
+                    <div style={{ padding: '10px 15px 0' }}>
                         {selectionCase.map((item, index) => {
                             const { id, styleName, buildName, creator, views, createTime, surfacePlotUrl } = item;
                             return <SelectionCaseLook

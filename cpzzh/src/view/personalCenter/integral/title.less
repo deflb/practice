@@ -1,0 +1,15 @@
+@import '../../../style//mixin.less';
+.wrapper{
+    width: 100%;
+    display: flex;
+    align-items: center;
+    padding: 10px 0 10px 17px;
+    .fontSize(title);
+    &:before{
+        content: '';
+        width: 5px;
+        height: 20px;
+        margin-right: 8px;
+        background-color: @orange;
+    }
+}

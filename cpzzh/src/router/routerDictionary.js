@@ -3,9 +3,21 @@ import routerBase from './routerBase';
 const _routerDictionary = {
     '/personalCenter': '个人中心',
     '/personalCenter/grade': '我的等级',
+    '/personalCenter/bounty': '我的奖励金',
+    '/personalCenter/myShowHome': '我的晒家',
+    '/personalCenter/myShowHome/add': '晒家',
+    '/personalCenter/myShowHome/add/selectHouses': '选择楼盘',
+    '/personalCenter/myShowHome/add/selectHouses/switchCity': '选择城市',
+    '/personalCenter/myShowHome/edit': '晒家',
+    '/personalCenter/myShowHome/edit/selectHouses': '选择楼盘',
+    '/personalCenter/myShowHome/edit/selectHouses/switchCity': '选择城市',
+    '/personalCenter/myBusinessReport': '我的商机报备',
     '/personalCenter/collect': '我的收藏',
     '/personalCenter/suggestionFeedback': '意见反馈',
     '/personalCenter/integral': '积分商城',
+    '/personalCenter/integral/integralDetail': '积分明细',
+    '/personalCenter/integral/productDetail': '商品详情',
+    '/personalCenter/integral/exchangeRecord': '兑换记录',
     '/personalCenter/message': '消息中心',
     '/personalCenter/message/detail': '消息详情',
     '/personalCenter/discountCoupon': '我的优惠券',
@@ -21,10 +33,10 @@ const _routerDictionary = {
     '/moreCase/mountings': '配件详情',
     '/checkTrue': '产品验真',
     '/showHome': '晒家有礼',
-    '/showHome/detail': '晒家详情',
     '/showHome/add': '晒家',
     '/showHome/add/selectHouses': '选择楼盘',
     '/showHome/add/selectHouses/switchCity': '选择城市',
+    '/reportBusiness': '报备商机',
 };
 
 let routerDictionary = {};

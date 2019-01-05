@@ -62,13 +62,13 @@ yarn run rest
 
 ## build
 
-`产生sourcemap`
+`不产生sourcemap(默认)`
 ```sh
 yarn run build
 ```
-`不产生sourcemap`
+`产生sourcemap`
 ```sh
-set "GENERATE_SOURCEMAP=false" && yarn run build
+set "GENERATE_SOURCEMAP=true" && yarn run build
 ```
 
 ## Less Modules
@@ -104,3 +104,10 @@ export default class demo extends Component {
 ```js
 export default ({...props}) => <i className='iconfont icon-xxx' />
 ```
+
+## 权限
+
+- 页面验权
+    - 在`src/store/action.js`文件下异步action`getUserInfo`下添加或删除
+- 操作验权
+    - 在操作前调用`src/component/customModal/index.js`文件里的`VerifyModal`方法

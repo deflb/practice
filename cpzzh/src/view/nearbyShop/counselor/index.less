@@ -1,50 +1,46 @@
 @import '../../../style/mixin.less';
-.wrapper{
-    height: 100%;
-    overflow-y: auto;
-    &_info{
-        display: flex;
-        align-items: center;
-        &>li:first-child{
-            flex: 1;
-            .fontSize(title);
-            color: @black;
-            &>div{
-                width: 30px;
-                height: 30px;
-                margin-right: 10px;
+.wrapper_info{
+    display: flex;
+    align-items: center;
+    &>li:first-child{
+        flex: 1;
+        .fontSize(title);
+        color: @black;
+        &>div{
+            width: 30px;
+            height: 30px;
+            margin-right: 10px;
+            border-radius: 50%;
+            background-color: @bgGrey;
+            img{
+                width: 100%;
+                height: 100%;
                 border-radius: 50%;
-                background-color: @bgGrey;
-                img{
-                    width: 100%;
-                    height: 100%;
-                    border-radius: 50%;
-                }
             }
-        }
-        &>li:last-child{
-            .fontSize(normal);
-            &>i:first-child{
-                color: @green;
-                margin-right: 2px;
-            }
-            &>i:last-child{
-                color: @red;
-                margin-left: 10px;
-            }
-        }
-        &>li{
-            display: flex;
-            align-items: center;
         }
     }
-    &_extra{
-        :global(.am-list-content){
-            display: flex;
-            &>div{
-                .fontSize(text);
-                color: @shallowGrey;
-            }
+    &>li:last-child{
+        .fontSize(normal);
+        &>i:first-child{
+            color: @green;
+            margin-right: 2px;
+        }
+        &>i:last-child{
+            color: @red;
+            margin-left: 10px;
+        }
+    }
+    &>li{
+        display: flex;
+        align-items: center;
+    }
+}
+.wrapper_extra{
+    :global(.am-list-content){
+        display: flex;
+        &>div{
+            .fontSize(text);
+            color: @grey;
         }
     }
 }

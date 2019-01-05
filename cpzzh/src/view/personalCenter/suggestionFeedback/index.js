@@ -54,6 +54,7 @@ export default createForm()(class suggestionFeedback extends Component {
                     <List.Item>
                         <CustomUpload
                             {...getFieldProps('imgList', {
+                                initialValue: [],
                                 rules: [
                                     { required: false }
                                 ],

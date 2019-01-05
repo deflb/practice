@@ -1,20 +1,32 @@
 .schedule{
-    padding:48px 32px;
+    padding:48px 16px 0 32px;
+    overflow-y:auto;
+    height: 100%;
     :global(.am-steps-vertical){
         display: flex;
         flex-direction: column-reverse;
         :global(.am-steps-item-tail){
-            height: 130%;
-            top: -130%;
+            flex:1;
+            top: -100%;
         }
+        :global(.am-steps-item-icon){
+            // background: #fff;
+            padding-bottom: 16px;
+        }
+        :global(.am-steps-item){
+            min-height: 150px;
+        }
+       
+       
     }
 }
+
 .desc{
     color:#ccc;
     font-style: 14px;
     .people{
         color:#000;
-        font-size: 16px;
+        font-size: 14px;
     }
     .tips{
         color: #ff953c;

@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { ImagePicker } from 'antd-mobile';
 import { request } from '../../request';
 import api from '../../request/api';
-import { fileaddress } from '../../request/baseURL';
+import { crmFileAddress } from '../../request/baseURL';
 
 export default class customImageUpload extends Component {
 
@@ -25,9 +25,9 @@ export default class customImageUpload extends Component {
             let uploadRow = fileList[len - 1], formData = new FormData();
             formData.append('file', uploadRow.file)
             request({
-                url: api.fileUpload, data: formData,
+                url: api.crmUploadFile, data: formData,
                 config: {
-                    baseURL: fileaddress
+                    baseURL: crmFileAddress
                 }
             }).then(res => {
                 changeHandle([
@@ -38,9 +38,9 @@ export default class customImageUpload extends Component {
         }
         if (type === 'remove')
             request({
-                url: api.fileDelete, data: { url: files[index].fileUrl },
+                url: api.crmUploadFile, data: { url: files[index].fileUrl },
                 config: {
-                    baseURL: fileaddress
+                    baseURL: crmFileAddress
                 }
             }).then(res => {
                 let _files = [...this.props.files];  // 同上
@@ -51,7 +51,7 @@ export default class customImageUpload extends Component {
     render() {
         return <ImagePicker
             multiple
-            accept="image/*,video/*"
+            accept="image/*,video/*;capture=camera"
             {...this.props}
             onChange={this.onChange}
         />

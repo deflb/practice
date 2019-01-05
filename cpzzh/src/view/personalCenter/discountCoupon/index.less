@@ -1,18 +1,17 @@
 @import '../../../style/mixin.less';
 .wrapper{
     height: 100%;
-    background-color: #F2F2F2;
     display: flex;
     flex-direction: column;
-    overflow: hidden;
-    :global(.bg_grey_list_view){
-        flex: 1;
+    &_main{
+        padding: 24px 15px 0;
     }
-    &_bottom{
-        height: 50px;
-        line-height: 50px;
-        text-align: center;
-        color: @red;
-        .fontSize(title);
-    }
+
+    // &_bottom{
+    //     height: 50px;
+    //     line-height: 50px;
+    //     text-align: center;
+    //     color: @red;
+    //     .fontSize(title);
+    // }
 }

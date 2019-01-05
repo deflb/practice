@@ -10,12 +10,14 @@
 html{
     height: 100%;
     background-color: @bgGrey;
+    touch-action: none;
     body{
         position: relative;
         min-width: @minWidth;
         max-width: @maxWidth;
         height: 100%;
         line-height: 1.5;
+        .fontSize(text);
         color: @black;
         background-color: @white;
         margin: 0 auto;

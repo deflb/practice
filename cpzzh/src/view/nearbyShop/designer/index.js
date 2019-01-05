@@ -1,17 +1,19 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { connect } from 'react-redux';
-import { ListView } from 'antd-mobile';
+import { List } from 'antd-mobile';
+import CustomListView from '../../../component/customListView';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
-import InfoList from '../../../component/infoList';
+// import InfoList from '../../../component/infoList';
 import TitleContent from '../../../component/titleContent';
-import CasePdLook from '../../../component/casePdLook';
+import CaseItem from '../../../component/itemPreView/caseItem';
 import CustomCarousel from '../../../component/customCarousel';
 import asyncC from '../../../component/asyncC';
 import fullC from '../common/fullC';
 import { request } from '../../../request';
 import api from '../../../request/api';
-import styles from './index.less';
+import whichImgLink from '../../../utlis/whichImgLink';
+import styles from '../counselor/index.less';
 const MeasureRoom = asyncC(() => import('../measureRoom'));
 const Detail = asyncC(() => import('../../moreCase/caseComponent/detail'));
 
@@ -24,10 +26,7 @@ export default connect(state => ({
         hasMore: true,
         keyword: '',
         dataBlobs: [],
-        dataSource: new ListView.DataSource({
-            rowHasChanged: (row1, row2) => row1 !== row2
-        }),
-        isLoading: false,
+        loading: false,
         height: 0,
 
         shopStaffDetail: {} // 设计师详情
@@ -36,8 +35,7 @@ export default connect(state => ({
     componentDidMount() {
         const { location } = this.props,
             { state = {} } = location,
-            { fsalesname = '设计师详情', fsalesid, fusrid } = state;
-        document.title = '设计师 ' + fsalesname;
+            { fsalesid, fusrid } = state;
         this.getCaseList({ fusrid })
         this.getShopStaffDetail(fsalesid)
     }
@@ -45,7 +43,7 @@ export default connect(state => ({
     componentWillReceiveProps(nextProps) {
         const { location, match } = nextProps,
             { pathname, state } = location;
-        if (pathname === match.path)
+        if (pathname === match.path && document.title !== '设计师 ' + state.fsalesname)
             document.title = '设计师 ' + state.fsalesname;
     }
 
@@ -61,8 +59,8 @@ export default connect(state => ({
         dataBlobs = this.state.dataBlobs,
         fusrid = this.state.fusrid
     } = {}) => {
-        const { pageSize, dataSource } = this.state;
-        this.setState({ isLoading: true, keyword, fusrid })
+        const { pageSize } = this.state;
+        this.setState({ loading: true, keyword, fusrid })
         request({ url: api.pageCase, data: { pageNo, pageSize, keyword, sceneId: '', creator: fusrid } }).then(res => {
             const { list, pageTurn } = res,
                 { nextPage, rowCount } = pageTurn,
@@ -72,49 +70,47 @@ export default connect(state => ({
                 hasMore: _dataBlobs.length >= rowCount ? false : true,
                 pageNo: nextPage,
                 dataBlobs: _dataBlobs,
-                dataSource: dataSource.cloneWithRows([..._dataBlobs]),
-                isLoading: false,
+                loading: false,
             })
-            pageNo === 1 && this.lv.scrollTo(0, 0)
-        }).catch(err => { this.setState({ isLoading: false }) })
+        }).catch(err => { this.setState({ loading: false }) })
     }
 
     onEndReached = (event) => {
-        const { isLoading, hasMore } = this.state;
-        if (isLoading || !hasMore)
+        const { loading, hasMore } = this.state;
+        if (loading || !hasMore)
             return;
         this.getCaseList()
     }
 
     updateCurrentItem = (field, index) => { // views comments likes
         if (!field) return;
-        const { dataBlobs, dataSource } = this.state,
+        const { dataBlobs } = this.state,
             _dataBlobs = [...dataBlobs],
             currentRow = { ..._dataBlobs[index] };
         currentRow[field]++;
         _dataBlobs.splice(index, 1, currentRow)
         this.setState({
-            dataBlobs: _dataBlobs,
-            dataSource: dataSource.cloneWithRows(_dataBlobs)
+            dataBlobs: _dataBlobs
         })
     }
 
     render() {
-        const { dataBlobs, dataSource, height, isLoading, shopStaffDetail } = this.state,
+        const { dataBlobs, height, loading, shopStaffDetail } = this.state,
+            { fheadpic, fmobile, fsalesname, fsnname } = shopStaffDetail,
             { match, history, location } = this.props,
             { state = {} } = location;
         return (
-            <div className={styles.wrapper}>
+            <div>
                 <CustomCarousel
-                    source={[]}
+                    source={state.shopImgList || []}
                 />
-                <div className={styles.wrapper_info}>
+                {/* <div className={styles.wrapper_info}>
                     <div className={styles.wrapper_info_avator}>
-                        {/* <img src={pd_png} alt='' /> */}
+                        {fheadpic ? <img src={whichImgLink(fheadpic)} alt='' /> : null}
                     </div>
                     <ul className={styles.wrapper_info_detail}>
-                        <li className={styles.wrapper_info_detail_name}>{shopStaffDetail.fsalesname}</li>
-                        {/* <li className={styles.wrapper_info_detail_address}><i className='iconfont icon-address' />广州 | 梦天旗舰店</li> */}
+                        <li className={styles.wrapper_info_detail_name}>{fsalesname}</li>
+                        <li className={styles.wrapper_info_detail_address}><i className='iconfont icon-address' />广州 | 梦天旗舰店</li>
                     </ul>
                     <InfoList
                         data={[
@@ -123,10 +119,26 @@ export default connect(state => ({
                             // { label: '设计理念', value: '设计理念设计理念设计理念设计理念设计理念设计理念' },
                         ]}
                     />
-                </div>
+                </div> */}
+                <List renderHeader={() => <ul className={styles.wrapper_info}>
+                    <li>
+                        <div>
+                            {fheadpic ? <img src={whichImgLink(fheadpic)} alt='' /> : null}
+                        </div>
+                        {fsalesname}
+                    </li>
+                    <li>
+                        {fmobile ? <a href={`tel:${fmobile}`} className='shallowGreyColor'><i className='iconfont icon-phone greenColor' />{fmobile}</a> : null}
+                        <i className='iconfont icon-code' />
+                    </li>
+                </ul>}>
+                    <List.Item onClick={e => { history.goBack() }} className={styles.wrapper_extra} thumb={<i className='iconfont icon-store redColor' />} arrow='horizontal'>
+                        {fsnname}
+                    </List.Item>
+                </List>
                 <CustomWhiteSpace />
                 <TitleContent title='设计作品'>
-                    <div>
+                    <div style={{ padding: '10px 15px 0' }}>
                         {/* <ul className={styles.wrapper_filter}>
                             {[
                                 { title: '全部', number: 8 },
@@ -135,26 +147,24 @@ export default connect(state => ({
                                 { title: '次卧', number: 1 },
                             ].map(item => <li className={styles.active} key={item.title}>{item.title}（{item.number}）</li>)}
                         </ul> */}
-                        <ListView
-                            dataSource={dataSource}
-                            renderFooter={() => isLoading ? '加载中...' : dataBlobs.length ? '我是有底线的' : '暂无结果'}
-                            renderRow={(rowData, sectionID, index) => {
-                                const { id, surfacePlotUrl, title, styleName, views, comments, likes } = rowData;
-                                return <CasePdLook
-                                    style={{ marginBottom: 10 }}
-                                    rowClick={() => {
-                                        history.push({
-                                            pathname: match.path + '/caseDetail',
-                                            state: { id, index, ...state }
-                                        })
-                                    }}
-                                    rowData={{ index, id, surfacePlotUrl, title, styleName, views, comments, likes }}
-                                    updateCurrentItem={this.updateCurrentItem}
-                                />
-                            }}
+                        <CustomListView
                             style={{ height }}
+                            sectionBodyClassName={null}
+                            loading={loading}
+                            data={dataBlobs}
                             onEndReached={this.onEndReached}
-                        // onEndReachedThreshold={30}
+                            renderRow={(rowData, sectionID, index) => (<CaseItem
+                                key={rowData.id}
+                                style={{ marginBottom: 10 }}
+                                rowClick={() => {
+                                    history.push({
+                                        pathname: match.path + '/caseDetail',
+                                        state: { id: rowData.id, index, ...state }
+                                    })
+                                }}
+                                rowData={rowData}
+                                updateLikeCount={this.updateCurrentItem.bind(this, 'likes', index)}
+                            />)}
                         />
                     </div>
                 </TitleContent>

@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import {Icon ,List,ActivityIndicator } from 'antd-mobile';
+import {Icon ,List } from 'antd-mobile';
 import styles  from './index.less';
 import { request } from '../../../request';
 import api from '../../../request/api';
@@ -17,16 +17,22 @@ export default connect(state => ({
     init(){
         //获取订单列表
        const {userInfo } =this.props;
-        request({ url: api.getOrderList, data: { pageNo: 1, pageSize: 10,fcstid:userInfo.customerId } }).then(res => {
-            const { list } = res;
-            
-            this.setState({ orderList: list||[] ,isLoading:false})
-        }).catch(err => { console.log(err) 
-        this.setState({
-            isLoading:false
-        })
-    })
-      
+        if(!userInfo.customerId){
+            request({ url: api.userInfo }).then(res => {
+                request({ url: api.getOrderList, data: { pageNo: 1, pageSize: 1000000,fcstid:res.customerId } }).then(res => {
+                    const { list } = res;
+                    this.setState({ orderList: list||[] ,isLoading:false})
+                }).catch(err => { console.log(err) })
+            })
+        }else{
+            request({ url: api.getOrderList, data: { pageNo: 1, pageSize: 1000000,fcstid:userInfo.customerId } }).then(res => {
+                        const { list } = res;
+                        this.setState({ orderList: list||[] ,isLoading:false})
+                    }).catch(err => { console.log(err) })
+                    this.setState({
+                        isLoading:false
+                    })
+        }
     }
     choose=(current)=>{
         let {orderList,id,orderId} = this.state;
@@ -52,6 +58,7 @@ export default connect(state => ({
                 orderId,
                 offical
             })
+            this.toDetail({id,orderId,offical})
     }
     toAdd=()=>{
         const { history, match } = this.props;
@@ -60,9 +67,8 @@ export default connect(state => ({
             state: {}
         })
     }
-    toDetail=()=>{
+    toDetail=({id,orderId,offical})=>{
         const { history, match } = this.props;
-        let {id,orderId,offical} = this.state;
         if(!id){
             return
         }
@@ -71,8 +77,8 @@ export default connect(state => ({
             state: {id,orderId,offical}
         })
     }
+  
     render() {
-        let {isLoading=true} =this.state;
         return (
             <div className={styles.myorder}>  
                 {this.state.orderList.length===0?
@@ -80,9 +86,10 @@ export default connect(state => ({
                :
                  <div className={styles.orderList}> 
                     <List.Item className={styles.mb_8+' '+styles.historyTop}>
-                    全部订单 <Icon className={"fr "+styles.icon} type="up" size ="lg" theme="outlined" onClick={this.toDetail} /></List.Item>
+                    全部订单 <Icon className={"fr  "+styles.icon} type="up" size ="lg" theme="outlined" onClick={this.toDetail} /></List.Item>
+                    <div className={styles.body} >
                     {this.state.orderList.map((item,index)=>{
-                        return <List.Item className={styles.hisItem} key ={item.orderNo +index}
+                        return <div className={styles.hisItem} key ={item.orderNo +index}
                                         onClick={(e)=>{
                                         e.stopPropagation();
                                         this.choose(item)}}>
@@ -90,11 +97,11 @@ export default connect(state => ({
                                           <div className={"fr "+styles.checkIcon}>{item.checked?
                                           <Icon type="check-circle" size="md" />:null}</div>
                              
-                                </List.Item>
+                                </div>
                     })}
+                    </div>
                 </div>
                 } 
-                 <ActivityIndicator animating={isLoading} size="large" toast/>
             </div>
         );
     }

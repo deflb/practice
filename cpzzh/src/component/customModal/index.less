@@ -1,0 +1,108 @@
+@import '../../style/mixin.less';
+@keyframes scale {
+    0% {
+        transform: scale(0);
+    }
+    25% {
+        transform: scale(0.5);
+    }
+    50% {
+        transform: scale(1);
+    }
+    75% {
+        transform: scale(1.1);
+    }
+    100% {
+        transform: scale(1);
+    }
+}
+.wrap{
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    height: 100%;
+    z-index: 999;
+    min-width: @minWidth;
+    max-width: @maxWidth;
+    margin: 0 auto;
+    background-color: rgba(0,0,0,0.4);
+    outline: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+.normal,.alert,.withdraw,.verify{
+    width: 270px;
+    background-color: @white;
+    border-radius: 6px;
+    animation: scale 0.2s linear;
+}
+.normal,.withdraw,.verify{
+    padding: 15px 15px 0;
+    &_header{
+        display: flex;
+        align-items: center;
+        font-size: 18px;
+        margin-bottom: 7px;
+        &_title{
+            flex: 1;
+        }
+        &_icon{
+            color: @colorGrey;
+        }
+    }
+    &_content{
+        font-size: 15px;
+    }
+}
+.alert{
+    text-align: center;
+    font-size: 18px;
+    &_header{
+        padding: 7px 0;
+        color: #1B1B1B;
+    }
+    &_content{
+        font-size: 15px;
+        padding: 30px 10px;
+        .real1px(x, top, x, bottom);
+    }
+    &_footer{
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        color: #1B1B1B;
+        &>span{
+            flex: 1;
+            padding: 7px 0;
+        }
+        &>span:nth-child(n+1){
+            .real1px(y, left);
+        }
+        &>span:last-child{
+            color: @red;
+        }
+    }
+}
+.withdraw{
+    padding-bottom: 15px;
+    background-color: @bgGrey;
+    &_content{
+        text-align: center;
+        &_title{
+            color: @colorGrey;
+            margin-bottom: 7px;
+        }
+        &_btn{
+            margin-top: 15px;
+        }
+    }
+}
+.verify{
+    padding-bottom: 15px;
+    &_btn{
+        margin-top: 15px;
+    }
+}

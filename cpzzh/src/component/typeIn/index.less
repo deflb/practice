@@ -1,23 +1,27 @@
 @import '../../style/mixin.less';
-.wrapper{
+.mask{
     position: fixed;
     top: 0;
     right: 0;
     bottom: 0;
     left: 0;
-    z-index: 2;
+    height: 100%;
+    z-index: 998;
     min-width: @minWidth;
     max-width: @maxWidth;
     margin: 0 auto;
     background-color: rgba(0, 0, 0, 0.3);
-    &_box{
+    overflow: hidden;
+    .content{
         position: absolute;
         bottom: 0;
         left: 0;
         right: 0;
+        z-index: 998;
         width: 100%;
-        display: flex;
+        height: 108px;
         background-color: @white;
+        display: flex;
         &_input{
             flex: 1;
         }
@@ -27,7 +31,7 @@
             padding: 14px 15px;
             .fontSize(normal);
             color: @yellow;
-            .yReal1px(before);
+            .real1px(y, left);
             margin-left: 4px;
         }
     }

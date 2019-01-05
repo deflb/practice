@@ -4,13 +4,13 @@
     align-items: center;
     padding: 0 8px;
     text-align: center;
-    color: @shallowGrey;
+    color: @grey;
     .fontSize(normal);
-    .xReal1px(after);
+    .real1px(x, bottom);
     &>li{
         flex: 1;
         &>div{
-            .yReal1px(after,dashed);
+            .real1px(unset, unset, y, right, dashed);
         }
         &::after{
             content: '';

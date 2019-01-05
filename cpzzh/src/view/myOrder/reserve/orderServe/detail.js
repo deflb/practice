@@ -3,75 +3,122 @@ import {} from 'antd-mobile';
 import styles  from './index.less';
 import { request } from '../../../../request';
 import api from '../../../../request/api';
-// import { imgAddress } from '../../../../request/baseURL';
 import Design from './design'//设计
 import Gauge from './gauge'//测量
 import SecondGauge from './SecondGauge'//测量
 import Putsample from './putSample'//安装
 import SendGoods from './sendGoods'
 import TakeGoods from './takeGoods'
+import Other from './others'
+import { formatDate } from '../../../../utlis';
 
 export default class serveDetail extends Component {
     state = {
-       height:1000
+        fstate:0
     }
     componentDidMount(){
-        const hei = document.documentElement.clientHeight
-        this.setState({ height: hei })
-        this.init();
-    }
-    init(){
       
-        request({ url: api.getStoreList, data: { pageNo: 1, pageSize: 10 } }).then(res => {
-            const { list } = res;
-            this.setState({ orderList: list||[] })
-        }).catch(err => { console.log(err) })
-      
+            let {location={}} = this.props,{state={}}=location;
+            this.setState({
+                              fstate:state.fstate,
+                              fid:state.fid
+                          })
+           if(!this.state.fstate)
+            request({ url: api.getOrderserve, data: { pageNo: 1, pageSize: 10,orderId:state.orderId} }).then(res => {
+              let {list}  = res;
+              list.forEach(item=>{
+                  if(item.taskNo===state.taskNo){
+                      this.setState({
+                          fstate:item.fstate,
+                          fid:item.fid
+                      })
+                  }
+              })
+            })
     }
+ 
     toPj =(e)=>{
         e.stopPropagation();
-        const { history,location } = this.props,{state}=location;
+        const { history,location ,match} = this.props,{state}=location;
+        let url;
+        if(!this.state.fstate){
+            url = '/pingjia'
+        }else{
+            url = '/pingjiaResult'
+        }
+        let param = Object.assign({},state);
+            param.fid = this.state.fid;
+            param.taskType = this.getSbType(state.taskType) ;
         history.push({
-            pathname: '/myOrder/detail/serve/pingjia',
-            state:{fservicePrjId:state.fservicePrjId}
+            pathname:match.path.slice(0,-12) + url,
+            state:param
         })
     } 
+    getSbType(num){
+        let taskType;
+        switch(num){
+            case 1:
+            taskType=0;
+            break;
+            case 2:
+            taskType=3;
+            break;
+            case 3:
+            taskType=1;
+            break;
+            case 4:
+            taskType=2;
+            break;
+            case 5:
+            taskType=6;
+            break;
+           
+            case 6:
+            taskType=7;
+            break;
+            case 7:
+            default:
+            taskType=4
+        }
+        return taskType;
+    }
     getDate=(date)=>{
         if(!date||date<150000000){
             return date
         }
-        return new Date(date).toLocaleString().replace(/\//g,'-').slice(0,-10)
+        return formatDate(new Date(date),"YYYY-MM-DD hh:mm")
     }
+  
     renderDetail=()=>{
         let {location} =this.props,{state}=location;
-        switch(state.taskType){
-            case 1:
+        switch(String(state.taskType)){
+            case '1':
             return <Gauge {...this.props} state={state} getDate={this.getDate} />
-            case 2:
-           return <Design {...this.props}  state={state} getDate={this.getDate}/>
-            case 3: 
-           return <SecondGauge {...this.props}  state={state} getDate={this.getDate}/>
-          
-            case 4:
-           return <Putsample {...this.props}  state={state} getDate={this.getDate}/>
-            case 5:
+            case '3': 
+            return <SecondGauge {...this.props}  state={state} getDate={this.getDate}/>
+             case '4':
+            return <Putsample {...this.props}  state={state} getDate={this.getDate}/>
+            case '2':
+            return <Design {...this.props}  state={state} getDate={this.getDate}/>
+            case '5':
            return <SendGoods {...this.props}  state={state} getDate={this.getDate}/>
-            case 6:
+            case '6':
            return <TakeGoods {...this.props} state={state} getDate={this.getDate}/>
+           case '7':
            default:
-           return <Gauge {...this.props} state={state} getDate={this.getDate} />
-        //    <div className="tc greyColor mt-8">错误的任务类型...</div>
+           return <Other {...this.props}  state={state} getDate={this.getDate}/>
         }
     }
     render() {
-        let {height} = this.state;
         let {location={}} = this.props,{state={}}=location;
         return (
-            <div className={styles.serveDetail} style={{height}}>
+            <div className={styles.serveDetail}>
+                <div className={styles.serveDetailBody}  >
                {
                   this.renderDetail(state.taskType,state.taskNo)
                }
-                <div className ={styles.detailFooter} onClick={this.toPj}>评价</div>
+               </div>
+                <div  className ={styles.detailFooter} onClick={this.toPj}>{this.state.fstate?'查看评价':"评价"}</div>
              </div>
         );
     }

@@ -1,20 +1,36 @@
+@import '../../../style/mixin.less';
 .apply{
     background: #f2f2f2;
     overflow: hidden;
- 
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .body{
+        flex:1;
+        overflow-y: auto;
+    }
+   
     .item{
         margin-bottom: 2px;
         background: #fff;
         padding:8px 16px;
         color:rgb(51, 51, 51);
-        &>span{
-            font-size: 0.1rem;
-        }
+      
     }
     .mb8{
         margin-bottom: 8px;
     }
     .paddingbox{
         padding:0 16px;
+        margin-bottom: 16px;
+    }
+    .nameless{
+      display: flex;
+      justify-content: center;
+      margin: 8px 0;
+    }
+    :global(.am-list-item) :global(.am-list-line) :global(.am-list-extra) {
+        color: #afafaf;
+        font-size: @font-size-md;
     }
 } 

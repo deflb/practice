@@ -10,13 +10,13 @@ export default class Title extends Component {
     }
   
     render(){
-        let {text,prop} = this.props;
+        let {text,prop={}} = this.props;
         return(
           <div className={styles.title}>
                 {text}
                 { 
                     Object.keys(prop).map(key=>{
-                        return <span className="ml-8"> {`${key} ${prop[key]}mm`}</span>
+                        return <span key={key} className="ml-8"> {`${key} ${prop[key]}mm`}</span>
                     })
                 }
           </div>

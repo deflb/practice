@@ -4,7 +4,7 @@ import { push } from 'react-router-redux';
 import routerBase from '../../router/routerBase';
 import PropTypes from 'prop-types';
 import { formatDate } from '../../utlis';
-import { imgAddress } from '../../request/baseURL';
+import whichImgLink from '../../utlis/whichImgLink';
 import styles from './index.less';
 
 export default connect()(class selectionCaseLook extends Component {
@@ -27,7 +27,7 @@ export default connect()(class selectionCaseLook extends Component {
             { styleName, buildName, creator, views, createTime, surfacePlotUrl } = data;
         return (
             <div onClick={rowClick} className={className ? `${styles.wrapper} ${className}` : styles.wrapper} style={style}>
-                <img src={imgAddress + surfacePlotUrl} alt={styleName} />
+                <img src={whichImgLink(surfacePlotUrl)} alt={styleName} />
                 <ul className={styles.wrapper_info}>
                     <li>{styleName}</li>
                     <li>{buildName}</li>

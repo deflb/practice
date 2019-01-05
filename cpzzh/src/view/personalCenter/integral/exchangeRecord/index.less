@@ -1,0 +1,29 @@
+@import '../../../../style/mixin.less';
+.item{
+    display: flex;
+    padding: 10px 15px;
+    align-items: center;
+    .real1px(x, bottom);
+    &_img{
+        width: 100px;
+        height: 100px;
+        margin-right: 7px;
+        img{
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+    }
+    &_content{
+        flex: 1;
+        .fontSize(normal);
+        &_des{
+            color: @grey;
+            .fontSize(text);
+        }
+    }
+    &_flag{
+        color: @orange;
+        .fontSize(title);
+    }
+}

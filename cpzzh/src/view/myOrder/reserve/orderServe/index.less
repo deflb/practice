@@ -2,14 +2,26 @@
 .wrapper{
     height: 100%;
     background-color: @bgGrey;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .pjBody{
+        flex:1;
+        overflow-y:auto;
+    }
+   
 }
 .scheduleServe{
-    padding-top: 64px;
     background: #f2f2f2;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
 }
 .serveDetail{
     background: #f2f2f2;
-    padding-bottom: 60px;
+    display: flex;
+    flex-direction: column;
+    height: 100%;
     .f2f2f2{
         background: #f2f2f2;
     }
@@ -18,10 +30,15 @@
         top: 50%;
         width: 100%;
     }
+    .serveDetailBody{
+        overflow-y:auto;
+        height: 100%;
+    }
 }
 .desc{
     color:#ccc;
     font-style: 14px;
+    margin-left: 16px;
     .people{
         color:#000;
         font-size: 14px;
@@ -32,18 +49,27 @@
     }
 }
 .header{
-    position: fixed;
-    left: 0;top: 0;
-    width: 100%;
-    z-index: 100;
+    margin-bottom: 4px;
 }
 .body{
     background: #fff;
     padding: 8px 16px;
+    flex:1;
+    overflow-y: auto;
+    height: 100%;
     .title{
-        width: 6rem;
+        width: 200%;
+        .text{
+            width: 80px;
+            float: left;
+            margin-left: 16px;
+        }
+        .btnBox{
+            width: 40%;
+            float: left;
+        }
         .btn{
-            float: right;
+            float: left;
             color:#FF4463;
             font-weight: normal;
             border:1px solid #FF4463;
@@ -74,21 +100,23 @@
     margin-left: 5%;
 }
 .labels{
-    label{
+    :global(label){
         width: 40%;
         display: inline-block;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        white-space: nowrap;
     }
 }
 .historyTop{
     background: #fff;
     padding: 8px 0;
     padding-left: 16px;
-    font-size: 16px;
     .icon{
-        color: #999;
+        color: #dadada;
         font-weight: normal;
-        width: 32px;
         margin-top: -8px;
+        font-size: @font-size-md;
     }
 }
 
@@ -103,17 +131,14 @@
     background: #ff953c;
     line-height: 3;
     color: #fff;
-    position: fixed;
-    left: 0;
-    bottom: 0;
     width: 100%;
     height: 48px;
-    font-size: 16px;
     z-index: 100;
 }
 .iconImg{
     width: 100% !important;
     height: auto !important;
+    min-height: 75px;
     position: absolute;
     top: 50%;
     left: 50%;
@@ -132,3 +157,15 @@
     opacity:0.3;
 }
 
+.nothing{
+    text-align: center;
+    padding-top: 30%;
+    color:#999;
+    font-size: 24px;
+    background: #fff;
+}
+.nameless{
+    display: flex;
+    justify-content: center;
+    margin: 8px 0;
+  }

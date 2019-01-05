@@ -1,13 +1,13 @@
 @import '../../style/mixin.less';
 .wrapper{
     &>li:first-child{
-        padding: 12px 0;
+        height: 50px;
+        line-height: 50px;
         text-align: center;
-        .fontSize(title);
-        .xReal1px();
+        font-size: @font-size-md;
+        .real1px(x, top, x, bottom);
     }
     &>li:last-child{
-        padding: 10px 15px 0;
-        .fontSize(normal);
+        font-size: @font-size-sm;
     }
 }
