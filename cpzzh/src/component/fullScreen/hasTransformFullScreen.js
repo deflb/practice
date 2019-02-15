@@ -1,6 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
-import { getDisplayName } from '../../utlis';
+import { getDisplayName, isIOS } from '../../utlis';
 import styles from './index.less';
 
 export default WrappedComponent => class extends Component { // 全屏 父级有transform属性
@@ -21,7 +21,9 @@ export default WrappedComponent => class extends Component { // 全屏 父级有
     renderModal = () => {
         ReactDOM.render(
             <div className={styles.wrapper}>
-                <WrappedComponent {...this.props} />
+                {isIOS() ?
+                    <div style={{ height: 'calc(100% + 1px)' }}><WrappedComponent {...this.props} /></div>
+                    : <WrappedComponent {...this.props} />}
             </div>,
             this.modal
         )

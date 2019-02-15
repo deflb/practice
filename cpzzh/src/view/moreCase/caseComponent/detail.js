@@ -2,17 +2,22 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { Card, Toast } from 'antd-mobile';
+import wx from 'weixin-js-sdk';
+import wxConfig from '../../../utlis/wxConfig';
+import whichImgLink from '../../../utlis/whichImgLink';
+import { wholeUrl } from '../../../utlis';
 import InfoList from '../../../component/infoList';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import CustomCarousel from '../../../component/customCarousel';
-import hasTransformFullScreen from '../../../component/fullScreen/hasTransformFullScreen';
+// import hasTransformFullScreen from '../../../component/fullScreen/hasTransformFullScreen';
 import Evaluate from '../../../component/evaluate';
 import EvaluateBar from '../../../component/evaluate/bar';
 import { request } from '../../../request';
 import api from '../../../request/api';
+import { getLocationSearch } from '../../../utlis';
 import styles from './detail.less';
 
-export default hasTransformFullScreen(class caseDetail extends Component {
+export default class caseDetail extends Component {
     state = {
         isLoading: false,
         detail: {}
@@ -28,67 +33,83 @@ export default hasTransformFullScreen(class caseDetail extends Component {
     }
 
     getDetail = () => { // 获取案例详情
-        const { location, updateCurrentItem } = this.props,
-            { state = {} } = location,
-            { id } = state;
-        if (id) {
+        const { updateCurrentItem } = this.props;
+        if (this.id) {
             this.setState({ isLoading: true })
-            request({ url: api.caseDetail, data: { id } }).then(res => {
+            request({ url: api.caseDetail, data: { id: this.id } }).then(res => {
+                const { location } = this.props, { pathname } = location;
+                wxConfig({ wx, jsApiList: ['updateTimelineShareData', 'updateAppMessageShareData'] }).then(() => {
+                    wx.updateTimelineShareData({
+                        title: '案例详情',
+                        link: wholeUrl(pathname + `?id=${res.id}`),
+                        imgUrl: whichImgLink(res.surfacePlotUrl)
+                    })
+                    wx.updateAppMessageShareData({
+                        title: '案例详情',
+                        desc: res.title,
+                        link: wholeUrl(pathname + `?id=${res.id}`),
+                        imgUrl: whichImgLink(res.surfacePlotUrl)
+                    })
+                })
                 this.setState({ detail: res, isLoading: false });
                 // 更新查看数
-                updateCurrentItem('views', state.index)
+                updateCurrentItem('views', this.index)
             }).catch(err => {
                 this.setState({ isLoading: false })
             })
         }
     }
 
-    componentDidMount() {
-        document.title = '案例详情'
+    componentWillMount() {
+        document.title = '案例详情';
+        const { location } = this.props,
+            { state = {} } = location,
+            { id, index } = state;
+        this.id = id || getLocationSearch('id');
+        this.index = index;
         this.getDetail()
     }
 
     onCollect = () => { // 收藏|取消收藏
-        const { location, collectBack } = this.props,
-            { state = {} } = location,
+        const { collectBack } = this.props,
             { detail } = this.state,
             { flagLike } = detail,
             status = flagLike ? 0 : 1;
-        request({ url: api.saveCollects, data: { id: state.id, status } }).then(res => {
-            Toast.success(res, 0.7);
-            if (status === 1) {
-                ++detail.collects;
-                detail.flagLike = 1;
-            } else {
-                detail.collects--;
-                detail.flagLike = 0;
-            }
-            collectBack();
-            this.setState({ detail: { ...detail } })
-        }).catch(err => { })
+        if (this.id)
+            request({ url: api.saveCollects, data: { id: this.id, status } }).then(res => {
+                Toast.success(res, 0.7);
+                if (status === 1) {
+                    ++detail.collects;
+                    detail.flagLike = 1;
+                } else {
+                    detail.collects--;
+                    detail.flagLike = 0;
+                }
+                collectBack();
+                this.setState({ detail: { ...detail } })
+            }).catch(err => { })
     }
 
     onLike = () => { // 点赞
         const { detail } = this.state,
-            { location, updateCurrentItem } = this.props,
-            { state = {} } = location;
-        request({ url: api.saveLikes, data: { id: state.id, status: 1 } }).then(res => {
-            Toast.success(res, 0.7);
-            detail.likes++;
-            this.setState({ detail: { ...detail } })
-            // 更新列表点赞数
-            updateCurrentItem('likes', state.index)
-        }).catch(err => { })
+            { updateCurrentItem } = this.props;
+        if (this.id)
+            request({ url: api.saveLikes, data: { id: this.id, status: 1 } }).then(res => {
+                Toast.success(res, 0.7);
+                detail.likes++;
+                this.setState({ detail: { ...detail } })
+                // 更新列表点赞数
+                updateCurrentItem('likes', this.index)
+            }).catch(err => { })
     }
 
     onSave = () => { // 评价保存后
         const { detail } = this.state,
-            { location, updateCurrentItem } = this.props,
-            { state } = location;
+            { updateCurrentItem } = this.props;
         detail.comments++;
         this.setState({ detail: { ...detail } })
         // 更新列表评价数
-        updateCurrentItem('comments', state.index)
+        updateCurrentItem('comments', this.index)
     }
 
     onSend = info => { // 发送评价
@@ -101,23 +122,21 @@ export default hasTransformFullScreen(class caseDetail extends Component {
 
     render() {
         const { detail } = this.state,
-            { location } = this.props,
-            { state = {} } = location,
             { title, effectImageUrlList = [], remark, content,
                 areaName, houseName, priceName, spaceName, styleName,
                 collects, comments, flagLike, likes, views,
                 // intents
             } = detail;
-        return <div className={styles.wrapper}>
-            <div className={styles.wrapper_container}>
+        return (<React.Fragment>
+            <div className={styles.content}>
                 <CustomCarousel
                     source={effectImageUrlList}
                 />
                 <Card full>
-                    <Card.Header title={<div className={styles.wrapper_title}>{title}</div>} />
+                    <Card.Header title={<div className={styles.title}>{title}</div>} />
                     <Card.Body>
-                        <div className={styles.wrapper_info}>
-                            <p className={styles.wrapper_info_des}>{remark}</p>
+                        <div className={styles.info}>
+                            <p className={styles.info_des}>{remark}</p>
                             <InfoList data={[
                                 { label: '面积', value: areaName, span: 12 },
                                 { label: '户型', value: houseName, span: 12 },
@@ -144,7 +163,7 @@ export default hasTransformFullScreen(class caseDetail extends Component {
                     listApi={api.pageCommentList}
                     replyApi={api.saveCommentReply}
                     commentApi={api.saveComment}
-                    id={state.id}
+                    id={this.id}
                     field='caseId'
                     onSave={this.onSave}
                 />
@@ -156,6 +175,6 @@ export default hasTransformFullScreen(class caseDetail extends Component {
                 onCollect={this.onCollect}
                 onComment={this.onComment}
             />
-        </div>
+        </React.Fragment>)
     }
-})
+}

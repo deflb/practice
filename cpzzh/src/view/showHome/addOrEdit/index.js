@@ -1,17 +1,17 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { createForm } from 'rc-form';
-import { List, InputItem, Button, Toast, TextareaItem, WingBlank } from 'antd-mobile';
-import fullScreen from '../../../component/fullScreen';
+import { List, InputItem, Button, Toast, WingBlank } from 'antd-mobile';
+// import fullScreen from '../../../component/fullScreen';
 import CustomUpload from '../../../component/customUpload';
+import CustomEditor from '../../../component/customEditor';
 import asyncC from '../../../component/asyncC';
 import { request } from '../../../request';
 import api from '../../../request/api';
 import whichImgLink from '../../../utlis/whichImgLink';
-import styles from './index.less';
 const SelectHouses = asyncC(() => import('./selectHouses'));
 
-export default createForm()(fullScreen(class add extends Component {
+export default createForm()(class add extends Component {
     state = {
         building: '楼盘',
         buildingId: '',
@@ -46,7 +46,7 @@ export default createForm()(fullScreen(class add extends Component {
         form.validateFields((error, values) => {
             if (!error) {
                 let imgArr = values.imgList.map(item => `<img src='${whichImgLink(item.fileUrl || item.url)}' alt='' />`);
-                values.content = values.content + '<div data-flag>' + imgArr.join('') + '</div>';
+                values.content = CustomEditor.toHTML(values.content) + '<div data-flag>' + imgArr.join('') + '</div>';
                 values.buildingId = this.state.buildingId;
                 delete values.imgList;
                 if (state.id) values.id = state.id;
@@ -58,6 +58,15 @@ export default createForm()(fullScreen(class add extends Component {
                         onComplete();
                     }, 1000)
                 })
+            } else {
+                if (error.title) {
+                    Toast.info('请输入标题', 0.7);
+                    return
+                }
+                if (error.content) {
+                    Toast.info('请输入详细描述', 0.7);
+                    return
+                }
             }
         })
     }
@@ -72,7 +81,7 @@ export default createForm()(fullScreen(class add extends Component {
             { form, match, location } = this.props,
             { state = {} } = location,
             { getFieldProps } = form;
-        return (<div className={styles.wrapper}>
+        return (<React.Fragment>
             <List>
                 <InputItem
                     {...getFieldProps('title', {
@@ -86,16 +95,14 @@ export default createForm()(fullScreen(class add extends Component {
                 <List.Item arrow="horizontal" onClick={this.selectHouses}>
                     <span className={buildingId ? null : 'shallowGreyColor'}>{building}</span>
                 </List.Item>
-                <TextareaItem
-                    className={styles.wrapper_content}
+                <CustomEditor
+                    placeholder='请详细描述一下你的家呗...'
                     {...getFieldProps('content', {
-                        initialValue: content,
+                        initialValue: CustomEditor.createEditorState(content),
                         rules: [
                             { required: true, message: '请详细描述一下你的家呗' },
                         ],
                     })}
-                    rows={6}
-                    placeholder='请详细描述一下你的家呗...'
                 />
             </List>
             <CustomUpload
@@ -110,6 +117,6 @@ export default createForm()(fullScreen(class add extends Component {
             />
             <WingBlank><Button type='primary' onClick={this.onPublish}>发布</Button></WingBlank>
             <Route path={match.path + '/selectHouses'} render={props => <SelectHouses {...props} whichHouses={this.whichHouses} />} />
-        </div>)
+        </React.Fragment>)
     }
-}))
+})

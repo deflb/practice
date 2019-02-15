@@ -1,7 +1,9 @@
 import React, { Component } from 'react';
 import { Route } from 'react-router';
 import { Button } from 'antd-mobile';
-import { mapInstanceSimple, convertorTranslate } from '../../utlis/bMap';
+import wx from 'weixin-js-sdk';
+import wxConfig from '../../utlis/wxConfig';
+import { mapInstanceSimple, coordConvertor } from '../../utlis/bMap';
 import asyncC from '../../component/asyncC';
 import fullScreen from '../../component/fullScreen';
 import styles from './detail.less';
@@ -17,12 +19,29 @@ export default fullScreen(class detail extends Component {
     }
 
     componentDidMount() {
-        let { location } = this.props,
+        const { location } = this.props,
             { state = {} } = location,
             { flongitude, flatitude } = state;
-        convertorTranslate({ longitude: flongitude, latitude: flatitude }, (bPos) => {
-            mapInstanceSimple(bPos, 'map_view')
-        });
+        mapInstanceSimple({ longitude: flongitude, latitude: flatitude }, 'map_view');
+        wxConfig({ wx, jsApiList: ['openLocation'] })
+    }
+
+    goToShop = () => {
+        const { state } = this.props.location;
+        if (state) {
+            const { flongitude, flatitude, fsname, faddress } = state;
+            coordConvertor([{ longitude: flongitude, latitude: flatitude }], 5, 3).then(res => {
+                const { lng, lat } = res[0];
+                wx.openLocation({
+                    longitude: lng,
+                    latitude: lat,
+                    name: fsname,
+                    address: faddress,
+                    scale: 26,
+                    infoUrl: ''
+                })
+            })
+        }
     }
 
     render() {
@@ -39,7 +58,8 @@ export default fullScreen(class detail extends Component {
                         {/* <li>营业时间：</li> */}
                         {fmastermobile ? <li>电话：<a href={`tel:${fmastermobile}`}>{fmastermobile}</a></li> : null}
                     </ul>
-                    <Button className={styles.wrapper_info_detail_go} inline size='small' type='warning' onClick={this.goToDetail.bind(this, { fsname, isNear, distance, faddress, fshopid, fmastermobile, flongitude, flatitude })}>去门店</Button>
+                    <Button style={{ marginRight: 7 }} inline size='small' type='warning' onClick={this.goToShop}>去门店</Button>
+                    <Button inline size='small' type='warning' onClick={this.goToDetail.bind(this, { fsname, isNear, distance, faddress, fshopid, fmastermobile, flongitude, flatitude })}>门店详情</Button>
                 </li>
             </ul>
             <Route path={match.path + '/detail'} component={MoreDetail} />

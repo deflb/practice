@@ -51,7 +51,7 @@ export default hasPositionFullScreen(class switchCity extends Component {
             { state = {} } = location;
         return (<div className={styles.wrapper}>
             <CustomSearchBar
-                className={styles.wrapper_search}
+                style={{ padding: '0 15px' }}
                 onSearch={this.onSearch}
                 placeholder='输入城市搜索'
             />

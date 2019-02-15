@@ -1,86 +1,89 @@
 @import '../../style/mixin.less';
-.wrapper{
-    height: 100%;
-    display: flex;
-    flex-direction: column;
+.main {
+    min-height: 100%;
+    padding-bottom: 58px;
     background-color: @bgGrey;
-    .main{
-        flex: 1;
-        overflow: auto;
-        .content{
-            background-color: @white;
-            &_title{
-                height: 44px;
-                line-height: 44px;
-                font-size: @font-size-md;
-                padding: 0 15px;
-            }
-            &_box{
-                font-size: @font-size-sm;
-                padding: 0 15px;
-                .real1px(x, top);
-                &_item{
+    .content {
+        background-color: @white;
+        &_title {
+            height: 44px;
+            line-height: 44px;
+            font-size: @font-size-md;
+            padding: 0 15px;
+        }
+        &_box {
+            font-size: @font-size-sm;
+            padding: 0 15px;
+            .real1px(x, top, x, bottom);
+            &_item {
+                display: flex;
+                .real1px(unset, unset, x, bottom);
+                &_left {
                     display: flex;
-                    .real1px(unset, unset, x, bottom);
-                    &_left{
-                        display: flex;
-                        align-items: center;
-                        padding: 0 12px;
-                        &>div{
-                            text-align: center;
-                            font-size: 0;
-                            margin-right: 12px;
-                            img{
-                                width: 20px;
-                                height: 20px;
-                                margin-bottom: 6px;
-                            }
-                            p{
-                                line-height: 1;
-                                font-size: @font-size-sm;
-                                color: @grey;
-                            }
+                    align-items: center;
+                    padding: 0 12px;
+                    &>div {
+                        text-align: center;
+                        font-size: 0;
+                        margin-right: 12px;
+                        img {
+                            width: 20px;
+                            height: 20px;
+                            margin-bottom: 6px;
                         }
-                        &>img{
-                            width: 10px;
-                            height: 18px;
+                        p {
+                            line-height: 1;
+                            font-size: @font-size-sm;
+                            color: @grey;
                         }
                     }
-                    &_right{
-                        flex: 1;
-                        .real1px(y, left);
-                        p{
-                            height: 46px;
-                            line-height: 46px;
-                            padding-left: 24px;
-                            .whichRowsOverflowOmit(1);
-                        }
-                        p:last-child{
-                            .real1px(x, top);
-                        }
+                    &>img {
+                        width: 10px;
+                        height: 18px;
+                    }
+                }
+                &_right {
+                    flex: 1;
+                    .real1px(y, left);
+                    p {
+                        height: 46px;
+                        line-height: 46px;
+                        padding-left: 24px;
+                        .whichRowsOverflowOmit(1);
+                    }
+                    p:last-child {
+                        .real1px(x, top);
                     }
                 }
             }
         }
     }
-    .footer{
-        height: 58px;
+}
+
+.footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    z-index: 100;
+    width: 100%;
+    height: 58px;
+    display: flex;
+    font-size: @font-size-md;
+    background-color: @white;
+    &_left,
+    &_right {
+        flex: 1;
         display: flex;
-        font-size: @font-size-md;
-        background-color: @white;
-        &>li{
-            flex: 1;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            img{
-                width: 30px;
-                height: 30px;
-                margin-right: 6px;
-            }
+        justify-content: center;
+        align-items: center;
+        img {
+            width: 30px;
+            height: 30px;
+            margin-right: 6px;
         }
-        &>li:last-child{
-            .real1px(y, left);
-        }
+    }
+    &_right {
+        color: @black;
+        .real1px(y, left);
     }
 }

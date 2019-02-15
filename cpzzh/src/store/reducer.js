@@ -1,8 +1,9 @@
-import { LOCATION_CHANGE, SELECTION_CASE, USER_INFO, USER_LEVEL_INFO, GLOBAL_LOADING } from './type';
+import { LOCATION_CHANGE, SELECTION_CASE, USER_INFO, USER_LEVEL_INFO, GLOBAL_LOADING, PAGE_STATUS } from './type';
 import { isIOS } from '../utlis';
 
 const routeState = (state = '/', action) => { // 路由状态
     if (action.type === LOCATION_CHANGE) {
+        console.log(action)
         let signatureUrl = sessionStorage.getItem('signatureUrl');
         if (!signatureUrl || (signatureUrl && !isIOS()))
             sessionStorage.setItem('signatureUrl', window.location.href)
@@ -39,10 +40,18 @@ const globalLoading = (state = false, action) => { // 全局loading
         return state
 }
 
+const pageStatus = (state ={}, action) => {
+    if (action.type === PAGE_STATUS)
+        return action.data
+    else
+        return state
+}
+
 export default {
     routeState,
     selectionCase,
     userInfo,
     userLevelInfo,
-    globalLoading
+    globalLoading,
+    pageStatus
 }

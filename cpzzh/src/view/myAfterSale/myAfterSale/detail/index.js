@@ -7,6 +7,8 @@ import { formatDate } from '../../../../utlis';
 import  whichImgLink  from '../../../../utlis/whichImgLink';
 import double_arrowSrc from '../../../../assets/icon/double_arrow_rigth@3x.png'
 import addIcon from '../../../../assets/icon/add@3x.png'
+import CustomModal from '../../../../component/customModal';
+const { preview } = CustomModal;
 export default class myAfterSale extends Component {
     state = {
       Handle:'已处理',
@@ -15,6 +17,9 @@ export default class myAfterSale extends Component {
     }
     componentDidMount(){
         this.init();
+    }
+    componentWillUnmount() {
+        CustomModal.unmountFnDialog();
     }
     init(){
         let {location={}}=this.props,{state={}} =location;
@@ -91,8 +96,8 @@ export default class myAfterSale extends Component {
                     <List.Item className={styles.mb_8+' '+styles.historyTop}> 
                     <div className="normalFontSizeC">
                     {this.statusIcon(data.factclmtypedesc)}
-                    当前售后单 : {data.fclaimno} 
-                    <Icon size ="lg" className={"fr "+styles.icon}
+                    <span>当前售后单 : {data.fclaimno} </span>
+                    <Icon size ="lg" className={styles.icon}
                     type="down" theme="outlined" 
                     onClick={this.back} />
                     </div></List.Item>
@@ -112,8 +117,9 @@ export default class myAfterSale extends Component {
                             <List.Item >
                             <label className="normalFontSizeC fl">销货单号</label>
                             <div className={"normalFontSizeC fl"} style={{display:'flex',width:'65%'}}>
-                                <div className="oneRowOverflowOmit fl mr-8" style={{flex:'1'}}>{data.fordno}</div>
-                                <div className="blueColor fl" onClick={this.toOrdDetail.bind(this,data.fordno)}>查看详情<img src={double_arrowSrc} className="ml-8" style={{height:'8px'}} alt=""/></div>
+                                <div className=" fl mr-8" style={{flex:'1'}}>{data.fordno}</div>
+                                <div className="blueColor fl" onClick={this.toOrdDetail.bind(this,data.fordno)}>查看详情
+                                <img src={double_arrowSrc} className="ml-8" style={{height:'8px',width:'12px'}} alt=""/></div>
                             </div>
                             </List.Item>
                             </div>
@@ -143,7 +149,9 @@ export default class myAfterSale extends Component {
                                 <label className="normalFontSizeC">照片</label>
                                 <div className={styles.before}>
                                     <Grid columnNum={3} data={photoData} itemStyle={{marginRight:'8px'}} renderItem={(el,index)=>{
-                                        return <img className={styles.iconImg} key={index+'iconImg'} src={el.icon} alt=""/>
+                                        return <img width="100%" className={styles.iconImg} key={index+'iconImg'} src={el.icon} alt=""  onClick={()=>{
+                                            preview([{url:el.icon}])
+                                        }}/>
                                     }} hasLine={false}/>
                                 </div>
                             </List.Item>
@@ -173,21 +181,25 @@ export default class myAfterSale extends Component {
                                 <div style={{minHeight:'100px'}}>
                                     <label className="normalFontSizeC">现场照片</label>
                                     <br/>
-                                    <div className={`${styles.before} ${styles.border}`}>
+                                    <div className={`${styles.before} `}>
                                     <div><span>处理前</span></div>
                                     <WhiteSpace/>
                                     <Grid data={photoData} columnNum={3}
-                                    itemStyle={{marginRight:'12px',height:'72px'}} renderItem={(el,index)=>{
-                                        return <img className={styles.iconImg} alt="" key={index+'iconImg2'} src={el.icon}/>
+                                    itemStyle={{marginRight:'12px'}} renderItem={(el,index)=>{
+                                        return <img  onClick={()=>{
+                                            preview([{url:el.icon}])
+                                        }} width="100%" className={styles.iconImg} alt="" key={index+'iconImg2'} src={el.icon}/>
                                     }}  hasLine={false}/>
                                     </div>
                                     
                                     <div className={styles.before}>
                                     <div><span>处理后</span></div>
                                     <WhiteSpace/>
-                                    <Grid data={photoData2} columnNum={3} itemStyle={{marginRight:'12px',height:'72px'}}
+                                    <Grid data={photoData2} columnNum={3} itemStyle={{marginRight:'12px'}}
                                         renderItem={(el,index)=>{
-                                            return <img  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
+                                            return <img  onClick={()=>{
+                                                preview([{url:el.icon}])
+                                            }} width="100%"  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
                                         }} 
                                     hasLine={false}/>
                                     </div>

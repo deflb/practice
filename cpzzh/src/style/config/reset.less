@@ -1,5 +1,5 @@
 @import '../mixin.less';
-*{
+* {
     margin: 0;
     padding: 0;
     list-style: none;
@@ -7,11 +7,11 @@
     box-sizing: border-box;
     cursor: pointer;
 }
-html{
+
+html {
     height: 100%;
-    background-color: @bgGrey;
     touch-action: none;
-    body{
+    body {
         position: relative;
         min-width: @minWidth;
         max-width: @maxWidth;
@@ -21,10 +21,8 @@ html{
         color: @black;
         background-color: @white;
         margin: 0 auto;
-        overflow: hidden;
-        :global(#root){
+        :global(#root) {
             height: 100%;
-            overflow: hidden;
         }
     }
 }

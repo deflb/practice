@@ -19,6 +19,7 @@ export default class serveDetail extends Component {
     componentDidMount(){
       
             let {location={}} = this.props,{state={}}=location;
+            
             this.setState({
                               fstate:state.fstate,
                               fid:state.fid
@@ -49,6 +50,7 @@ export default class serveDetail extends Component {
         let param = Object.assign({},state);
             param.fid = this.state.fid;
             param.taskType = this.getSbType(state.taskType) ;
+        
         history.push({
             pathname:match.path.slice(0,-12) + url,
             state:param
@@ -93,17 +95,17 @@ export default class serveDetail extends Component {
         let {location} =this.props,{state}=location;
         switch(String(state.taskType)){
             case '1':
-            return <Gauge {...this.props} state={state} getDate={this.getDate} />
+            return <Gauge {...this.props} state={state} title="量尺信息" getDate={this.getDate} />
             case '3': 
-            return <SecondGauge {...this.props}  state={state} getDate={this.getDate}/>
+            return <SecondGauge {...this.props}  state={state} title="复尺信息" getDate={this.getDate}/>
              case '4':
-            return <Putsample {...this.props}  state={state} getDate={this.getDate}/>
+            return <Putsample {...this.props}  state={state} title="放样信息" getDate={this.getDate}/>
             case '2':
-            return <Design {...this.props}  state={state} getDate={this.getDate}/>
+            return <Design {...this.props}  state={state} title="方案设计" getDate={this.getDate}/>
             case '5':
-           return <SendGoods {...this.props}  state={state} getDate={this.getDate}/>
+           return <SendGoods {...this.props}  state={state} title="送货信息" getDate={this.getDate}/>
             case '6':
-           return <TakeGoods {...this.props} state={state} getDate={this.getDate}/>
+           return <TakeGoods {...this.props} state={state} title="安装信息" getDate={this.getDate}/>
            case '7':
            default:
            return <Other {...this.props}  state={state} getDate={this.getDate}/>
@@ -118,7 +120,7 @@ export default class serveDetail extends Component {
                   this.renderDetail(state.taskType,state.taskNo)
                }
                </div>
-                <div  className ={styles.detailFooter} onClick={this.toPj}>{this.state.fstate?'查看评价':"评价"}</div>
+                <div  className ={styles.detailFooter+' titleFontSize'} onClick={this.toPj}>{this.state.fstate?'查看评价':"评价"}</div>
              </div>
         );
     }

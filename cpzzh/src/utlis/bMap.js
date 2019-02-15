@@ -1,15 +1,15 @@
 import BMap from 'BMap';
 import { Toast } from 'antd-mobile';
 
-function convertorTranslate(lngAndLat = {}, callBack = function () { }) { // gps坐标转百度坐标
-    let convertor = new BMap.Convertor(),
-        pointArr = [new BMap.Point(lngAndLat.longitude, lngAndLat.latitude)];
-    return convertor.translate(pointArr, 1, 5, (data) => { // 请求回调 异步
-        if (data.status === 0) {
-            let pos = data.points[0],
-                result = { longitude: pos.lng, latitude: pos.lat };
-            callBack(result);
-        }
+function coordConvertor(pointArr = [], from = 1, to = 5) { // pointArr [{longitude,latitude}]  from 1-8 to 3-6 数值具体含义查看百度坐标转换服务文档
+    return new Promise((resolve, reject) => {
+        const convertor = new BMap.Convertor();
+        convertor.translate(pointArr.map(item => new BMap.Point(item.longitude, item.latitude)), from, to, (data) => {
+            if (data.status === 0) {
+                resolve(data.points)
+            } else
+                reject(data)
+        })
     })
 }
 
@@ -23,15 +23,31 @@ function geocoder(lngAndLat = {}, callBack = function () { }) { // 逆地址解�
 }
 
 function mapInstanceSimple(lngAndLat = {}, eleSelector = '') { // lngAndLat：百度坐标 eleSelector: DOM元素选择器
-    let bm = new BMap.Map(eleSelector),
+    const bm = new BMap.Map(eleSelector),
         lng = lngAndLat.longitude,
         lat = lngAndLat.latitude,
-        marker = new BMap.Marker({ lng, lat });
-    bm.enableScrollWheelZoom(true);
-    bm.addControl(new BMap.NavigationControl());
-    bm.centerAndZoom(new BMap.Point(lng, lat), 18);
-    bm.setCenter({ lng, lat });
-    bm.addOverlay(marker);
+        _bm_userPos = sessionStorage.getItem('bm_userPos');
+    if (_bm_userPos) {
+        const { longitude, latitude } = JSON.parse(_bm_userPos),
+            distanceY = longitude - lng,
+            distanceX = latitude - lat,
+            cnterLng = distanceY >= 0 ? lng + distanceY / 2 : longitude + distanceY / 2,
+            cnterLat = distanceX >= 0 ? lat + distanceX / 2 : latitude + distanceX / 2;
+        bm.centerAndZoom(new BMap.Point(cnterLng, cnterLat), 12);
+        // DrivingRoute TransitRoute WalkingRoute
+        const Route = new BMap.DrivingRoute(bm, {
+            renderOptions: {
+                map: bm,
+                autoViewport: true
+            }
+        })
+        Route.search(new BMap.Point(longitude, latitude), new BMap.Point(lng, lat))
+    } else {
+        bm.centerAndZoom(new BMap.Point(lng, lat), 16);
+        bm.enableScrollWheelZoom(true);
+        bm.addControl(new BMap.NavigationControl());
+        bm.addOverlay(new BMap.Marker({ lng, lat }));
+    }
 }
 
 function mapInstance(lngAndLat = {}, eleSelector = '', callBack = function () { }, triggleWxPosition = function () { }) { // 实例化地图(地图展示) lngAndLat：百度坐标  eleSelector: DOM元素选择器
@@ -140,8 +156,8 @@ function mapInstance(lngAndLat = {}, eleSelector = '', callBack = function () { 
 }
 
 export {
-    convertorTranslate,
     geocoder,
     mapInstanceSimple,
-    mapInstance
+    mapInstance,
+    coordConvertor
 }

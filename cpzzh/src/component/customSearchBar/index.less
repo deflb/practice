@@ -1,7 +1,20 @@
 @import '../../style/mixin.less';
-.wrapper{
+.search(){
     background-color: @white;
     :global(.am-search-input){
         background-color: @bgGrey;
     }
+}
+.wrapper{
+    display: flex;
+    align-items: center;
+    padding-right: 8px;
+    .search{
+        flex: 1;
+        margin-right: 6px;
+        .search();
+    }
+}
+.search{
+    .search();
 }

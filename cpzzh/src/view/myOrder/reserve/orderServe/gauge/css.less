@@ -25,8 +25,7 @@
     }
     .left{
         float: left;
-        width: 20%;
-        // font-weight: bold;
+        width: 24%;
         margin-right: 4%;
         :global(label){
             border-left: 3px solid #34A5EA;
@@ -34,13 +33,18 @@
             height: 16px;
             line-height: 14px;
             padding-left: 4px;
-            white-space: nowrap;            
+            white-space: nowrap;   
+               
         }
     }
     .right{
         float: left;
-        width: 76%;
-       
-       
+        width: 70%;
+        white-space: normal;   
+    }
+    .isThree{
+        :global(.am-accordion-header){
+            height: 88px!important;
+        }
     }
 }

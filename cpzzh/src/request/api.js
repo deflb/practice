@@ -101,4 +101,13 @@ export default {
     // 微信活动
     activityDetail: '/manage/wechatActivity/activityDetail', // 活动详情
     saveCustomerActivity: '/manage/wechatActivity/saveCustomerActivity', // 客户参加活动
+
+    // 商机报备
+    myBusinessReward: '/manage/business/myBusinessReward', // 我已获得奖励
+    getBusiness: '/manage/business/getBusiness', // 商机详情
+    myBusiness: '/manage/business/myBusiness', // 我的商机报备
+    saveBusiness: '/manage/business/saveBusiness', // 报备商机-保存商机
+    pageGuideReward: '/manage/business/pageGuideReward', // 报备商机-导购员列表
+    getCustomerInfo: '/manage/business/getCustomerInfo', // 报备商机-获取客户信息
+    getReporterReward: '/manage/business/getReporterReward', // 报备商机-获取报备人奖励
 }

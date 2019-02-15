@@ -5,7 +5,7 @@ import fullScreen from '../../../component/fullScreen';
 export default fullScreen(class messageDetail extends Component {
     render() {
         const { location } = this.props,
-            { state } = location;
+            { state = {} } = location;
         return (
             <Card full>
                 <Card.Header

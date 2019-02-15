@@ -1,3 +1,4 @@
+import 'babel-polyfill';
 import React from 'react';
 import ReactDOM from 'react-dom';
 import Root from './root';
@@ -8,7 +9,6 @@ import { createStore, combineReducers, applyMiddleware } from 'redux';
 import { routerReducer, ConnectedRouter, routerMiddleware } from 'react-router-redux';
 import createBrowserHistory from 'history/createBrowserHistory';
 import thunk from 'redux-thunk';
-import 'babel-polyfill';
 import FastClick from 'fastclick';
 FastClick.attach(document.body);
 

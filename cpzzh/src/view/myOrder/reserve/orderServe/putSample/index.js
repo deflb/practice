@@ -7,24 +7,32 @@ import styles from '../index.less'
 import { request } from '../../../../../request';
 import api from '../../../../../request/api';
 import whichImgLink from '../../../../../utlis/whichImgLink';
+import CustomModal from '../../../../../component/customModal';
+const { preview } = CustomModal;
 export default class PutSample extends Component {
     constructor(props) {
         super(props)
         this.state={
            data:{},
            current:1,
-           markInfos:[{}]
+           markInfos:[{}],
+           loading:true
         }
     }
     componentDidMount(){
-       
+        let {title } = this.props;
+        document.title = title;
         this.init()
+    }
+    componentWillUnmount() {
+        CustomModal.unmountFnDialog();
     }
     init=()=>{
         let {taskNo,orderNo} =this.props.state;
         request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType:'mark'}}).then(res => {
             this.setState({
-                markInfos:res.markInfos||[{}]
+                markInfos:res.markInfos||[{}],
+                loading:false
             })
         })
     }
@@ -42,20 +50,20 @@ export default class PutSample extends Component {
             ImgList=[]
         }
         return Array.from(ImgList).map((_val, i) => ({
-            icon: whichImgLink(_val),
+            icon: whichImgLink(_val.url),
           }));  
     }
     render(){
-        let {markInfos=[{}],current} = this.state;
+        let {markInfos=[{}],current,loading} = this.state;
         let info = markInfos[current-1] ||{};
         let {rooms=[]} = info;
-        let{state} = this.props;
+        let{state,title} = this.props;
         
         return(
             <div className={styles.serveDetails}>
               <List>
                 <List.Item className={styles.historyTop}>
-                    放样信息
+                    {title}
                 </List.Item>
 
               </List>
@@ -89,12 +97,18 @@ export default class PutSample extends Component {
                  
                 
                 <div >
+                    {info.markDrawing&&info.markDrawing.length>0?
                      <Grid data={this.getPhoto(info.markDrawing)} 
-                      itemStyle={{margin:'8px 8px  0 0',height:'75px'}}
+                      itemStyle={{margin:'8px 8px  0 0',}}
                       renderItem={(el,index)=>{
-                          return <img  alt={el.name} className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
+                          return <img width="100%" alt={el.name}  onClick={()=>{
+                            preview([{url:el.icon}])
+                          }} className={styles.iconImg} key={index+'iconImg3'} 
+                          src={el.icon}/>
                       }} 
-                     hasLine={false}/>
+                     hasLine={false}/>:
+                     <div style={{display:loading?'none':null}} className="tc greyColor textFontSize">暂无数据</div>}
+                     
                 </div>
                    
 
@@ -114,17 +128,19 @@ export default class PutSample extends Component {
                 <Card.Body style={{padding:'8px 0'}}>
                     <div >
                     {rooms.map((item,index)=>{
-                        return <div key={item.roomCode+''+{index}}> 
+                        return <div key={item.roomCode+''+index}> 
                                 <Title text={`${item.roomName}${item.wallName}`}/>
                                     {item.components.map((child,index)=>{
                                         return  <Col key={child.objId+''+index} text={child.name} state={child} isPut={item.isMark}/>
                                     })}
+                                    <div className="pl-16">
                                     <Grid data={this.getRoomPhotos(item.photos)} 
-                                        itemStyle={{margin:'8px 8px  0 0',height:'75px'}}
+                                        itemStyle={{margin:'8px 8px  0 0',}}
                                         renderItem={(el,index)=>{
-                                            return <img  alt={el.name} className={styles.iconImg} key={index+'iconI'} src={el.icon}/>
+                                            return <img width="100%" alt={el.name} className={styles.iconImg} key={index+'iconI'} src={el.icon}/>
                                         }} 
                                     hasLine={false}/>
+                                    </div>
                              </div>
                     })}
                     </div>

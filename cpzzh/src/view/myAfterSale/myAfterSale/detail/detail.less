@@ -13,6 +13,10 @@
             font-weight: normal;
             margin-top: -8px;
             font-size: @font-size-md;
+            position: absolute;
+            right: 8px;
+            width: 24px;
+            color:#888;
         }
 }
 
@@ -27,13 +31,16 @@
     .item{
         margin-bottom: 2px;
         background: #fff;
-        padding:8px 16px;
+        padding:8px;
+        :global(.am-list-line){
+            padding: 0;
+        }
         .descItem{
             width: 70%;
             display: inline-block;
         }
         :global(label){
-            margin-right: 16px;
+            margin-right: 8%;
             width: 25%;
             display: inline-block;
             color:rgb(51, 51, 51);
@@ -55,8 +62,8 @@
             
             margin-bottom: 8px;
             font-size: 14px;
-            &.border{
-                border-bottom: 1px solid #CCC;
+            .iconImg{
+                border: 1px solid #CCC;
             }
         }
     }

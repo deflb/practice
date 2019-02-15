@@ -7,10 +7,14 @@ import online_service_service_icon from '../../assets/icon/online_service_servic
 import online_service_member_icon from '../../assets/icon/online_service_member@3x.png';
 import online_service_integral_icon from '../../assets/icon/online_service_integral@3x.png';
 import styles from './index.less';
+import routerBase from '../../router/routerBase';
 
 export default class onlineCustomService extends Component {
+    goToOnline = () => {
+        this.props.history.push(routerBase + '/onlineCustomService')
+    }
     render() {
-        return (<div className={styles.wrapper}>
+        return (<React.Fragment>
             <div className={styles.main}>
                 <div className={styles.content}>
                     <p className={styles.content_title}>常见问题</p>
@@ -34,16 +38,16 @@ export default class onlineCustomService extends Component {
                     </div>
                 </div>
             </div>
-            <ul className={styles.footer}>
-                <li>
+            <div className={styles.footer}>
+                <span className={styles.footer_left} onClick={this.goToOnline}>
                     <img src={online_service_icon} alt='' />
                     在线客服
-                </li>
-                <li>
+                </span>
+                <a href='tel:400-2020-0000' className={styles.footer_right}>
                     <img src={dial_icon} alt='' />
                     一键拨打
-                </li>
-            </ul>
-        </div>)
+                </a>
+            </div>
+        </React.Fragment>)
     }
 }

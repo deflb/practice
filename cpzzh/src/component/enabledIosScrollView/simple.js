@@ -1,4 +1,6 @@
 import React from 'react';
 import { isIOS } from '../../utlis';
 
-export default ({ children }) => (<div style={{ minHeight: isIOS() ? 'calc(100% + 1px)' : null }}>{children}</div>)
+export default ({ children }) => isIOS() ?
+    (<div style={{ minHeight: 'calc(100% + 1px)' }}>{children}</div>)
+    : children;

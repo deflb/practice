@@ -1,15 +1,13 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router';
-import asyncC from '../../component/asyncC';
 import CustomListView from '../../component/customListView';
 import CaseItem from '../../component/itemPreView/caseItem';
 import TypesClassifySelect from '../../component/typesClassifySelect';
-import SearchBar from './common/searchBar';
+import CustomSearchBar from '../../component/customSearchBar';
 import Filter from './common/filter';
 import { request } from '../../request';
 import api from '../../request/api';
 import styles from './case.less';
-const Detail = asyncC(() => import('./caseComponent/detail'));
+import routerBase from '../../router/routerBase';
 
 export default class designCase extends Component {
     state = {
@@ -115,7 +113,7 @@ export default class designCase extends Component {
 
     // 为了性能考虑 字段方面的更新 前端直接处理 不去拉取数据
     updateCurrentItem = (field, index) => { // views comments likes
-        if (!field) return;
+        if (!field || (!index && index !== 0)) return;
         const { dataBlobs } = this.state,
             _dataBlobs = [...dataBlobs],
             currentRow = { ..._dataBlobs[index] };
@@ -136,11 +134,11 @@ export default class designCase extends Component {
             loading,
             refreshing,
         } = this.state,
-            { match, history } = this.props;
+            { history } = this.props;
         let current;
         return (
             <div className={styles.wrapper}>
-                <SearchBar
+                <CustomSearchBar
                     placeholder='请输入关键字'
                     extra={<Filter
                         onRest={() => {
@@ -218,7 +216,7 @@ export default class designCase extends Component {
                         style={{ marginBottom: 10 }}
                         rowClick={() => {
                             history.push({
-                                pathname: match.path + '/case',
+                                pathname: routerBase + '/caseDetail',
                                 state: { id: rowData.id, index }
                             })
                         }}
@@ -226,7 +224,6 @@ export default class designCase extends Component {
                         updateLikeCount={this.updateCurrentItem.bind(this, 'likes', index)}
                     />)}
                 />
-                <Route path={match.path + '/case'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} />} />
             </div>
         );
     }

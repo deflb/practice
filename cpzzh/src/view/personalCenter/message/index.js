@@ -79,36 +79,34 @@ export default class message extends Component {
     render() {
         const { dataBlobs, loading, refreshing } = this.state,
             { match } = this.props;
-        return (
-            <div style={{ height: '100%' }}>
-                <CustomListView
-                    style={{ height: '100%' }}
-                    loading={loading}
-                    data={dataBlobs}
-                    onEndReached={this.onEndReached}
-                    refreshing={refreshing}
-                    onRefresh={this.onRefresh}
-                    renderRow={(rowData, sectionID, index) => (<div key={rowData.msgId}>
-                        <div className={styles.message_time}>
-                            <span>{formatDate(rowData.msgDate)}</span>
-                        </div>
-                        <Card full className={styles.message_content}>
-                            <Card.Header
-                                title={<div className='oneRowsOverflowOmit'>{rowData.msgTitle}</div>}
-                                extra={<span className={rowData.isRead === '0' ? styles.message_content_noread : styles.message_content_isread} />}
-                            />
-                            <Card.Body>
-                                <ul className={styles.message_content_simple}>
-                                    <img src={list_thumb_png} alt='' />
-                                    <li className={styles.message_content_simple_text}>{rowData.msgContent}</li>
-                                </ul>
-                            </Card.Body>
-                            <Card.Footer extra={<div className={styles.message_content_view} onClick={this.goToDetail.bind(this, rowData, index)}>查看详情</div>} />
-                        </Card>
-                    </div>)}
-                />
-                <Route path={match.path + '/detail'} component={Detail} />
-            </div>
-        );
+        return (<React.Fragment>
+            <CustomListView
+                useBodyScroll
+                loading={loading}
+                data={dataBlobs}
+                onEndReached={this.onEndReached}
+                refreshing={refreshing}
+                onRefresh={this.onRefresh}
+                renderRow={(rowData, sectionID, index) => (<div key={rowData.msgId}>
+                    <div className={styles.message_time}>
+                        <span>{formatDate(rowData.msgDate)}</span>
+                    </div>
+                    <Card full className={styles.message_content}>
+                        <Card.Header
+                            title={<div className='oneRowsOverflowOmit'>{rowData.msgTitle}</div>}
+                            extra={<span className={rowData.isRead === '0' ? styles.message_content_noread : styles.message_content_isread} />}
+                        />
+                        <Card.Body>
+                            <ul className={styles.message_content_simple}>
+                                <img src={list_thumb_png} alt='' />
+                                <li className={styles.message_content_simple_text}>{rowData.msgContent}</li>
+                            </ul>
+                        </Card.Body>
+                        <Card.Footer extra={<div className={styles.message_content_view} onClick={this.goToDetail.bind(this, rowData, index)}>查看详情</div>} />
+                    </Card>
+                </div>)}
+            />
+            <Route path={match.path + '/detail'} component={Detail} />
+        </React.Fragment>);
     }
 }

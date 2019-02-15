@@ -9,7 +9,7 @@ import { request } from '../../../request';
 import api from '../../../request/api';
 import wx from 'weixin-js-sdk';
 import wxConfig from '../../../utlis/wxConfig';
-import { convertorTranslate, geocoder } from '../../../utlis/bMap';
+import { coordConvertor, geocoder } from '../../../utlis/bMap';
 import { sortAndClassify } from '../../../utlis/hzToPy';
 import styles from './selectHouses.less';
 const SwitchCity = asyncC(() => import('./switchCity'));
@@ -24,19 +24,15 @@ export default hasPositionFullScreen(class selectHouses extends Component {
         houses: [],
         housesLen: 0,
     }
-    getSignature = () => {
-        wxConfig({ wx, jsApiList: ['getLocation'] }).then(() => {
-            this.getPos()
-        })
-    }
     getPos = () => {
         let self = this;
         this.setState({ cityName: '定位中...' })
         wx.getLocation({
             type: 'wgs84',
             success: function (res) {
-                convertorTranslate(res, (bPos) => {
-                    geocoder(bPos, (addressComponents) => {
+                coordConvertor([res], 1, 5).then(res => {
+                    const { lng, lat } = res[0];
+                    geocoder({ longitude: lng, latitude: lat }, (addressComponents) => {
                         let cityName = addressComponents.city;
                         self.setState({ cityName });
                         request({ url: api.getCityByName, data: { cityName } }).then(info => {
@@ -60,7 +56,9 @@ export default hasPositionFullScreen(class selectHouses extends Component {
         })
     }
     componentDidMount() {
-        this.getSignature();
+        wxConfig({ wx, jsApiList: ['getLocation'] }).then(() => {
+            this.getPos()
+        })
     }
 
     onSearch = keyword => {
@@ -80,7 +78,7 @@ export default hasPositionFullScreen(class selectHouses extends Component {
             { match, history, whichHouses } = this.props;
         return (<div className={styles.wrapper}>
             <CustomSearchBar
-                className={styles.wrapper_search}
+                style={{ padding: '0 15px' }}
                 onSearch={this.onSearch}
                 placeholder='输入楼盘名称搜索'
             />

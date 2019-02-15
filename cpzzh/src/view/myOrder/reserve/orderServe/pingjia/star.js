@@ -32,10 +32,10 @@ export default class Star extends Component {
                         return(
                             <span key={index}>
                                 <span onClick={this.starChange.bind(this,index)}>{ele>this.state.num?
-                                <span style={{color:"#c1c1c1",fontSize:"32px"}}>
-                                 <i className='iconfont icon-collect greyColor' />
-                                </span>:<span style={{color:"#e93536",fontSize:"32px"}}>
-                                <i className='iconfont icon-star-fill redColor' />
+                                <span >
+                                 <i style={{color:"#c1c1c1",fontSize:"20px"}} className='iconfont icon-collect greyColor ' />
+                                </span>:<span >
+                                <i style={{color:"#e93536",fontSize:"20px"}} className='iconfont icon-star-fill redColor' />
                                 </span>}</span>
                             </span>
                         )

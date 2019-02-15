@@ -1,66 +1,75 @@
 import React, { Component } from 'react';
 import fullScreen from '../../../../component/fullScreen';
-// import whichImgLink from '../../../../utlis/whichImgLink';
+import whichImgLink from '../../../../utlis/whichImgLink';
 import Overview from '../component/overview';
 import CustomModal from '../../../../component/customModal';
 import EnabledIosScrollView from '../../../../component/enabledIosScrollView';
+import { request } from '../../../../request';
+import api from '../../../../request/api';
+import { formatDate } from '../../../../utlis';
 import styles from './index.less';
 
 export default fullScreen(class detail extends Component {
     state = {
         visible: false,
+        detail: {},
     }
     componentDidMount() {
-        document.title = '商机详情--刘星';
+        const { location } = this.props, { state = {} } = location;
+        document.title = `商机详情--${state.customerName}`;
+        if (state.businessId)
+            request({ url: api.getBusiness, data: { id: state.businessId } }).then(res => {
+                this.setState({ detail: res })
+            })
     }
     componentWillUnmount() {
         CustomModal.unmountFnDialog();
     }
     render() {
-        let { visible } = this.state;
+        const { visible, detail } = this.state, guideInfo = detail.guideInfo || {};
         return (<EnabledIosScrollView><ul className={styles.wrapper}>
             <li className={styles.header}>
                 <ul className={styles.header_date}>
-                    <li>报备日期：2018/10/12 10:05</li>
-                    <li>待确认</li>
+                    <li>报备日期：{formatDate(detail.reportTime, 'YYYY/MM/DD hh:mm')}</li>
+                    <li>{detail.statusStr}</li>
                 </ul>
-                <div className={styles.header_record}>104元<span onClick={() => { this.setState({ visible: true }) }} className={styles.header_record_text}><i className='iconfont icon-message' />调整记录</span></div>
+                <div className={styles.header_record}>{detail.reward}元<span onClick={() => { this.setState({ visible: true }) }} className={styles.header_record_text}><i className='iconfont icon-message' />调整记录</span></div>
             </li>
-            <li className={styles.detail}>
-                <Overview
+            {detail.status ? <li className={styles.detail}>
+                {detail.status === 1 ? <Overview
                     className={styles.detail_valid}
                     source={[
-                        { number: 120, unit: '元', des: '商机奖励' },
-                        { number: 300, unit: '元', des: '成交提成' },
-                        { number: 5000, des: '积分' },
+                        { number: detail.gainReward, unit: '元', des: '商机奖励' },
+                        { number: detail.gainBonus, unit: '元', des: '成交提成' },
+                        { number: detail.gainScore, des: '积分' },
                     ]}
-                />
-                <ul className={styles.detail_void}>
+                /> : null}
+                {detail.status === 2 ? <ul className={styles.detail_void}>
                     <li className={styles.detail_void_title}>商机无效原因</li>
                     <li className={styles.detail_void_content}>客户无相关需求</li>
-                </ul>
-                <p className={styles.detail_date}>确认完成时间：2018/10/13 09:50</p>
-            </li>
-            <li className={styles.title}>指定导购员</li>
-            <li className={styles.guide}>
+                </ul> : null}
+                <p className={styles.detail_date}>确认完成时间：{formatDate(detail.confirmTime, 'YYYY/MM/DD hh:mm')}</p>
+            </li> : null}
+            {detail.guideId ? <li className={styles.title}>指定导购员</li> : null}
+            {detail.guideId ? <li className={styles.guide}>
                 <div className={styles.info}>
                     <ul className={styles.info_header}>
                         <li className={styles.info_header_title}>
                             <span className={styles.info_header_title_icon}>
                                 <i className='iconfont icon-user' />
                             </span>
-                            吴亮
-                            <span className={styles.info_header_title_des}>成交率 96%</span>
+                            {guideInfo.guideName}
+                            <span className={styles.info_header_title_des}>成交率 {guideInfo.dealRate}%</span>
                         </li>
                         <li className={styles.info_header_extra}>
                             <span className={styles.info_header_extra_thumb}>
-                                {/* <img src='' alt='' /> */}
+                                {guideInfo.guideAvatar ? <img src={whichImgLink(guideInfo.guideAvatar)} alt='' /> : null}
                             </span>
-                            <a href='tel://18622005511'><i className='iconfont icon-phone redColor' /></a>
+                            <a href={`tel://${guideInfo.phone}`}><i className='iconfont icon-phone redColor' /></a>
                         </li>
                     </ul>
                 </div>
-            </li>
+            </li> : null}
             <li className={styles.title}>客户信息</li>
             <li className={styles.custom}>
                 <div className={styles.info}>
@@ -69,18 +78,18 @@ export default fullScreen(class detail extends Component {
                             <span className={styles.info_header_title_icon}>
                                 <i className='iconfont icon-user' />
                             </span>
-                            刘星
-                            <span className={styles.info_header_title_des}>老客户</span>
+                            {detail.customerName}
+                            {detail.isOld ? <span className={styles.info_header_title_des}>老客户</span> : null}
                         </li>
                     </ul>
                 </div>
-                <a className={styles.info} href='tel://18622005511'>
+                <a className={styles.info} href={`tel://${detail.customerPhone}`}>
                     <ul className={styles.info_header}>
                         <li className={styles.info_header_title}>
                             <span className={styles.info_header_title_icon}>
                                 <i className='iconfont icon-user' />
                             </span>
-                            18680085566
+                            {detail.customerPhone}
                         </li>
                         <li className={styles.info_extra}>
                             <i className='iconfont icon-phone redColor' />
@@ -93,7 +102,7 @@ export default fullScreen(class detail extends Component {
                             <span className={styles.info_header_title_icon}>
                                 <i className='iconfont icon-user' />
                             </span>
-                            广东-东莞-南城
+                            {detail.province}-{detail.city}-{detail.district}
                         </li>
                     </ul>
                 </div>
@@ -107,7 +116,7 @@ export default fullScreen(class detail extends Component {
                         </li>
                     </ul>
                     <div className={styles.info_content}>
-                        需要装修一个儿童房
+                        {detail.customerDemand}
                     </div>
                 </div>
             </li>

@@ -14,13 +14,13 @@ export default connect(state => ({
         page: 'case',
     }
 
+    getMatchsKey = (pathname) => {
+        const matchs = pathname.match(/moreCase\/([^/]*)/);
+        return matchs ? matchs[1] : '';
+    }
     componentWillMount() {
-        const { routeState } = this.props,
-            { pathname } = routeState,
-            arr = pathname.split('/'),
-            key = arr[arr.length - 1];
-        if (key)
-            this.setState({ page: key })
+        const key = this.getMatchsKey(this.props.routeState.pathname);
+        if (key && key !== this.state.page) this.setState({ page: key })
     }
 
     render() {

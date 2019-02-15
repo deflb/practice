@@ -26,8 +26,14 @@ const _routerDictionary = {
     '/nearbyShop/detail': '附近门店',
     '/onlineCustomService': '在线客服',
     '/myOrder': '我的订单',
+    '/myOrder/detail':'订单详情',
+    '/myOrder/detail/serve':'订单服务',
+    '/myOrder/detail/serve/serveDetail':'服务详情',
     '/myAfterSale': '我的售后',
+    '/myAfterSale/detail': '售后详情',
     '/myAfterSale/apply': '申请售后',
+    '/myOrder/detail/serve/pingjia':"评价服务",
+    '/myOrder/detail/serve/pingjiaResult':'评价结果',
     '/moreCase': '万套案例',
     '/moreCase/palette': '色板详情',
     '/moreCase/mountings': '配件详情',
@@ -37,6 +43,7 @@ const _routerDictionary = {
     '/showHome/add/selectHouses': '选择楼盘',
     '/showHome/add/selectHouses/switchCity': '选择城市',
     '/reportBusiness': '报备商机',
+   
 };
 
 let routerDictionary = {};

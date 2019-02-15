@@ -7,6 +7,8 @@ import styles from '../index.less'
 import { request } from '../../../../../request';
 import  whichImgLink from '../../../../../utlis/whichImgLink';
 import api from '../../../../../request/api';
+import CustomModal from '../../../../../component/customModal';
+const { preview } = CustomModal;
 export default class secondGauge extends Component {
     constructor(props) {
         super(props)
@@ -15,7 +17,12 @@ export default class secondGauge extends Component {
            current:1,
         }
     }
+    componentWillUnmount() {
+        CustomModal.unmountFnDialog();
+    }
     componentDidMount(){
+        let {title } = this.props;
+        document.title = title;
         this.init()
       
     }
@@ -31,7 +38,7 @@ export default class secondGauge extends Component {
    
     render(){
         let {measureInfo=[{}],current} = this.state;
-        let {state} = this.props;
+        let {state,title} = this.props;
         let info = measureInfo[current-1] ||{};
         let {rooms=[]} = info; 
        
@@ -39,7 +46,7 @@ export default class secondGauge extends Component {
             <div className={styles.serveDetails}>
               <List>
                 <List.Item className={styles.historyTop}>
-                    复尺信息
+                    {title}
                 </List.Item>
 
               </List>
@@ -70,7 +77,13 @@ export default class secondGauge extends Component {
                 <Card.Body style={{padding:'8px'}}>
                      <div style={{minHeight:'200px'}}>
                     <div className="tc">{info.unitName}</div>
-                         <img src={whichImgLink(info.unitsPicture)} width="100%" alt=""/>
+                         <img src={whichImgLink(info.unitsPicture)} width="100%" alt="" 
+                          onClick={()=>{
+                            preview([{url:whichImgLink(info.unitsPicture)}])
+                        }}
+                         onError={()=>{
+                           info.unitsPicture = ""
+                        }}/>
                     </div>
                 </Card.Body>
                 </Card>
@@ -91,7 +104,7 @@ export default class secondGauge extends Component {
                             return <div key={item.name+''+index}>
                                      <Title text={item.name} prop={item.prop}/>
                                      {item.walls.map((child,idx)=>{
-                                         return  <Row key={child.name+''+idx} 
+                                         return  <Row isFuchi={true} key={child.name+''+idx} 
                                                      state={child}/>
                                      })}
                                     

@@ -1,22 +1,16 @@
 @import '../../../style/mixin.less';
-.wrapper{
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    &_container{
-        flex: 1;
-        overflow: auto;
-    }
-    &_title{
+.content {
+    padding-bottom: 50px;
+    .title {
         flex: 1;
         .whichRowsOverflowOmit(2)
     }
-    &_info{
+    .info {
         .fontSize(text);
-        &_des{
+        &_des {
             color: @grey;
             padding-bottom: 15px;
-            .real1px(unset,unset, x, bottom);
+            .real1px(unset, unset, x, bottom);
         }
     }
 }

@@ -81,7 +81,7 @@ console.log(Object.keys(obj3))
 console.log(Object.getOwnPropertyNames(obj3))
 
 console.log('123456789'.slice(-4, -3)) // start -> end  start不能大于end 为负从后往前
-console.log('123456789'.substr(-4, 1)) // from length  length 必须大于0  from 为负从后往前 
+console.log('123456789'.substr(-4, 1)) // from length  length 必须大于0  from 为负从后往前
 console.log('123456789'.substring(1, -3)) // start -> end 不能同时为负  start>end -> (start,end) start<end -> (end, start)
 
 console.log([1, 2, 3].splice(-1, 1)) // start 为负从后往前 返回删除的子项

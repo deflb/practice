@@ -1,0 +1,26 @@
+@import '../../style/mixin.less';
+.position{
+    line-height: 50px;
+    .fontSize(text);
+    &_btn{
+        border: 1px solid @red;
+        border-radius: 4px;
+        color: @red;
+        padding: 4px 15px;
+        margin-left: 15px;
+        &:active{
+            color: @white;
+            background-color: @red;
+        }
+    }
+}
+.pcd{
+    display: flex;
+    line-height: 40px;
+    text-align: center;
+    color: @colorGrey;
+    .real1px(x, top, x, bottom);
+    >li{
+        flex: 1;
+    }
+}

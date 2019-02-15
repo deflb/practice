@@ -8,18 +8,13 @@ export default class Tel extends Component {
            
         }
     }
-    tel=(e)=>{
-        let {tel} = this.props;
-        e.stopPropagation();
-        if(tel)
-        window.location.href ="tel://"+tel;
-    }
+    
     render(){
         return(
 
-            <span onClick={this.tel}>
+            <a href={`tel:${this.props.tel}`}>
               <i className='iconfont icon-tel01 greenColor' />
-            </span>
+            </a>
     )
     }
 }

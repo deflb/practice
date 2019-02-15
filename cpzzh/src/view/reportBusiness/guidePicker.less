@@ -1,0 +1,46 @@
+@import '../../style/mixin.less';
+.guide{
+    &_area,&_tip{
+        padding: 7px 0;
+        text-align: center;
+    }
+    &_tip{
+        .real1px(x, top, dashed);
+        color: @red;
+    }
+    &_item{
+        display: flex;
+        align-items: center;
+        padding: 7px 15px;
+        .fontSize(normal);
+        &_avatar{
+            width: 50px;
+            height: 50px;
+            background-color: @bgGrey;
+            border-radius: 50%;
+            margin-right: 15px;
+            img{
+                display: block;
+                width: 100%;
+                height: 100%;
+                border-radius: 50%;
+            }
+        }
+        &_content{
+            flex: 1;
+            .top, .bottom{
+                display: flex;
+                justify-content: space-between;
+            }
+            .top{
+                &_left{
+                    font-weight: 700;
+                    color: @blobBlack;
+                }
+                &_right{
+                    color: @red;
+                }
+            }
+        }
+    }
+}

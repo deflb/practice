@@ -1,7 +1,7 @@
 import React, { Component } from 'react';
 import wx from 'weixin-js-sdk';
 import wxConfig from '../../utlis/wxConfig';
-import { mapInstance, convertorTranslate } from '../../utlis/bMap';
+import { mapInstance, coordConvertor } from '../../utlis/bMap';
 import { Route } from 'react-router';
 import asyncC from '../../component/asyncC';
 import CustomListView from '../../component/customListView';
@@ -20,6 +20,7 @@ export default class nearbyShop extends Component {
         flongitude: 0,
         loading: false,
         refreshing: false,
+        noFooterInfo: true,
     }
     goToDetail = rowData => {
         const { history, match } = this.props;
@@ -43,8 +44,9 @@ export default class nearbyShop extends Component {
                 dataBlobs: _dataBlobs,
                 loading: false,
                 refreshing: false,
+                noFooterInfo: false
             });
-        }).catch(err => { this.setState({ loading: false, refreshing: false }) })
+        }).catch(err => { this.setState({ loading: false, refreshing: false, noFooterInfo: false }) })
     }
 
     getPos = (callback) => {
@@ -56,21 +58,27 @@ export default class nearbyShop extends Component {
         })
     }
 
+    wgs84ToBd09 = (pos) => coordConvertor([pos], 1, 5).then(res => {
+        const { lng, lat } = res[0];
+        return { longitude: lng, latitude: lat }
+    })
+
     componentDidMount() {
-        wxConfig({ wx, jsApiList: ['getLocation'] }).then(res => {
+        wxConfig({ wx, jsApiList: ['getLocation'] }).then(() => {
             let self = this;
-            this.getPos((res) => {
-                convertorTranslate(res, (bPos) => {
+            this.getPos((pos) => {
+                self.wgs84ToBd09(pos).then(bPos => {
+                    sessionStorage.setItem('bm_userPos', JSON.stringify(bPos));
                     mapInstance(bPos, 'map', (point) => {
                         self.getNearShop({ pageNo: 1, flatitude: point.latitude, flongitude: point.longitude, dataBlobs: [] });
                     }, (fn) => {
                         self.getPos((pos) => {
-                            convertorTranslate(pos, (bPos) => {
-                                fn(bPos);
+                            self.wgs84ToBd09(pos).then(bPos => {
+                                fn(bPos)
                             })
                         })
                     });
-                });
+                })
             })
         }).catch(err => { })
     }
@@ -88,7 +96,7 @@ export default class nearbyShop extends Component {
     }
 
     render() {
-        const { dataBlobs, loading, refreshing } = this.state,
+        const { dataBlobs, loading, refreshing, noFooterInfo } = this.state,
             { match } = this.props;
         return (
             <div className={styles.wrapper}>
@@ -105,6 +113,7 @@ export default class nearbyShop extends Component {
                         <li className={styles.wrapper_list_item_title}><span className={styles.wrapper_list_item_title_pos}>{rowData.fsname}{rowData.isNear === 1 ? <span className={styles.wrapper_list_item_title_pos_tip}>离你最近</span> : null}</span>{rowData.distance.toFixed(1)}km</li>
                         <li className={styles.wrapper_list_item_address}><i className='iconfont icon-address' />{rowData.faddress}</li>
                     </ul>)}
+                    noFooterInfo={noFooterInfo}
                 />
                 <Route path={match.path + '/detail'} component={Detail} />
             </div>

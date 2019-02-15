@@ -6,8 +6,13 @@ import api from '../../../request/api';
 import Tel from '../../../component/tel'
 import { formatDate } from '../../../utlis';
 import whichImgLink from '../../../utlis/whichImgLink';
+import CustomModal from '../../../component/customModal';
+import { connect } from 'react-redux';
+const { preview } = CustomModal;
 const Step =  Steps.Step;
-export default class reserveDetail extends Component {
+export default connect(state => ({
+    userInfo: state.userInfo
+}))( class reserveDetail extends Component {
     state = {
         data:{},
         current:1,
@@ -18,17 +23,33 @@ export default class reserveDetail extends Component {
         dataBlobs:[],
         goodsNumber:0,
         offical:false,//是否正式详情
+        isOnly:true,
+        length:1
     }
+   
     componentDidMount(){
-        this.init();
-       
-    }
-    init(){
         let {location={}} = this.props,{state={}}=location;
+        this.init(state);
+        
+    }
+   
+      componentWillUnmount() {
+        CustomModal.unmountFnDialog();
+       
+      }
+
+  
+    init(state){
+        
+        if(!state.id){
+            this.initFirst()
+            return 
+        }
         this.setState({
             orderNo:state.id,
             orderId:state.orderId,
-            isLoading:true
+            isOnly:state.isOnly,
+            isLoading:true,
         })
         if(!state.offical){
              request({method : 'get', url: api.getOrderDetail+state.id, data: {} }).then(res => {
@@ -82,6 +103,33 @@ export default class reserveDetail extends Component {
         
       
     }
+    initFirst=()=>{
+        const {userInfo } =this.props;
+       
+            if(!userInfo.customerId){
+                this.setState({
+                    isLoading:false
+                })
+                return
+            }
+            request({ url: api.getOrderList, data: { pageNo: 1, pageSize: 100,fcstid:userInfo.customerId } }).then(res => {
+                    if(res.list.length>0){
+                        let a = res.list[0];
+                        this.init({
+                            id:a.orderNo,
+                            orderId:a.orderId,
+                            isOnly:res.list.length>1?false:true
+                        }) 
+                    }else{
+                        this.setState({
+                            isLoading:false,
+                            inNothing:true
+                        })
+                    }
+                    
+                    }).catch(err => { console.log(err) })
+                   
+    }
     initSteps=(orderId)=>{
         let data ={orderId:orderId}
         this.setState({
@@ -92,8 +140,11 @@ export default class reserveDetail extends Component {
             let steps =[];
             let{nodeList} = res;
             let current = 0;
-            nodeList.forEach(item => {
-                current +=Number(item.status);
+            let length = nodeList.length;
+            nodeList.forEach((item,index) => {
+                if(item.status===0&&current===0){
+                    current = index+1
+                }
                 let obj = {};
                 obj.title = "";
                 obj.description = item.nodeName;
@@ -108,12 +159,15 @@ export default class reserveDetail extends Component {
                 </div>
                 steps.push(obj)
             });
-            
+           
             this.setState({
                 steps:steps,
                 current,
-                isLoading:false
+                isLoading:false,
+                length
             })
+            
+            this.contentNode.scrollLeft = this.contentNode.scrollWidth
         }).catch(err => { console.log(err)
         this.setState({
             isLoading:false
@@ -125,10 +179,10 @@ export default class reserveDetail extends Component {
      }
     
     getSteps=()=>{
-      
         return this.state.steps.map((s, i) => <Step key={i} status={"wait"} title={s.title} description={s.description}  icon={this.getIcon(s)} />);
        }
-  
+    
+ 
    
    toViewStep =()=>{//跳到进度
     const { history, match } = this.props;
@@ -149,17 +203,26 @@ export default class reserveDetail extends Component {
     // this.getCaseList()
 }
 
-    wantPro =()=>{
+    wantPro =(bool)=>{//是否收起
         let {data} = this.state,{intentionProducts,batches} = data;
+        if(!bool){
+            if(intentionProducts)
+            intentionProducts = intentionProducts.slice(0,3);
+            if(batches)
+            batches = batches.slice(0,3)
+        }
         if(intentionProducts){
             return intentionProducts.map((item,index)=><div style={{overflow:'hidden',borderTop:index>=1?'1px dashed #999':null,padding:"8px 0px"}}  key={item.goodsCode}>
-                    <div  className={"fl "} style={{width:'20%',minHeight:'100px'}}>
+                    <div  className={"fl "} style={{width:'30%',minHeight:'100px'}}>
                     <div className={styles.imgBox}>
-                        <img src={whichImgLink(item.thumbnail)} alt=""  border="1" />
+                        <img src={whichImgLink(item.thumbnail)} onClick={()=>{
+                            preview([{url:whichImgLink(item.thumbnail)}])}} onError={()=>{
+                           item.thumbnail = ""
+                        }} alt=""  width="100%" border="1" />
                         
                     </div>
                     </div>
-                    <div  className={`fl ml-8 normalFontSizeC`} style={{width:'68%'}}>
+                    <div  className={`fl ml-8 normalFontSizeC`} style={{width:'58%'}}>
                         <div className="titleFontSizeC">{item.goodsName}</div>
                         <div className="greyColor">规格 :<span className="ml-8">{item.sizeDesc?item.sizeDesc:''}</span></div>
                         <div className={styles.redC}>{`￥${item.unitPrice}/${item.unit}`}</div>
@@ -177,10 +240,14 @@ export default class reserveDetail extends Component {
                             {item.orderProducts.map((item,index)=>{
                                 return <div key={index+''+item.code}>
                                     <div style={{overflow:'hidden',borderTop:index>=1?'1px dashed #999':null,padding:"8px 0px"}} key={item.code}>
-                                        <div  className={"fl"} style={{width:'80px'}}>
-                                        <img src={whichImgLink(item.thumbnail)} alt="" width="80" border="1" />
+                                        <div  className={"fl"} style={{width:'30%'}}>
+                                        <img src={whichImgLink(item.thumbnail)} onClick={()=>{
+                            preview([{url:whichImgLink(item.thumbnail)}])}} alt="" width="100%" border="1" 
+                                        onError={()=>{
+                                            item.thumbnail = ""
+                                         }} />
                                         </div>
-                                        <div  className={`fl ml-8`}>
+                                        <div  className={`fl ml-8`} style={{width:'58%'}}>
                                             <h3>{item.name}</h3>
                                             <div>规格 : {item.size?item.size+'mm':''}</div>
                                             <div className={styles.redC}>{`￥${item.price}/pcs`}</div>
@@ -198,18 +265,22 @@ export default class reserveDetail extends Component {
         }
     }
     back=()=>{
-        this.props.history.goBack()
+        const { history, match } = this.props;
+        history.push({
+            pathname: match.path.slice(0,-7),
+            state: {}
+        })
     }
     toServe=()=>{
         const { history, match } = this.props;
-        let {orderId,orderNo} = this.state;
+        let {orderId,orderNo,isOnly} = this.state;
         if(!orderId){
             Toast.fail('没有订单id')
             return 
         }
         history.push({
             pathname: match.path + '/serve',
-            state: {orderId,orderNo}
+            state: {orderId,orderNo,isOnly}
         })
     }
     toApply=()=>{
@@ -241,7 +312,7 @@ export default class reserveDetail extends Component {
         if(!offical){
             return <span className="fr">
                 <Button size="small" className={`fl mr-8`} type="primary" onClick={()=>{
-                    window.location.href ="tel://"+data.guidePhone;
+                    window.location.href ="tel:"+data.guidePhone;
                 }}>联系顾问</Button>
                 <Button size="small" className={`fl mr-8`} type="warning" onClick={this.toServe}>订单服务</Button>
             </span>
@@ -249,10 +320,10 @@ export default class reserveDetail extends Component {
    
         return <span className="fr">
                 <Button size="small" className={`fl mr-8`} type="primary" onClick={()=>{
-                    window.location.href ="tel://"+data.guidePhone;
+                    window.location.href ="tel:"+data.guidePhone;
                 }}>联系设计师</Button>   
                 <Button size="small" className={`fl mr-8`} type="primary" onClick={()=>{
-                    window.location.href ="tel://"+data.guidePhone;
+                   window.location.href ="tel:"+data.guidePhone;
                 }}>联系顾问</Button>
                 <Button size="small" className={`fl mr-8`} type="warning" onClick={this.toApply}>申请售后</Button>
                 <Button size="small" className={`fl mr-8`} type="warning" onClick={this.toServe}>订单服务</Button>
@@ -274,14 +345,20 @@ export default class reserveDetail extends Component {
         
      
     }
+    onOff=()=>{
+        let {onOff} = this.state;
+        this.setState({
+            onOff:!onOff
+        })
+    }
     render() {
-        let {data={},orderNo,current,goodsNumber,offical} = this.state;
+        let {data,orderNo,current,goodsNumber,offical,onOff,isOnly,length,isLoading,inNothing} = this.state;
        
         return (
          
             <div className={styles.reserve}>   
             
-             <div className={styles.header}>
+             <div className={styles.header} style={{display:!data.orderNo&&!isLoading?"none":null}}>
                 <List.Item className={styles.historyTop}>
                  <div className="normalFontSizeC" style={{display:'flex'}}>
                        <span>{this.statusIcon(data.recerveStatusDesc)}</span> 
@@ -290,13 +367,13 @@ export default class reserveDetail extends Component {
                      <div className="oneRowOverflowOmit mr-8" style={{flex:'1'}}>
                         当前订单 : {data.orderNo||orderNo} 
                      </div>
-                     <Icon className={styles.icon} type="down" theme="outlined" size ="lg"  onClick={this.back} />
+                     <Icon style={{display:isOnly?'none':null}} className={styles.icon} type="down" theme="outlined" size ="lg"  onClick={this.back} />
                      </div>
                      </div></List.Item>
                  </div>
              <div className="mb-8"></div>
              <div className={styles.flexItem} >
-             {!data?(<div className={styles.nothing}>暂无详情</div>):
+             {inNothing&&!isLoading?(<div className={styles.nothing}>暂无订单</div>):
                    
             <div style={{paddingBottom:'52px'}}>
             <Card full>
@@ -306,14 +383,16 @@ export default class reserveDetail extends Component {
                 extra={<span><Icon className={"fr "+styles.icon} type="right" theme="outlined" onClick={this.toViewStep}/></span>}
             />
             <Card.Body >
-                <div style={{right:0,position:'relative',overflowY:'auto',paddingTop:'4px'}} >
+                <div ref={ node => this.contentNode = node } style={{overflowX:'auto',
+                paddingTop:'4px'}}
+                  >
                     <Steps  current={current} direction="horizontal" size="small" >
                         {this.getSteps()}
                     </Steps>
                 </div>
                 <WhiteSpace size="lg"/>
                 <div className={styles.desc} style={{paddingLeft:'32px'}}>
-                    {this.state.steps[current-1]?this.state.steps[current-1].desc:''}
+                    {this.state.steps[length-1]?this.state.steps[length-1].desc:''}
                 </div>
 
             </Card.Body>
@@ -327,10 +406,10 @@ export default class reserveDetail extends Component {
             <Card.Header
                 title={(<span className="normalFontSizeC">{offical?"产品信息":"意向产品"}</span>)}
                 thumb=""
-                extra={<div><span className={`fl normalFontSizeC`}>共<span className={`${styles.redC}`}> {goodsNumber} </span>件产品</span><span className="blueColor normalFontSizeC">展开</span></div>}
+                extra={<div><span className={`fl normalFontSizeC`}>共<span className={`${styles.redC}`}> {goodsNumber} </span>件产品</span><span className="pointer blueColor normalFontSizeC" onClick={this.onOff}>{onOff?"收起":'展开'}</span></div>}
             />
             <Card.Body style={{paddingTop:'0'}}>
-             {this.wantPro(data.intentionProducts)}
+             {this.wantPro(onOff)}
             
 
             </Card.Body>
@@ -344,7 +423,7 @@ export default class reserveDetail extends Component {
                     extra={null}
                 />
             <Card.Body>
-                <div className={styles.feiyo}>
+                <div className={styles.feiyo+' normalFontSize'}>
                     <div className={styles.feiyoItem}>
                         <div>应收总额</div>
                         <div className="origanColor">￥{data.totalReceivable}</div>
@@ -363,7 +442,12 @@ export default class reserveDetail extends Component {
                 <WhiteSpace/>
                 {this.getFunds(data.funds)}
                 <WhiteSpace size="lg"/>
-
+                <div className="xBoth1px"></div>
+                <WhiteSpace size="lg"/>
+                <div className="titleFontSizeC">
+                    <div className="fl">应收总额</div>
+                    <div className="origanColor fr">￥{data.totalReceivable}</div>
+                </div>
             </Card.Body>
             </Card>
             <div className="mb-8"></div>
@@ -375,7 +459,8 @@ export default class reserveDetail extends Component {
             />
             <Card.Body>
                 <div  className={`${styles.desc} pl-8`}>
-                <div><label>姓名 : </label><span className={`${styles.people}`}>
+                <div style={{display:data.customerName?null:'none'}}>
+                <label>姓名 : </label><span className={`${styles.people}`}>
                     <span className="mr-8">{data.customerName||''}
                     </span>
                     <span>{data.customerPhone||''}</span>
@@ -400,12 +485,16 @@ export default class reserveDetail extends Component {
             />
             <Card.Body>
                 <div className={`${styles.desc} pl-8`}>
-                    <div>导购员 : <span className={styles.people}>{`${data.guideName||""}  ${data.guidePhone||''}`}
+                    <div>家居顾问 : <span className={styles.people}>{`${data.guideName||""}  ${data.guidePhone||''}`}
                     <span className="ml-8" style={{display:data.guidePhone?null:'none'}}><Tel tel={data.guidePhone}/></span></span></div>
-                    <div>活动名称 : <span className={styles.people}>{data.factivitytitle}</span></div>
-                    <div>套餐名称 : <span className={styles.people}>{data.factivitysuitename}</span></div>
-                    <div>要求交期 : <span className={styles.people}>{this.getDate(data.forddate)}</span></div>
-                    <div>下单日期 : <span className={styles.people}>{this.getDate(data.fordrdate)}</span></div>                   
+                    <div style={{display:data.factivitytitle?null:'none'}}>活动名称 : 
+                    <span className={styles.people}>{data.factivitytitle}</span></div>
+                    <div style={{display:data.factivitysuitename?null:'none'}}>套餐名称 : 
+                    <span className={styles.people}>{data.factivitysuitename}</span></div>
+                    <div style={{display:data.forddate?null:'none'}}>要求交期 : 
+                    <span className={styles.people}>{formatDate(new Date(data.forddate),"YYYY-MM-DD")}</span></div>
+                    <div style={{display:data.fordrdate?null:'none'}}>下单日期 : 
+                    <span className={styles.people}>{formatDate(new Date(data.fordrdate),"YYYY-MM-DD")}</span></div>                   
                 </div>
             
 
@@ -426,11 +515,11 @@ export default class reserveDetail extends Component {
                     
         }
         </div>
-            <div className={styles.footer}>
+            <div className={styles.footer} style={{display:!data.orderNo&&!isLoading?"none":null}}>
                 {this.footer(data)}
                     
             </div>
     </div>
         );
     }
-}
+})

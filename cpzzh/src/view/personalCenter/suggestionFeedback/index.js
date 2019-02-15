@@ -27,6 +27,11 @@ export default createForm()(class suggestionFeedback extends Component {
                         this.props.history.goBack()
                     }, 1000)
                 }).catch(err => { })
+            } else {
+                if (error.ffeedtext) {
+                    Toast.info('请填写反馈内容', 0.7);
+                    return
+                }
             }
         })
     }
@@ -34,41 +39,40 @@ export default createForm()(class suggestionFeedback extends Component {
     render() {
         const { length, maxLength } = this.state,
             { getFieldProps } = this.props.form;
-        return (
-            <div className={styles.wrapper}>
-                <List>
-                    <TextareaItem
-                        {...getFieldProps('ffeedtext', {
-                            // initialValue: this.state.dpValue,
+        return (<React.Fragment>
+            <List>
+                <TextareaItem
+                    {...getFieldProps('ffeedtext', {
+                        // initialValue: this.state.dpValue,
+                        rules: [
+                            { required: true, message: '请填写反馈内容' },
+                            // { validator: this.validateDatePicker },
+                        ],
+                    })}
+                    rows={5}
+                    count={100}
+                    placeholder='请输入反馈内容'
+                />
+            </List>
+            <List renderHeader={() => <div className={styles.upload_header}>拍照上传<span className={styles.upload_header_tip}>{`（${length}/${maxLength}）`}</span></div>}>
+                <List.Item>
+                    <CustomUpload
+                        {...getFieldProps('imgList', {
+                            initialValue: [],
                             rules: [
-                                { required: true, message: '请填写反馈内容' },
-                                // { validator: this.validateDatePicker },
+                                { required: false }
                             ],
                         })}
-                        rows={5}
-                        count={100}
-                        placeholder='请输入反馈内容'
+                        getLength={length => { this.setState({ length }) }}
+                        maxLength={maxLength}
+                        accept='image/*'
                     />
-                </List>
-                <List renderHeader={() => <div className={styles.wrapper_upload_header}>拍照上传<span className={styles.wrapper_upload_header_tip}>{`（${length}/${maxLength}）`}</span></div>}>
-                    <List.Item>
-                        <CustomUpload
-                            {...getFieldProps('imgList', {
-                                initialValue: [],
-                                rules: [
-                                    { required: false }
-                                ],
-                            })}
-                            getLength={length => { this.setState({ length }) }}
-                            maxLength={maxLength}
-                        />
-                    </List.Item>
-                </List>
-                <CustomWhiteSpace />
-                <WingBlank><Button type='primary' onClick={e => {
-                    this.saveFeedback()
-                }}>提交</Button></WingBlank>
-            </div>
-        );
+                </List.Item>
+            </List>
+            <CustomWhiteSpace />
+            <WingBlank><Button type='primary' onClick={e => {
+                this.saveFeedback()
+            }}>提交</Button></WingBlank>
+        </React.Fragment>);
     }
 })

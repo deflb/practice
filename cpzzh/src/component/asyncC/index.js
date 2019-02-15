@@ -17,6 +17,6 @@ export default importFn => class asyncC extends React.Component {
     }
     render() {
         const { C } = this.state;
-        return C ? <C {...this.props} /> : null
+        return C ? <C {...this.props} /> : <div>页面加载中...</div>
     }
 }

@@ -99,8 +99,8 @@ export default class Pingjia extends Component {
                     <List>
                         <List.Item >
                         <WhiteSpace size="xs"/>
-                            整体评价
-                            <div style={{width:'75%'}} className="fr">
+                            <label className="fl greyColor" style={{width:'25%'}}>整体评价</label>
+                            <div  className="fl greyColor">
                                     <span onClick={this.changeCheck.bind(this,1)} className={styles.checkIcon}>{allhighappraiseresult===1?<Icon type="check-circle" size="xs"/>:null} </span>好评
                                     <span onClick={this.changeCheck.bind(this,2)} className={styles.checkIcon}>{allhighappraiseresult===2?<Icon type="check-circle" size="xs"/>:null} </span>中评
                                     <span onClick={this.changeCheck.bind(this,3)} className={styles.checkIcon}>{allhighappraiseresult===3?<Icon type="check-circle" size="xs"/>:null} </span>差评
@@ -113,15 +113,17 @@ export default class Pingjia extends Component {
                    {tempMstDto.ifstarlvappraise===0?null:
                    <List>
                    <List.Item>
-                       <div className={styles.labels+' textFontSize'}>
+                       <div className={styles.labels+' textFontSize greyColor'}>
                        {
                                 tempItemDtos.map((item,index)=>{
-                                    return<div key={item.itemid+''+index}>
-                                            <label >{item.title}</label><Star onChange={(num)=>{
+                                    return<div className="titleFontSize" key={item.itemid+''+index}>
+                                            <label  style={{width:'28%'}}>{item.title}</label>
+                                            <Star  onChange={(num)=>{
                                                 let name = 'starNum'+index;
                                                 let obj={};
                                                 obj[name]=num;
-                                                this.setState(obj)}} name="0"/><span className={"ml-8 "+
+                                                this.setState(obj)}} name="0"/>
+                                            <span className={"ml-8 "+
                                                 color[this.state['starNum'+index]-1]}>
                                                 {Number(this.state['starNum'+index]||0)}分</span>
                                             <div className="origanColor "><label></label>
@@ -157,7 +159,6 @@ export default class Pingjia extends Component {
                             }}
                             getLength={length => { this.setState({ length }) }}
                             maxLength={maxLength}
-                            getLength={length => { this.setState({ length }) }}
                             value ={this.state.imgList}
                             accept='image/*'
                         />

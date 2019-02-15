@@ -4,12 +4,14 @@ import styles  from './index.less';
 import { request } from '../../../request';
 import api from '../../../request/api';
 import { connect } from 'react-redux';
+// import CustomListView from '../../../component/customListView';
 export default connect(state => ({
     userInfo: state.userInfo
 }))(class reserve extends Component {
     state = {
         orderList:[], 
-        id:''
+        id:'',
+        isLoading:true
     }
     componentDidMount(){
         this.init();
@@ -17,22 +19,28 @@ export default connect(state => ({
     init(){
         //获取订单列表
        const {userInfo } =this.props;
-        if(!userInfo.customerId){
-            request({ url: api.userInfo }).then(res => {
-                request({ url: api.getOrderList, data: { pageNo: 1, pageSize: 1000000,fcstid:res.customerId } }).then(res => {
-                    const { list } = res;
-                    this.setState({ orderList: list||[] ,isLoading:false})
-                }).catch(err => { console.log(err) })
-            })
-        }else{
-            request({ url: api.getOrderList, data: { pageNo: 1, pageSize: 1000000,fcstid:userInfo.customerId } }).then(res => {
+            if(!userInfo.customerId){
+                this.setState({
+                    isLoading:false
+                })
+                return
+            }
+            console.log(userInfo)
+            request({ url: api.getOrderList, data: { pageNo: 1, pageSize:100,fcstid:userInfo.customerId } }).then(res => {
                         const { list } = res;
-                        this.setState({ orderList: list||[] ,isLoading:false})
-                    }).catch(err => { console.log(err) })
-                    this.setState({
-                        isLoading:false
-                    })
-        }
+                        if(list.length>0){
+                            this.setState({ orderList: list,isLoading:false})
+                        }else{
+                             this.setState({
+                                    isLoading:false,
+                                    isNothing:true
+                                })
+                        }
+                        
+                    }).catch(err => {   this.setState({
+                        isLoading:false,
+                    }) })
+                   
     }
     choose=(current)=>{
         let {orderList,id,orderId} = this.state;
@@ -60,35 +68,37 @@ export default connect(state => ({
             })
             this.toDetail({id,orderId,offical})
     }
-    toAdd=()=>{
-        const { history, match } = this.props;
-        history.push({
-            pathname: match.path + '/apply',
-            state: {}
-        })
-    }
+  
     toDetail=({id,orderId,offical})=>{
         const { history, match } = this.props;
+        let {orderList} = this.state;
+        let isOnly = 1;
+            if(orderList.length>1){
+                isOnly = 0;
+            }
+
         if(!id){
             return
         }
         history.push({
             pathname: match.path + '/detail',
-            state: {id,orderId,offical}
+            state: {id,orderId,offical,isOnly}
         })
     }
   
     render() {
+        let {isLoading,orderList,isNothing} = this.state;
         return (
             <div className={styles.myorder}>  
-                {this.state.orderList.length===0?
+                {isNothing&&!isLoading?
                 <div className ={styles.nothing}>暂无订单</div>
                :
                  <div className={styles.orderList}> 
                     <List.Item className={styles.mb_8+' '+styles.historyTop}>
-                    全部订单 <Icon className={"fr  "+styles.icon} type="up" size ="lg" theme="outlined" onClick={this.toDetail} /></List.Item>
+                    全部订单 <Icon className={"fr  "+styles.icon} type="up" size ="lg" theme="outlined"  /></List.Item>
                     <div className={styles.body} >
-                    {this.state.orderList.map((item,index)=>{
+                  {
+                        orderList.map((item,index)=>{
                         return <div className={styles.hisItem} key ={item.orderNo +index}
                                         onClick={(e)=>{
                                         e.stopPropagation();

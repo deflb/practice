@@ -18,15 +18,22 @@
         }
     }
     &_content{
-        padding: 7px 15px;
-        &_title{
-            margin-bottom: 7px;
-        }
+        padding: 15px;
         :global(.am-list){
-            margin-bottom: 7px;
             .real1px(y, left, y, right);
             :global(.am-list-thumb){
                 margin-right: 5px;
+            }
+        }
+        &_reward{
+            margin-top: 15px;
+            margin-bottom: 7px;
+            >span:first-child{
+                color: @red;
+                margin: 0 15px 0 7px;
+            }
+            >span:last-child{
+                text-decoration: line-through;
             }
         }
         &_extra{
@@ -42,24 +49,5 @@
         color: @white;
         background-color: @red;
         padding: 10px 0;
-    }
-}
-.guide{
-    &_header{
-        display: flex;
-        background-color: @bgGrey;
-        &>li{
-            padding: 9px 15px;
-            color: @red;
-        }
-        &>li:nth-child(2){
-            flex: 1;
-            color: @black;
-            text-align: center;
-        }
-    }
-    p{
-        padding: 7px 0;
-        text-align: center;
     }
 }

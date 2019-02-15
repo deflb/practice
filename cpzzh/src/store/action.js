@@ -1,4 +1,4 @@
-import { SELECTION_CASE, USER_INFO, USER_LEVEL_INFO, GLOBAL_LOADING } from './type';
+import { SELECTION_CASE, USER_INFO, USER_LEVEL_INFO, GLOBAL_LOADING, PAGE_STATUS } from './type';
 import { Toast } from 'antd-mobile';
 import { isObject, pageUrlRegFn } from '../utlis';
 import { request } from '../request';
@@ -35,8 +35,16 @@ const getUserInfo = (history, pathname) => dispatch => {
             request({ url: api.levelInfo }).then(data => {
                 dispatch(_saveUserLevelInfo(data))
             }).catch(err => { })
-        else { // 未验证用户可查看 个人中心 晒家有礼 案例 附近门店 活动 及以上的下属页面
+        else { // 未验证用户可查看 个人中心 我的收藏 我的晒家 我的商机报备 我的消息 在线客服 意见反馈 晒家有礼 晒家详情 案例 案例详情 附近门店 活动 及以上的下属页面
             if (!pageUrlRegFn('/personalCenter').test(pathname)
+                && !pageUrlRegFn('/myCollect').test(pathname)
+                && !pageUrlRegFn('/myShowHome').test(pathname)
+                && !pageUrlRegFn('/myBusinessReport').test(pathname)
+                && !pageUrlRegFn('/myMessage').test(pathname)
+                && !pageUrlRegFn('/onlineCustomService').test(pathname)
+                && !pageUrlRegFn('/suggestionFeedback').test(pathname)
+                && !pageUrlRegFn('/caseDetail').test(pathname)
+                && !pageUrlRegFn('/showHomeDetail').test(pathname)
                 && !pageUrlRegFn('/showHome').test(pathname)
                 && !pageUrlRegFn('/moreCase').test(pathname)
                 && !pageUrlRegFn('/nearbyShop').test(pathname)
@@ -56,9 +64,15 @@ const globalLoadingToggle = data => ({
     data
 })
 
+const setPageStatus = data => ({
+    type: PAGE_STATUS,
+    data
+})
+
 export {
     getSelectionCase,
     getUserInfo,
     saveUserInfo,
-    globalLoadingToggle
+    globalLoadingToggle,
+    setPageStatus
 }

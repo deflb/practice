@@ -3,7 +3,7 @@ import { Route } from 'react-router';
 import asyncC from '../../component/asyncC';
 import CustomListView from '../../component/customListView';
 import TextMaskImageBox from '../../component/textMaskImageBox';
-import SearchBar from './common/searchBar';
+import CustomSearchBar from '../../component/customSearchBar';
 import Filter from './common/filter';
 import { request } from '../../request';
 import api from '../../request/api';
@@ -28,7 +28,7 @@ export default class palette extends Component {
         const { history, match } = this.props;
         history.push({
             pathname: match.path + '/palette',
-            state: rowData
+            state: {id: rowData.id}
         })
     }
     getPaletteClassify = () => {
@@ -94,7 +94,7 @@ export default class palette extends Component {
         } = this.state, { match } = this.props;
         return (
             <div className={styles.wrapper}>
-                <SearchBar
+                <CustomSearchBar
                     placeholder='请输入色板名称'
                     extra={<Filter
                         onRest={() => {

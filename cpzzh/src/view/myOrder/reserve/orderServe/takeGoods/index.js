@@ -5,14 +5,20 @@ import styles from '../index.less'
 import { request } from '../../../../../request';
 import api from '../../../../../request/api';
 import whichImgLink from '../../../../../utlis/whichImgLink';
+import CustomModal from '../../../../../component/customModal';
+const { preview } = CustomModal;
 export default class SendGoods extends Component {
     constructor(props) {
         super(props)
         this.state={
         }
     }
+    componentWillUnmount() {
+        CustomModal.unmountFnDialog();
+    }
     componentDidMount(){
-       
+        let {title } = this.props;
+        document.title = title;
         this.init()
     }
     init=()=>{
@@ -32,12 +38,13 @@ export default class SendGoods extends Component {
           }));  
     }
     render(){
-        let {installInfo={}} = this.state,{state} =this.props;
+        let {installInfo={}} = this.state,
+        {state,title} =this.props;
         return(
             <div className={styles.serveDetails} >
               <List>
                 <List.Item className={styles.historyTop}>
-                    安装信息
+                    {title}
                 </List.Item>
 
               </List>
@@ -69,9 +76,13 @@ export default class SendGoods extends Component {
                 
                 <div style={{minHeight:'60px'}}>
                      <Grid columnNum={3}
-                          itemStyle={{margin:'8px 8px  0 0',height:'75px'}}
+                          itemStyle={{margin:'8px 0 0 8px ',}}
                           renderItem={(el,index)=>{
-                              return <img  alt="" className={styles.iconImg}  key={index+'iconImg3'} src={el.icon}/>
+                              return <img  alt="" width="100%" className={styles.iconImg}  key={index+'iconImg3'}
+                              onClick={()=>{
+                                preview([{url:el.icon}])
+                            }}
+                              src={el.icon}/>
                           }} 
                           hasLine={false}
                          data={this.getPhoto(installInfo.uninstallPhotos)}/>
@@ -92,9 +103,13 @@ export default class SendGoods extends Component {
                 
                 <div style={{minHeight:'60px'}}>
                      <Grid columnNum={3}
-                          itemStyle={{margin:'8px 8px  0 0',height:'75px'}}
+                          itemStyle={{margin:'8px 0 0 8px  ',}}
                           renderItem={(el,index)=>{
-                              return <img  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
+                              return <img  alt="" width="100%" className={styles.iconImg} key={index+'iconImg3'}
+                              onClick={()=>{
+                                preview([{url:el.icon}])
+                            }}
+                              src={el.icon}/>
                           }} 
                           hasLine={false}
                          data={this.getPhoto(installInfo.installingPhotos)} />
@@ -114,9 +129,13 @@ export default class SendGoods extends Component {
                 
                 <div style={{minHeight:'60px'}}>
                      <Grid columnNum={3}
-                          itemStyle={{margin:'8px 8px  0 0',height:'75px'}}
+                          itemStyle={{margin:'8px 0 0 8px ',}}
                           renderItem={(el,index)=>{
-                              return <img  alt="" className={styles.iconImg} key={index+'iconImg3'} src={el.icon}/>
+                              return <img  alt="" width="100%" className={styles.iconImg} key={index+'iconImg3'} 
+                              onClick={()=>{
+                                preview([{url:el.icon}])
+                            }}
+                              src={el.icon}/>
                           }} 
                           hasLine={false}
                          data={this.getPhoto(installInfo.installedPhotos)}/>

@@ -1,0 +1,126 @@
+@import '../../style/mixin.less';
+.container{
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    .content{
+        flex: 1;
+        background: #eeeff8;
+        overflow: hidden auto;
+        .msgContent{
+            background: #fff;
+            padding: 10px 20px;
+            border-radius:24px 24px;
+            margin: 6px 10px 0 10px;
+            
+            border: 1px solid #ccc;
+            box-shadow: 0 0 3px #ccc;
+            word-wrap: break-word;
+        }
+        .attar{
+            width: 48px;
+            position: relative;
+            :global(img){
+                background: #fff;
+                width: 32px;
+                height: 32px;
+                position: absolute;
+                border: 1px solid #ddd;
+                top: 50%-16px;
+                left: 50%;
+                transform: translate(-50%,-50%);
+            }
+        }
+        .leftMsg{
+            margin-top: 16px;
+            float: left;
+            width: 90%;
+            display: flex;
+            justify-content: flex-start;
+            :global(.right){
+                display: none;
+            }
+            .flex1{
+                flex: 1;
+            }
+            .time{
+                text-align: left;
+                padding: 0 20px;
+            }
+        }
+        .rightMsg{
+            margin-top: 16px;
+            float: right;
+            display: flex;
+            justify-content: flex-end;
+            .flex1{
+                flex: 1;
+            }
+            :global(.left){
+                display: none;
+            }
+            .time{
+                text-align: right;
+                padding: 8px 20px;
+            }
+        }
+    }
+   
+}
+.footer{
+    display: flex;
+    padding: 8px 0;
+    .input{
+        flex:1;
+        background: #f4f4f4;
+    }
+    .leftIcon,.rightIcon{
+        width: 32px;
+        height: 32px;
+        border: 1px solid #ccc;
+        border-radius: 50%;
+        margin:8px 16px;
+        position: relative;
+        padding: 4px;
+        .leftImg{
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%,-50%)
+        }
+    }
+    .greenBtn{
+        margin: 8px;
+        background: @green;
+        color:#fff;
+
+    }
+}
+.fileInputbox{
+    position: relative;
+}
+.fileInput{
+    position: absolute;
+     right: 0;
+     top:0;
+     opacity: 0;
+ }
+ .reply{
+    padding:0 10%;
+    padding-top: 32px;
+    :global(.mb-32){
+        margin-bottom: 32px;
+    }
+    :global(label){
+        display: inline-block;
+        width: 15%;
+        color:#83909d;
+        float: left;
+    }
+    .InputItem{
+        border: 1px solid #ddd;
+        padding: 8px 8px;
+    }
+    
+ }
+ 

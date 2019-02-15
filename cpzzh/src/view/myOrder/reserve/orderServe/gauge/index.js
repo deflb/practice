@@ -12,9 +12,12 @@ export default class Gauge extends Component {
         this.state={
            data:{},
            current:1,
+           isLoading:true
         }
     }
     componentDidMount(){
+        let {title } = this.props;
+        document.title = title;
         this.init()
        
     }
@@ -22,14 +25,15 @@ export default class Gauge extends Component {
         let {taskNo,orderNo} =this.props.state;
         request({ url: api.getTaskCompleteInfo, data: {taskNo,orderNo,taskType:"measure"}}).then(res => {
             this.setState({
-                measureInfo:res.measureInfo||[{}]
+                measureInfo:res.measureInfo||[{}],
+                isLoading:false
             })
         })
     }
    
     render(){
-        let {measureInfo=[{}],current} = this.state;
-        let {state} = this.props;
+        let {measureInfo=[{}],current,isLoading} = this.state;
+        let {state,title} = this.props;
         let info = measureInfo[current-1] ||{};
         let {rooms=[]} = info; 
      
@@ -37,14 +41,15 @@ export default class Gauge extends Component {
             <div className={styles.serveDetails}>
               <List>
                 <List.Item className={styles.historyTop}>
-                    量尺信息
+                    {title}
                 </List.Item>
 
               </List>
            
                 <div className={styles.body}>
                     <div className={styles.desc}>
-                        <div><span className="mr-8">{state.execRoleName} :</span> 
+                        <div>
+                        <span className="mr-8">{state.execRoleName} :</span> 
                         <span className={styles.people}>
                         <span className="mr-8">{state.execUserName}</span>
                         <span className="mr-8">{state.mobilePhone}</span>
@@ -69,7 +74,7 @@ export default class Gauge extends Component {
                      <div style={{minHeight:'200px'}}>
                     <div className="tc">{info.unitName}</div>
                     {
-                        !info.unitsPicture?(<div className="tc greyColor">暂无图片</div>):
+                        !info.unitsPicture&&!isLoading?(<div className="tc greyColor">暂无图片</div>):
                          (<img src={info.unitsPicture} width="100%" alt=""/>)
                         }
                     </div>
@@ -87,7 +92,7 @@ export default class Gauge extends Component {
                 />
                 <Card.Body style={{padding:'8px 0'}}>
                     <div style={{minHeight:'200px'}}>
-                    {rooms.length===0?(<div className="tc greyColor">暂无清单</div>):
+                    {rooms.length===0&&!isLoading?(<div className="tc greyColor">暂无清单</div>):
                         rooms.map((item,index)=>{
                             return <div key={item.name+''+index}>
                                      <Title text={item.name} prop={item.prop}/>

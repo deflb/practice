@@ -1,0 +1,30 @@
+@import '../../style/mixin.less';
+.wrapper{
+    .fontSize(normal);
+    .top{
+        display: flex;
+        line-height: 40px;
+        text-align: center;
+        background-color: @bgGrey;
+        >li:first-child{
+            color: @colorGrey;
+            padding: 0 15px;
+            &:active{
+                color: @white;
+                background-color: @colorGrey;
+            }
+        }
+        >li:nth-child(2){
+            flex: 1;
+            color: @blobBlack;
+        }
+        >li:last-child{
+            color: @red;
+            padding: 0 15px;
+            &:active{
+                color: @white;
+                background-color: @red;
+            }
+        }
+    }
+}

@@ -35,7 +35,7 @@ export default class showHomeItem extends Component {
         e.stopPropagation();
         const { rowData, updateLikeCount } = this.props;
         request({ url: api.houseShowLike, data: { id: rowData.id } }).then(res => {
-            Toast.success(res, 0.7);
+            Toast.success('操作成功', 0.7);
             // 更新点赞数
             updateLikeCount()
         }).catch(err => { })

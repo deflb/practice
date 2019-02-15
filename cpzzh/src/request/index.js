@@ -102,6 +102,23 @@ crm3_upload.interceptors.response.use(function (response) {
     return Promise.reject(error);
 })
 
+const base_request = axios.create({ timeout })
+base_request.interceptors.request.use(function (config) {
+    dispatch(globalLoadingToggle(true));
+    return config;
+}, function (error) {
+    return Promise.reject(error);
+})
+base_request.interceptors.response.use(function (response) {
+    dispatch(globalLoadingToggle(false));
+    return response.data;
+}, function (error) {
+    dispatch(globalLoadingToggle(false));
+    let msg = new RegExp('timeout').test(error) ? '请求超时' : '网络错误';
+    Toast.fail(msg, 1);
+    return Promise.reject(error);
+})
+
 const _getPublicKey = (merchantCode, userName) => request_form.post(api.getPublicKey, { merchantCode, userName }).then(res => res).catch(err => null),
     _encodePassword = ({ publicKey, password }) => {
         const crypt = new jsencrypt.JSEncrypt({ default_key_size: 1024 });
@@ -157,5 +174,6 @@ request.getAuthUrl = async () => {
 export {
     request,
     request_form,
-    crm3_upload
+    crm3_upload,
+    base_request
 }

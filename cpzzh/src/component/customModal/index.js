@@ -2,13 +2,14 @@ import React, { Component } from 'react';
 import PropTypes from 'prop-types';
 import ReactDOM from 'react-dom';
 import { createForm } from 'rc-form';
-import { Icon, InputItem, Button, Toast, List } from 'antd-mobile';
+import { Icon, InputItem, Button, Toast, List, Carousel } from 'antd-mobile';
 import { regExp } from '../../utlis';
+import whichImgLink from '../../utlis/whichImgLink';
 import { request } from '../../request';
 import api from '../../request/api';
 import { getUserInfo } from '../../store/action';
 import styles from './index.less';
-const Wrap = ({ children, onClick, className }) => (<div role='dialog' className={className ? `${styles.wrap} ${className}` : styles.wrap} onClick={onClick}>
+const Wrap = ({ children, onClick, className, style }) => (<div role='dialog' style={style} className={className ? `${styles.wrap} ${className}` : styles.wrap} onClick={onClick}>
     {React.cloneElement(children, { onClick: e => { e.stopPropagation() } })}
 </div>);
 
@@ -80,7 +81,8 @@ class CustomModal extends Component {
 // 以下为方法类dialog 简单易用 注意：由于不受生命周期控制，须在调用页面生命周期componentWillUnmount进行卸载
 let alert_container = null,
     withdraw_container = null,
-    verify_container = null;
+    verify_container = null,
+    preview_container = null;
 function unmountAlert() {
     if (alert_container) {
         ReactDOM.unmountComponentAtNode(alert_container)
@@ -102,10 +104,18 @@ function unmountVerify() {
         verify_container = null;
     }
 }
+function unmountPreview() {
+    if (preview_container) {
+        ReactDOM.unmountComponentAtNode(preview_container)
+        document.body.removeChild(preview_container)
+        preview_container = null;
+    }
+}
 function unmountFnDialog() { // 移除所有 供调用页面使用
     unmountAlert();
     unmountWithdraw();
     unmountVerify();
+    unmountPreview();
 };
 CustomModal.unmountFnDialog = unmountFnDialog;
 // 提示
@@ -316,6 +326,16 @@ CustomModal.verify = ({ dispatch, userInfo }) => {
     document.body.appendChild(verify_container);
     ReactDOM.render(<VerifyModal dispatch={dispatch} userInfo={userInfo} />, verify_container);
     return false;
+}
+
+CustomModal.preview = (imgList = []) => { // [{url}]
+    preview_container = document.createElement('div');
+    document.body.appendChild(preview_container);
+    ReactDOM.render(<Wrap onClick={unmountPreview} style={{ backgroundColor: '#000' }}>
+        <Carousel dots={false} autoplay={false}>
+            {imgList.map((item, index) => (<img onClick={unmountPreview} key={index} style={{ display: 'block', width: '100%', height: 'auto' }} src={whichImgLink(item.url)} alt="" onLoad={() => { window.dispatchEvent(new Event('resize')) }} />))}
+        </Carousel>
+    </Wrap>, preview_container);
 }
 
 export default CustomModal;

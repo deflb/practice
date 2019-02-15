@@ -56,6 +56,22 @@ export default connect(state => ({
                 Toast.fail('请填写必填项', 0.7)
         })
     }
+    getDay = (begin, end) => {
+        let seconds = 0, minutes = 0, hours = 0, days = 0;
+        if (begin && end) {
+            // 处理 safari 内核兼容问题
+            const bt = new Date(begin.replace(/\s/, 'T')).getTime(),
+                et = new Date(end.replace(/\s/, 'T')).getTime(),
+                ds = et - bt;
+            if (ds > 0) {
+                seconds = parseInt(ds / 1000 % 60);
+                minutes = parseInt(ds / 1000 / 60 % 60);
+                hours = parseInt(ds / 1000 / 60 / 60 % 24);
+                days = parseInt(ds / 1000 / 60 / 60 / 24);
+            }
+        }
+        return `${days}天${hours}时${minutes}分${seconds}秒`;
+    }
 
     componentWillUnmount() {
         CustomModal.unmountFnDialog();
@@ -72,84 +88,82 @@ export default connect(state => ({
             fieldAddressParam = detail.fieldAddressParam || {},
             { getFieldProps } = this.props.form;
         return (<div className={styles.wrapper}>
-            <div className={styles.wrapper_content}>
-                <div dangerouslySetInnerHTML={{ __html: content }} className={`${styles.wrapper_content_text} rich_text_global`} />
-                {timeStatus === 1 ? <div className={styles.activity_time}>活动时间：{beginTime}-{endTime}</div> : null}
-            </div>
+            <EnabledIosScrollView className={styles.wrapper_content}>
+                <div dangerouslySetInnerHTML={{ __html: content }} style={{ padding: '4px 15px' }} className='rich_text_global' />
+                {timeStatus === 1 ? <div className={styles.activity_time}>活动剩余时间：{this.getDay(beginTime, endTime)}</div> : null}
+            </EnabledIosScrollView>
             <div className={styles.wrapper_footer}>
-                <div className={styles.wrapper_footer_form}>
-                    <EnabledIosScrollView>
-                        <List>
-                            {fieldNameParam.showStatus === 1 ? <InputItem
-                                {...getFieldProps('name', {
-                                    rules: [
-                                        { required: fieldNameParam.requiredStatus === 1 ? true : false },
-                                    ]
-                                })}
-                                clear
-                                placeholder={`请输入您的姓名${fieldNameParam.requiredStatus === 1 ? '(必填)' : ''}`}
-                            /> : null}
-                            {fieldMobileParam.showStatus === 1 ? <InputItem
-                                {...getFieldProps('mobile', {
-                                    rules: [
-                                        { required: fieldMobileParam.requiredStatus === 1 ? true : false },
-                                    ]
-                                })}
-                                type='phone'
-                                clear
-                                placeholder={`请输入您的手机号${fieldMobileParam.requiredStatus === 1 ? '(必填)' : ''}`}
-                            /> : null}
-                            {fieldHousetypeParam.showStatus === 1 ? <InputItem
-                                {...getFieldProps('housetype', {
-                                    rules: [
-                                        { required: fieldHousetypeParam.requiredStatus === 1 ? true : false },
-                                    ]
-                                })}
-                                clear
-                                placeholder={`请输入户型${fieldHousetypeParam.requiredStatus === 1 ? '(必填)' : ''}`}
-                            /> : null}
-                            {fieldAreaParam.showStatus === 1 ? <InputItem
-                                {...getFieldProps('area', {
-                                    rules: [
-                                        { required: fieldAreaParam.requiredStatus === 1 ? true : false },
-                                    ]
-                                })}
-                                clear
-                                placeholder={`请输入面积${fieldAreaParam.requiredStatus === 1 ? '(必填)' : ''}`}
-                            /> : null}
-                            {fieldInstalltimeParam.showStatus === 1 ? <DatePicker
-                                mode='date'
-                                title='预计装修日期'
-                                {...getFieldProps('installtime', {
-                                    rules: [
-                                        { required: fieldInstalltimeParam.requiredStatus === 1 ? true : false },
-                                    ],
-                                })}
-                            >
-                                <List.Item arrow="horizontal">{`预计装修日期${fieldInstalltimeParam.requiredStatus === 1 ? '(必填)' : ''}`}</List.Item>
-                            </DatePicker> : null}
-                            {fieldAddressParam.showStatus === 1 ? <InputItem
-                                {...getFieldProps('address', {
-                                    rules: [
-                                        { required: fieldAddressParam.requiredStatus === 1 ? true : false },
-                                    ]
-                                })}
-                                clear
-                                placeholder={`请输入所在地区${fieldAddressParam.requiredStatus === 1 ? '(必填)' : ''}`}
-                            /> : null}
-                            {fieldBudgetParam.showStatus === 1 ? <InputItem
-                                {...getFieldProps('budget', {
-                                    rules: [
-                                        { required: fieldBudgetParam.requiredStatus === 1 ? true : false },
-                                    ]
-                                })}
-                                type='digit'
-                                clear
-                                placeholder={`请输入购买预算${fieldBudgetParam.requiredStatus === 1 ? '(必填)' : ''}`}
-                            /> : null}
-                        </List>
-                    </EnabledIosScrollView>
-                </div>
+                <EnabledIosScrollView className={styles.wrapper_footer_form}>
+                    <List>
+                        {fieldNameParam.showStatus === 1 ? <InputItem
+                            {...getFieldProps('name', {
+                                rules: [
+                                    { required: fieldNameParam.requiredStatus === 1 ? true : false },
+                                ]
+                            })}
+                            clear
+                            placeholder={`请输入您的姓名${fieldNameParam.requiredStatus === 1 ? '(必填)' : ''}`}
+                        /> : null}
+                        {fieldMobileParam.showStatus === 1 ? <InputItem
+                            {...getFieldProps('mobile', {
+                                rules: [
+                                    { required: fieldMobileParam.requiredStatus === 1 ? true : false },
+                                ]
+                            })}
+                            type='phone'
+                            clear
+                            placeholder={`请输入您的手机号${fieldMobileParam.requiredStatus === 1 ? '(必填)' : ''}`}
+                        /> : null}
+                        {fieldHousetypeParam.showStatus === 1 ? <InputItem
+                            {...getFieldProps('housetype', {
+                                rules: [
+                                    { required: fieldHousetypeParam.requiredStatus === 1 ? true : false },
+                                ]
+                            })}
+                            clear
+                            placeholder={`请输入户型${fieldHousetypeParam.requiredStatus === 1 ? '(必填)' : ''}`}
+                        /> : null}
+                        {fieldAreaParam.showStatus === 1 ? <InputItem
+                            {...getFieldProps('area', {
+                                rules: [
+                                    { required: fieldAreaParam.requiredStatus === 1 ? true : false },
+                                ]
+                            })}
+                            clear
+                            placeholder={`请输入面积${fieldAreaParam.requiredStatus === 1 ? '(必填)' : ''}`}
+                        /> : null}
+                        {fieldInstalltimeParam.showStatus === 1 ? <DatePicker
+                            mode='date'
+                            title='预计装修日期'
+                            {...getFieldProps('installtime', {
+                                rules: [
+                                    { required: fieldInstalltimeParam.requiredStatus === 1 ? true : false },
+                                ],
+                            })}
+                        >
+                            <List.Item arrow="horizontal">{`预计装修日期${fieldInstalltimeParam.requiredStatus === 1 ? '(必填)' : ''}`}</List.Item>
+                        </DatePicker> : null}
+                        {fieldAddressParam.showStatus === 1 ? <InputItem
+                            {...getFieldProps('address', {
+                                rules: [
+                                    { required: fieldAddressParam.requiredStatus === 1 ? true : false },
+                                ]
+                            })}
+                            clear
+                            placeholder={`请输入所在地区${fieldAddressParam.requiredStatus === 1 ? '(必填)' : ''}`}
+                        /> : null}
+                        {fieldBudgetParam.showStatus === 1 ? <InputItem
+                            {...getFieldProps('budget', {
+                                rules: [
+                                    { required: fieldBudgetParam.requiredStatus === 1 ? true : false },
+                                ]
+                            })}
+                            type='digit'
+                            clear
+                            placeholder={`请输入购买预算${fieldBudgetParam.requiredStatus === 1 ? '(必填)' : ''}`}
+                        /> : null}
+                    </List>
+                </EnabledIosScrollView>
                 {buttonName ? <Button type='primary' onClick={this.submit}>{buttonName}</Button> : null}
             </div>
         </div>)

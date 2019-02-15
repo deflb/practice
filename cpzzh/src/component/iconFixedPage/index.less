@@ -1,17 +1,12 @@
 @import '../../style/mixin.less';
-.wrapper{
-    position: relative;
-    height: 100%;
-    overflow: hidden;
-    &_add{
-        position: absolute;
-        bottom: 80px;
-        right: 20px;
-        z-index: 1;
-        width: 60px;
-        height: 60px;
-        background-image: url('../../assets//icon/add@3x.png');
-        background-size: 100% 100%;
-        background-repeat: no-repeat;
-    }
+.add_icon {
+    position: fixed;
+    bottom: 80px;
+    right: 20px;
+    z-index: 100;
+    width: 60px;
+    height: 60px;
+    background-image: url('../../assets//icon/add@3x.png');
+    background-size: 100% 100%;
+    background-repeat: no-repeat;
 }

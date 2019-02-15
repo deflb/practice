@@ -1,0 +1,50 @@
+@import '../../style/mixin.less';
+.wrapper{
+    display: flex;
+    justify-content: center;
+    >li{
+        flex: 1;
+        display: block;
+        position: relative;
+        overflow: hidden;
+        width: 100%;
+        height: 100%;
+        .mask{
+            position: absolute;
+            left: 0;
+            top: 0;
+            height: 100%;
+            margin: 0 auto;
+            width: 100%;
+            z-index: 3;
+            background-image: -webkit-linear-gradient(top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), -webkit-linear-gradient(bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));
+            background-image: linear-gradient(to bottom, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6)), linear-gradient(to top, rgba(255, 255, 255, 0.95), rgba(255, 255, 255, 0.6));
+            background-position: top, bottom;
+            background-repeat: no-repeat;
+        }
+        .indicator{
+            width: 100%;
+            position: absolute;
+            left: 0;
+            z-index: 3;
+            border-top: 1PX solid #999;
+            border-bottom: 1PX solid #999;
+        }
+        .content{
+            position: absolute;
+            left: 0;
+            top: 0;
+            width: 100%;
+            z-index: 1;
+            transition: all 0.1s ease-out;
+            >li{
+                touch-action: manipulation;
+                text-align: center;
+                .fontSize(normal);
+                color: #000;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+        }
+    }
+}

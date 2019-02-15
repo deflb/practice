@@ -37,15 +37,21 @@
 }
 .desc{
     color:#ccc;
-    font-style: 14px;
-    margin-left: 16px;
+    font-style: 12px;
+    &>:global(div){
+        display: flex; 
+    }
+    .flex{
+        display: flex; 
+    }
     .people{
         color:#000;
-        font-size: 14px;
+        font-size: 12px;
+        display: flex;
     }
     .tips{
         color: #ff953c;
-        font-size: 14px;
+        font-size: 12px;
     }
 }
 .header{
@@ -57,16 +63,18 @@
     flex:1;
     overflow-y: auto;
     height: 100%;
+    :global(.am-steps-item-title){
+        width: 100%;
+    }
     .title{
-        width: 200%;
+        display: flex;
         .text{
-            width: 80px;
-            float: left;
-            margin-left: 16px;
+            width: 70%;
         }
         .btnBox{
-            width: 40%;
-            float: left;
+            flex:1;
+            display: flex;
+            float: right;
         }
         .btn{
             float: left;
@@ -75,7 +83,12 @@
             border:1px solid #FF4463;
             margin-right: 4px;
             padding: 0 8px;
+            height: 24px;
+            line-height: 22px;
             border-radius: 50px ;
+        }
+        .pjbtn{
+            padding: 0 16px;
         }
         .yelBtn{
             color:#f90;
@@ -101,7 +114,7 @@
 }
 .labels{
     :global(label){
-        width: 40%;
+        width: 25%;
         display: inline-block;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -116,7 +129,11 @@
         color: #dadada;
         font-weight: normal;
         margin-top: -8px;
-        font-size: @font-size-md;
+        font-size: @font-size-xs;
+        position: absolute;
+        right: 8px;
+        color:#888;
+        width: 24px;
     }
 }
 
@@ -148,7 +165,7 @@
     overflow: hidden;
 }
 .overallView{
-    width:64%;
+    width:62%;
     height:40px;
     line-height:40px;
     color:#fff;
@@ -156,6 +173,14 @@
     text-align:center;
     opacity:0.3;
 }
+.overallbtnBox{
+    width: 36%;
+    margin-left: 1%;
+    height:40px;
+    line-height:40px;
+    padding-top: 4px;
+}
+
 
 .nothing{
     text-align: center;

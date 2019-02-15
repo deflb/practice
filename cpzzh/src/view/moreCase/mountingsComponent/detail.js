@@ -4,29 +4,49 @@ import InfoList from '../../../component/infoList';
 import CustomWhiteSpace from '../../../component/customWhiteSpace';
 import CustomCarousel from '../../../component/customCarousel';
 import hasTransformFullScreen from '../../../component/fullScreen/hasTransformFullScreen';
-import EnabledIosScrollView from '../../../component/enabledIosScrollView/simple';
+import EnabledIosScrollViewSimple from '../../../component/enabledIosScrollView/simple';
+import TitleContent from '../../../component/titleContent';
 import { request } from '../../../request';
 import api from '../../../request/api';
+import { getLocationSearch, wholeUrl } from "../../../utlis";
+import wx from 'weixin-js-sdk';
+import wxConfig from '../../../utlis/wxConfig';
+import whichImgLink from '../../../utlis/whichImgLink';
 
 export default hasTransformFullScreen(class mountingsDetail extends Component {
     state = {
         detail: {}
     }
 
-    componentDidMount() {
+    componentWillMount() {
+        document.title = '配件详情';
         const { location } = this.props,
             { state = {} } = location,
-            { id } = state;
+            id = state.id || getLocationSearch('id');
         if (id)
             request({ url: api.partDetail, data: { id } }).then(res => {
+                const { location } = this.props, { pathname } = location;
+                wxConfig({ wx, jsApiList: ['updateTimelineShareData', 'updateAppMessageShareData'] }).then(() => {
+                    wx.updateTimelineShareData({
+                        title: '配件详情',
+                        link: wholeUrl(pathname + `?id=${res.id}`),
+                        imgUrl: whichImgLink(res.surfacePlotUrl)
+                    })
+                    wx.updateAppMessageShareData({
+                        title: '配件详情',
+                        desc: res.name,
+                        link: wholeUrl(pathname + `?id=${res.id}`),
+                        imgUrl: whichImgLink(res.surfacePlotUrl)
+                    })
+                })
                 this.setState({ detail: res })
-            }).catch(err => {  })
+            }).catch(err => { })
     }
 
     render() {
         const { detail } = this.state,
             { name, imgUrlList = [], details, brandname, sortname, specification } = detail;
-        return <EnabledIosScrollView>
+        return <EnabledIosScrollViewSimple>
             <CustomCarousel
                 source={imgUrlList}
             />
@@ -43,14 +63,9 @@ export default hasTransformFullScreen(class mountingsDetail extends Component {
                 </Card.Body>
             </Card>
             <CustomWhiteSpace />
-            <Card full>
-                <Card.Header
-                    title="详情"
-                />
-                <Card.Body>
-                    <div dangerouslySetInnerHTML={{ __html: details }} className='rich_text_global' />
-                </Card.Body>
-            </Card>
-        </EnabledIosScrollView>
+            <TitleContent title='产品详情'>
+                <div dangerouslySetInnerHTML={{ __html: details }} style={{ padding: '7px 15px 0' }} className='rich_text_global' />
+            </TitleContent>
+        </EnabledIosScrollViewSimple>
     }
 })

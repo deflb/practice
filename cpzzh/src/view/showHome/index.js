@@ -1,9 +1,7 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router';
 import { connect } from 'react-redux';
 import CustomListView from '../../component/customListView';
 import TypesClassifySelect from '../../component/typesClassifySelect';
-import asyncC from '../../component/asyncC';
 import IconFixedPage from '../../component/iconFixedPage';
 import CustomSearchBar from '../../component/customSearchBar';
 import ShowHomeItem from '../../component/itemPreView/showHomeItem';
@@ -11,8 +9,7 @@ import CustomModal from '../../component/customModal';
 import { request } from '../../request';
 import api from '../../request/api';
 import styles from './index.less';
-const AddOrEdit = asyncC(() => import('./addOrEdit'));
-const Detail = asyncC(() => import('./detail'));
+import routerBase from '../../router/routerBase';
 
 export default connect(state => ({
     userInfo: state.userInfo
@@ -71,9 +68,9 @@ export default connect(state => ({
     }
 
     add = () => {
-        let { userInfo, dispatch, match, history } = this.props;
+        let { userInfo, dispatch, history } = this.props;
         if (CustomModal.verify({ dispatch, userInfo }))
-            history.push(match.path + '/add')
+            history.push(routerBase + '/addShowHome')
     }
 
     addComplete = () => {
@@ -82,7 +79,7 @@ export default connect(state => ({
     }
 
     updateCurrentItem = (field, index) => { // viewCount commentCount likeCount
-        if (!field) return;
+        if (!field || (!index && index !== 0)) return;
         const { dataBlobs } = this.state,
             _dataBlobs = [...dataBlobs],
             currentRow = { ..._dataBlobs[index] };
@@ -100,13 +97,13 @@ export default connect(state => ({
         this.setState({ dataBlobs: _dataBlobs })
     }
 
-    componentWillUnmount(){
+    componentWillUnmount() {
         CustomModal.unmountFnDialog();
     }
 
     render() {
         const { dataBlobs, loading, refreshing } = this.state,
-            { match, history } = this.props;
+            { history } = this.props;
         return (<IconFixedPage onAdd={this.add}>
             <div className={styles.wrapper}>
                 <CustomSearchBar
@@ -135,7 +132,7 @@ export default connect(state => ({
                         style={{ marginBottom: 10 }}
                         rowClick={() => {
                             history.push({
-                                pathname: match.path + '/detail',
+                                pathname: routerBase + '/showHomeDetail',
                                 state: { index, id: rowData.id }
                             })
                         }}
@@ -143,8 +140,6 @@ export default connect(state => ({
                         updateLikeCount={this.updateCurrentItem.bind(this, 'likeCount', index)}
                     />)}
                 />
-                <Route path={match.path + '/add'} render={props => <AddOrEdit {...props} onComplete={this.addComplete} />} />
-                <Route path={match.path + '/detail'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} />} />
             </div>
         </IconFixedPage>)
     }

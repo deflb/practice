@@ -11,9 +11,9 @@ export default class iconFixedPage extends Component {
     }
     render() {
         let { children, onAdd } = this.props;
-        return (<div className={styles.wrapper}>
+        return (<React.Fragment>
             {children}
-            <i className={styles.wrapper_add} onClick={onAdd} />
-        </div>)
+            <i className={styles.add_icon} onClick={onAdd} />
+        </React.Fragment>)
     }
 }

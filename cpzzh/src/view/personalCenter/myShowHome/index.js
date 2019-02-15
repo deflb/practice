@@ -1,8 +1,6 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router';
 import { connect } from 'react-redux';
 import { Toast } from 'antd-mobile';
-import asyncC from '../../../component/asyncC';
 import CustomListView from '../../../component/customListView';
 import IconFixedPage from '../../../component/iconFixedPage';
 import LeftDragDelete from '../../../component/leftDragDelete';
@@ -10,8 +8,7 @@ import ShowHomeItem from '../../../component/itemPreView/showHomeItem';
 import CustomModal from '../../../component/customModal';
 import { request } from '../../../request';
 import api from '../../../request/api';
-const AddOrEdit = asyncC(() => import('../../showHome/addOrEdit'));
-const Detail = asyncC(() => import('../../showHome/detail'));
+import routerBase from '../../../router/routerBase';
 
 export default connect(state => ({
     userInfo: state.userInfo
@@ -77,9 +74,9 @@ export default connect(state => ({
     }
 
     add = () => {
-        let { userInfo, dispatch, match, history } = this.props;
+        let { userInfo, dispatch, history } = this.props;
         if (CustomModal.verify({ dispatch, userInfo }))
-            history.push(match.path + '/add')
+            history.push(routerBase + '/addShowHome')
     }
 
     addComplete = () => {
@@ -125,10 +122,10 @@ export default connect(state => ({
 
     render() {
         const { dataBlobs, loading, refreshing } = this.state,
-            { match, history } = this.props;
+            { history } = this.props;
         return (<IconFixedPage onAdd={this.add}>
             <CustomListView
-                style={{ height: '100%' }}
+                useBodyScroll
                 loading={loading}
                 data={dataBlobs}
                 onEndReached={this.onEndReached}
@@ -149,7 +146,7 @@ export default connect(state => ({
                     <ShowHomeItem
                         rowClick={() => {
                             history.push({
-                                pathname: match.path + '/detail',
+                                pathname: `${routerBase}/showHomeDetail/?id=${rowData.id}`,
                                 state: { index, id: rowData.id, auditStatus: rowData.auditStatus }
                             })
                         }}
@@ -158,9 +155,6 @@ export default connect(state => ({
                     />
                 </LeftDragDelete>)}
             />
-            <Route path={match.path + '/add'} render={props => <AddOrEdit {...props} onComplete={this.addComplete} />} />
-            <Route path={match.path + '/detail'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} parentPath={match.path} />} />
-            <Route path={match.path + '/edit'} render={props => <AddOrEdit {...props} onComplete={this.backToList} />} />
         </IconFixedPage>)
     }
 })

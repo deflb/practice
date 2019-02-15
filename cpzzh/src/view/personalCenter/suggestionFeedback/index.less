@@ -1,13 +1,8 @@
 @import '../../../style/mixin.less';
-.wrapper{
-    height: 100%;
-    background-color: @bgGrey;
-    overflow-y: auto;
-    &_upload_header{
-        .fontSize(title);
-        &_tip{
-            .fontSize(text);
-            color: @shallowGrey;
-        }
+.upload_header {
+    .fontSize(title);
+    &_tip {
+        .fontSize(text);
+        color: @shallowGrey;
     }
 }

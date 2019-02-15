@@ -1,14 +1,12 @@
 import React, { Component } from 'react';
-import { Route } from 'react-router';
 import { Toast } from 'antd-mobile';
 import CustomListView from '../../../component/customListView';
 import LeftDragDelete from '../../../component/leftDragDelete';
 import ShowHomeItem from '../../../component/itemPreView/showHomeItem';
 import CustomModal from '../../../component/customModal';
-import asyncC from '../../../component/asyncC';
 import { request } from '../../../request';
 import api from '../../../request/api';
-const Detail = asyncC(() => import('../../showHome/detail'));
+import routerBase from '../../../router/routerBase';
 
 export default class caseCollect extends Component {
     constructor(props) {
@@ -64,7 +62,7 @@ export default class caseCollect extends Component {
 
     updateList = () => {
         const { dataBlobs } = this.state,
-            len = dataBlobs.length;
+            len = dataBlobs.length + 1;
         request({ url: api.myHouseShowCollect, data: { pageNo: 1, pageSize: len } }).then(res => {
             const { list, pageTurn } = res,
                 { rowCount } = pageTurn;
@@ -78,13 +76,13 @@ export default class caseCollect extends Component {
     del = id => {
         request({ url: api.houseShowCollect, data: { id } }).then(res => {
             this.setState({ visible: false });
-            Toast.success(res, 0.7);
+            Toast.success('操作成功', 0.7);
             this.updateList()
         }).catch(err => { })
     }
 
     updateCurrentItem = (field, index) => { // viewCount commentCount likeCount
-        if (!field) return;
+        if (!field || (!index && index !== 0)) return;
         const { dataBlobs } = this.state;
         if (dataBlobs.length) {
             const _dataBlobs = [...dataBlobs],
@@ -110,40 +108,37 @@ export default class caseCollect extends Component {
 
     render() {
         const { dataBlobs, loading, refreshing } = this.state,
-            { match, history } = this.props;
-        return (<div style={{ height: '100%' }}>
-            <CustomListView
-                style={{ height: '100%' }}
-                loading={loading}
-                data={dataBlobs}
-                onEndReached={this.onEndReached}
-                refreshing={refreshing}
-                onRefresh={this.onRefresh}
-                renderRow={(rowData, sectionID, index) => (<LeftDragDelete
-                    key={rowData.id}
-                    style={{ marginBottom: 10 }}
-                    onClick={() => {
-                        CustomModal.alert({
-                            message: '确认删除?', actions: [
-                                { text: '取消' },
-                                { text: '确认', onPress: this.del.bind(this, rowData.id) }
-                            ]
+            { history } = this.props;
+        return (<CustomListView
+            style={{ height: '100%' }}
+            loading={loading}
+            data={dataBlobs}
+            onEndReached={this.onEndReached}
+            refreshing={refreshing}
+            onRefresh={this.onRefresh}
+            renderRow={(rowData, sectionID, index) => (<LeftDragDelete
+                key={rowData.id}
+                style={{ marginBottom: 10 }}
+                onClick={() => {
+                    CustomModal.alert({
+                        message: '确认删除?', actions: [
+                            { text: '取消' },
+                            { text: '确认', onPress: this.del.bind(this, rowData.id) }
+                        ]
+                    })
+                }}
+            >
+                <ShowHomeItem
+                    rowClick={() => {
+                        history.push({
+                            pathname: `${routerBase}/showHomeDetail/?id=${rowData.id}`,
+                            state: { index, id: rowData.id }
                         })
                     }}
-                >
-                    <ShowHomeItem
-                        rowClick={() => {
-                            history.push({
-                                pathname: match.path + '/showHomeDetail',
-                                state: { index, id: rowData.id }
-                            })
-                        }}
-                        rowData={rowData}
-                        updateLikeCount={this.updateCurrentItem.bind(this, 'likeCount', index)}
-                    />
-                </LeftDragDelete>)}
-            />
-            <Route path={match.path + '/showHomeDetail'} render={props => <Detail {...props} updateCurrentItem={this.updateCurrentItem} collectBack={this.updateList} />} />
-        </div>);
+                    rowData={rowData}
+                    updateLikeCount={this.updateCurrentItem.bind(this, 'likeCount', index)}
+                />
+            </LeftDragDelete>)}
+        />);
     }
 }

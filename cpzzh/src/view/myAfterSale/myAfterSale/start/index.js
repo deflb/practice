@@ -9,7 +9,8 @@ export default class myAfterSale extends Component {
     state = {
         historyList:[],
         orderId:'',
-        orderNo:''
+        orderNo:'',
+        isLoading:true
     }
     componentWillMount(){
         this.init();
@@ -19,7 +20,7 @@ export default class myAfterSale extends Component {
         this.setState({
             isLoading:true
         })
-        request({ url: api.getStoreList, data: { pageNo: 1, pageSize: 1000000 } }).then(res => {
+        request({ url: api.getStoreList, data: { pageNo: 1, pageSize: 100 } }).then(res => {
             const { list } = res;
             this.setState({ historyList: list||[],isLoading:false })
         }).catch(err => { console.log(err)
@@ -70,9 +71,9 @@ export default class myAfterSale extends Component {
     }
    
     render() {
-        let {historyList} =this.state;
+        let {historyList,isLoading} =this.state;
         return (<div className={styles.myAfterSale}>  
-                {historyList.length===0?
+                {historyList.length===0&&!isLoading?
                
                     <div className ={styles.nothing}>
                     <img src={nothingImg} alt="" width="150"/></div>
